@@ -1,0 +1,6 @@
+{
+  "pfx": {
+    "path": "/path/to/key.pfx",
+    "pass": "passphrase"
+  }
+}

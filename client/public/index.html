@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>LIMO</title>
+    <!-- bower:js -->
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/async/lib/async.js"></script>
+    <script src="bower_components/handlebars/handlebars.js"></script>
+    <!-- endbower -->
+    <script src="//vk.com/js/api/xd_connection.js?2" type="text/javascript"></script>
+    <script src="remote.js" type="text/javascript"></script>
+    <script src="util.js" type="text/javascript"></script>
+    <script src="templates.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        var runParams;
+
+        var user;
+
+        //vk request
+
+        function getPhotosRequest(user, cb) {
+            doPublicVKRequest('photos.get', {
+                owner_id: user,
+                album_id: 'profile',
+                rev: 1,
+                count: 10
+            }, cb);
+        }
+
+        function processGetPhotosResponse(response) {
+            return response.items.map(function (photo) {
+                return photo.id;
+            });
+        }
+
+        getPhotos = async.seq(getPhotosRequest, async.asyncify(processGetPhotosResponse));
+
+        //--
+
+        function getLikersRequest(user, photo, cb) {
+            doPublicVKRequest('likes.getList', {
+                type: 'photo',
+                owner_id: user,
+                item_id: photo,
+                count: 100
+            }, cb);
+        }
+
+        function processGetLikersResponse(response) {
+            return (response.count > 100) ? [-100] : response.items;
+        }
+
+        getLikers = async.seq(getLikersRequest, async.asyncify(processGetLikersResponse));
+        
+        //--
+
+        function getUsersRequest(users, cb) {
+            doPublicVKRequest('users.get', {
+                user_ids: users.join(),
+                fields: ['photo_50','domain'].join(),
+                name_case: 'dat',
+                count: 1000
+            }, cb);
+        }
+
+        function processGetUsersResponse(response) {
+            return createFieldMap(response, 'id');
+        }
+
+        getUsers = async.seq(getUsersRequest, async.asyncify(processGetUsersResponse));
+
+        //--
+
+        function getPhotosDataRequest(user, photos, cb) {
+            var photosFullIds = photos.map(function (photo) {
+                return user + '_' + photo;
+            });
+
+            doPublicVKRequest('photos.getById', {
+                photos: photosFullIds
+            }, cb);
+        }
+
+        function processGetPhotosDataResponse(response) {
+            return createFieldMap(response, 'id');
+        }
+
+        getPhotosData = async.seq(getPhotosDataRequest, async.asyncify(processGetPhotosDataResponse));
+
+        //create data object
+
+        function createPhotoObject(photo, likers) {
+            return {
+                photo_id: photo,
+                likers: likers
+            };
+        }
+
+        function createDataObject(user, photos) {
+            return {
+                user_id: user,
+                photos: photos
+            };
+        }
+
+        //
+
+        function getPhotoObject(user, photo, cb) {
+            async.waterfall([
+                async.apply(getLikers, user, photo),
+                async.apply(async.asyncify(createPhotoObject), photo)
+            ], cb);
+        }
+
+        function getPhotoListObject(user, cb) {
+            var getUserPhotos = async.apply(getPhotos, user);
+            var getUserPhotoObject = async.apply(getPhotoObject, user);
+
+            async.waterfall([
+                getUserPhotos,
+                function (photos, cb) {
+                    async.concat(photos, getUserPhotoObject, cb);
+                }
+            ], cb);
+        }
+
+        function getVKData(user, cb) {
+            async.waterfall([
+                async.apply(getPhotoListObject, user),
+                async.apply(async.asyncify(createDataObject), user)
+            ], cb);
+        }
+
+        //server request
+
+        function sendServerObject(data, cb) {
+            doServerRequest(data, cb);
+        }
+
+        function processServerResponse(response) {
+            return response;
+        }
+
+        var getServerData = async.seq(sendServerObject, async.asyncify(processServerResponse));
+
+        //
+
+        function processServerData(user, data, cb) {
+            if (data.length == 0) {
+                cb(null, []);
+                return;
+            }
+
+            var photos = [];
+            var users = [];
+
+            data.forEach(function (photo) {
+                photos.push(photo.photo_id);
+                users.push(photo.unlikers);
+            });
+
+            async.parallel({
+                photos: async.apply(getPhotosData, user, photos),
+                users: async.apply(getUsers, users)
+            }, function (error, response) {
+                if (error) return cb(error);
+
+                var result = [];
+                
+                data.forEach(function (photo) {
+                    photo.unlikers.forEach(function (user) {
+                        var item = {
+                            photo: response.photos[photo.photo_id],
+                            user: response.users[user]
+                        };
+                        result.push(item);
+                    });
+                });
+
+                console.log(response, result);
+
+                cb(null, result);
+            })
+        }
+
+        //
+
+        process = async.seq(getVKData, getServerData);
+
+        function load() {
+            $('#feed_progress').css('display', 'block');
+            $('#feed_empty').css('display', 'block');
+            $('#feed_new_posts').css('display', 'none');
+            $('#feed_rows').empty();
+
+            async.waterfall([
+                async.apply(process, user),
+                async.apply(processServerData, user),
+                async.asyncify(showItems)
+            ], function (error, response) {
+                $('#feed_progress').css('display', 'none');
+                $('#feed_new_posts').css('display', 'block');
+            });
+        }
+
+        //----
+
+        $(document).ready(init);
+
+        function showItems(items) {
+            if (items.length > 0) {
+                $('#feed_empty').css('display', 'none');
+            }
+
+            items.forEach(function (item) {
+                $('#feed_rows').append(Template.item(item));
+            });
+        }
+
+        function init() {
+            runParams = getUrlVars();
+
+            user = runParams.viewer_id;
+
+            console.log('runParams:', runParams);
+
+            $('#page_wrap').load('page.html', null, function () {
+                $('#feed_new_posts').click(function () {
+                    load();
+                });
+
+                $('#show_more_link').css('display', 'none');
+
+                load();
+            });
+        }
+    </script>
+    <script src="//vk.com/js/al/feed.js?410" type="text/javascript"></script>
+    <script src="//vk.com/js/al/page.js?941" type="text/javascript"></script>
+    <link rel='stylesheet' type='text/css' href='//vk.com/css/al/common.css?511'>
+    <link rel='stylesheet' type='text/css' href='//vk.com/css/al/feed.css?239'>
+    <link rel='stylesheet' type='text/css' href='//vk.com/css/al/page.css?789'>
+    <link rel='stylesheet' type='text/css' href='vk-override.css'>
+</head>
+<body>
+    <div id="page_wrap"></div>
+</body>
+</html>

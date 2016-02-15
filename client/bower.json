@@ -1,0 +1,15 @@
+{
+  "name": "limo-client",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^2.2.0",
+    "async": "^1.5.2",
+    "handlebars": "^4.0.5"
+  }
+}
