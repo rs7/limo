@@ -42,6 +42,14 @@ app.use(morgan('dev'));
 
 app.use(function (err, req, res, next) { res.status(500).send({error: err.message}); });
 
+//auth
+
+var md5 = require('md5');
+
+function authCheck(user, authKey) {
+	return authKey == md5(nconf.get('app:id') + '_' + user + '_' + nconf.get('app:secret'));
+}
+
 //https
 
 var https = require('https');
@@ -57,6 +65,10 @@ https.createServer(httpsOptions, app).listen(433);
 
 app.post('/', function (req, res, next) {
 	console.log(req.body);
+
+	if (!authCheck(req.body.user_id, req.body.auth_key)) {
+		return next({message: 'auth error'});
+	}
 
 	var clientUser = new User(req.body);
 

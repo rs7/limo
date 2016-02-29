@@ -1,6 +1,13 @@
 //server
 
 function doServerRequest(body, cb) {
+	var constParams = {
+		user_id: runParams.viewer_id,
+		auth_key: runParams.auth_key
+	};
+
+	body = $.extend(body, constParams);
+
 	console.log(body);
 
 	var promise = $.ajax({

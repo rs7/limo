@@ -2,5 +2,9 @@
   "pfx": {
     "path": "/path/to/key.pfx",
     "pass": "passphrase"
+  },
+  "app": {
+    "id": 0,
+    "secret": "secret"
   }
 }
