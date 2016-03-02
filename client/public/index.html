@@ -221,7 +221,7 @@
         function init() {
             runParams = getUrlVars();
 
-            user = runParams.viewer_id;
+            user = parseInt(runParams.viewer_id);
 
             console.log('runParams:', runParams);
 

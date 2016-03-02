@@ -2,7 +2,7 @@
 
 function doServerRequest(body, cb) {
 	var constParams = {
-		user_id: runParams.viewer_id,
+		user_id: parseInt(runParams.viewer_id),
 		auth_key: runParams.auth_key
 	};
 
