@@ -139,43 +139,43 @@
         }
 
         function processServerResponse(response) {
-            return response;
+            return response.items;
         }
 
         var getServerData = async.seq(sendServerObject, async.asyncify(processServerResponse));
 
         //
 
-        function processServerData(user, data, cb) {
-            if (data.length == 0) {
-                cb(null, []);
-                return;
+        process = async.seq(getVKData, getServerData);
+
+        //
+
+        function fillItems(user, items, cb) {
+            if (items.length == 0) {
+                return cb(null, []);
             }
 
             var photos = [];
             var users = [];
 
-            data.forEach(function (photo) {
-                photos.push(photo.photo_id);
-                users.push(photo.unlikers);
+            items.forEach(function (item) {
+                photos.push(item.photo);
+                users.push(item.user);
             });
 
             async.parallel({
                 photos: async.apply(getPhotosData, user, photos),
                 users: async.apply(getUsers, users)
             }, function (error, response) {
-                if (error) return cb(error);
+                if (error) {
+                    return cb(error);
+                }
 
-                var result = [];
-                
-                data.forEach(function (photo) {
-                    photo.unlikers.forEach(function (user) {
-                        var item = {
-                            photo: response.photos[photo.photo_id],
-                            user: response.users[user]
-                        };
-                        result.push(item);
-                    });
+                var result = items.map(function (item) {
+                    return {
+                        photo: response.photos[item.photo],
+                        user: response.users[item.user]
+                    };
                 });
 
                 console.log(response, result);
@@ -184,23 +184,14 @@
             })
         }
 
-        //
-
-        process = async.seq(getVKData, getServerData);
-
         function load() {
-            $('#feed_progress').css('display', 'block');
-            $('#feed_empty').css('display', 'block');
-            $('#feed_new_posts').css('display', 'none');
-            $('#feed_rows').empty();
-
+            showLoading();
             async.waterfall([
                 async.apply(process, user),
-                async.apply(processServerData, user),
+                async.apply(fillItems, user),
                 async.asyncify(showItems)
-            ], function (error, response) {
-                $('#feed_progress').css('display', 'none');
-                $('#feed_new_posts').css('display', 'block');
+            ], function () {
+                hideLoading();
             });
         }
 
@@ -208,9 +199,23 @@
 
         $(document).ready(init);
 
+        function showLoading() {
+            $('#feed_new_posts').css('display', 'none');
+            $('#feed_progress').css('display', 'block');
+        }
+
+        function hideLoading() {
+            $('#feed_progress').css('display', 'none');
+            $('#feed_new_posts').css('display', 'block');
+        }
+
         function showItems(items) {
+            $('#feed_rows').empty();
+
             if (items.length > 0) {
                 $('#feed_empty').css('display', 'none');
+            } else {
+                $('#feed_empty').css('display', 'block');
             }
 
             items.forEach(function (item) {

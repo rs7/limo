@@ -12,6 +12,11 @@ mongoose.connect('mongodb://localhost/limo');
 
 //schema
 
+var historySchema = mongoose.Schema({
+	photo: Number,
+	user: Number
+}, {strict: true});
+
 var photoSchema = mongoose.Schema({
 	photo_id: {type: Number, required: true},
 	likers: {type: [Number], default: []}
@@ -19,7 +24,8 @@ var photoSchema = mongoose.Schema({
 
 var userSchema = mongoose.Schema({
 	user_id: {type: Number, required: true},
-	photos: {type: [photoSchema], required: true}
+	photos: {type: [photoSchema], required: true},
+	history: {type: [historySchema], default: []}
 }, {strict: true});
 
 var User = mongoose.model('User', userSchema);
@@ -66,39 +72,51 @@ https.createServer(httpsOptions, app).listen(433);
 app.post('/', function (req, res, next) {
 	console.log(req.body);
 
-	if (!authCheck(req.body.user_id, req.body.auth_key)) {
+	var input = req.body;
+
+	if (!authCheck(input.user_id, input.auth_key)) {
 		return next({message: 'auth error'});
 	}
 
-	var clientUser = new User(req.body);
-
-	var err = clientUser.validateSync();
-	if (err) return next(err);
-
-	User.findOneAndRemove({user_id: clientUser.user_id}, function (err, serverUser) {
+	User.findOne({user_id: input.user_id}, function (err, userVO) {
 		if (err) return next(err);
 
-		var result = findUnlikers(clientUser, serverUser);
+		if (!userVO) {
+			userVO = new User({
+				user_id: input.user_id
+			});
+		}
 
-		clientUser.save(function (err) {
+		findUnlikers(input.photos, userVO.photos).forEach(function (photo) {
+			photo.unlikers.forEach(function (user) {
+				var item = {
+					photo: photo.photo_id,
+					user: user
+				};
+				userVO.history.push(item);
+			});
+		});
+
+		var response = {
+			items: userVO.history
+		};
+
+		userVO.photos = input.photos;
+
+		userVO.save(function (err) {
 			if (err) return next(err);
 
-			var responseBody = {response: result};
+			console.log(response);
 
-			console.log(responseBody);
-
-			res.json(responseBody);
+			res.json({response: response});
 		});
 	});
 });
 
 //logic
 
-function findUnlikers(clientUser, serverUser) {
-	if (!serverUser) return [];
-
-	var clientPhotos = clientUser.photos;
-	var serverPhotos = serverUser.photos;
+function findUnlikers(clientPhotos, serverPhotos) {
+	if (!serverPhotos) return [];
 
 	var unlikePhotos = [];
 
