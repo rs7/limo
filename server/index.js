@@ -48,6 +48,14 @@ app.use(bodyParser.json());
 
 app.use(morgan('dev'));
 
+app.use(function (req, res, next) {
+	if (authCheck(req.body.user_id, req.body.auth_key)) {
+		return next();
+	}
+
+	res.status(403).json({error: 'auth error'});
+});
+
 app.use(function (err, req, res, next) { res.status(500).send({error: err.message}); });
 
 //auth
@@ -75,10 +83,6 @@ app.post('/', function (req, res, next) {
 	console.log(req.body);
 
 	var input = req.body;
-
-	if (!authCheck(input.user_id, input.auth_key)) {
-		return next({message: 'auth error'});
-	}
 
 	User.findOne({user_id: input.user_id}, function (err, userVO) {
 		if (err) return next(err);
