@@ -131,10 +131,5 @@ function findUnlikers(clientPhotos, serverPhotos) {
 		});
 	});
 
-	//todo: remove this debug data
-	unlikePhotos.push({
-		photo_id: 358693393, unlikers: [176778820,209991765,53083705]
-	});
-
 	return unlikePhotos;
 }
