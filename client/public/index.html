@@ -134,19 +134,9 @@
 
         //server request
 
-        function sendServerObject(data, cb) {
+        function getServerData(data, cb) {
             doServerRequest(data, cb);
         }
-
-        function processServerResponse(response) {
-            return response.items;
-        }
-
-        var getServerData = async.seq(sendServerObject, async.asyncify(processServerResponse));
-
-        //
-
-        process = async.seq(getVKData, getServerData);
 
         //
 
@@ -174,7 +164,8 @@
                 var result = items.map(function (item) {
                     return {
                         photo: response.photos[item.photo],
-                        user: response.users[item.user]
+                        user: response.users[item.user],
+                        date: new Date(item.date)
                     };
                 });
 
@@ -187,9 +178,17 @@
         function load() {
             showLoading();
             async.waterfall([
-                async.apply(process, user),
-                async.apply(fillItems, user),
-                async.asyncify(showItems)
+                async.apply(getVKData, user),
+                getServerData,
+                function (response, cb) {
+                    async.waterfall([
+                        async.apply(fillItems, user, response.items),
+                        function (items, cb) {
+                            showItems(items, new Date(response.last_seen));
+                            cb();
+                        }
+                    ], cb);
+                }
             ], function () {
                 hideLoading();
             });
@@ -209,8 +208,10 @@
             $('#feed_new_posts').css('display', 'block');
         }
 
-        function showItems(items) {
-            $('#feed_rows').empty();
+        function showItems(items, lastSeen) {
+            var unreadBar = $('#feedback_unread_bar'); 
+            unreadBar.prevAll().remove();
+            unreadBar.nextAll().remove();
 
             if (items.length > 0) {
                 $('#feed_empty').css('display', 'none');
@@ -219,7 +220,11 @@
             }
 
             items.forEach(function (item) {
-                $('#feed_rows').append(Template.item(item));
+                if (item.date > lastSeen) {
+                    unreadBar.before(Template.item(item));
+                } else {
+                    unreadBar.after(Template.item(item));
+                }
             });
         }
 

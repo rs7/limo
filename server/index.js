@@ -14,7 +14,8 @@ mongoose.connect('mongodb://localhost/limo');
 
 var historySchema = mongoose.Schema({
 	photo: Number,
-	user: Number
+	user: Number,
+	date: {type: Date, required: true}
 }, {strict: true});
 
 var photoSchema = mongoose.Schema({
@@ -25,6 +26,7 @@ var photoSchema = mongoose.Schema({
 var userSchema = mongoose.Schema({
 	user_id: {type: Number, required: true},
 	photos: {type: [photoSchema], required: true},
+	last_seen: {type: Date, required: true},
 	history: {type: [historySchema], default: []}
 }, {strict: true});
 
@@ -83,7 +85,8 @@ app.post('/', function (req, res, next) {
 
 		if (!userVO) {
 			userVO = new User({
-				user_id: input.user_id
+				user_id: input.user_id,
+				last_seen: new Date(0)
 			});
 		}
 
@@ -91,17 +94,20 @@ app.post('/', function (req, res, next) {
 			photo.unlikers.forEach(function (user) {
 				var item = {
 					photo: photo.photo_id,
-					user: user
+					user: user,
+					date: new Date()
 				};
 				userVO.history.push(item);
 			});
 		});
 
 		var response = {
-			items: userVO.history
+			items: userVO.history,
+			last_seen: userVO.last_seen
 		};
 
 		userVO.photos = input.photos;
+		userVO.last_seen = new Date();
 
 		userVO.save(function (err) {
 			if (err) return next(err);
