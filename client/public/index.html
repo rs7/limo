@@ -177,6 +177,7 @@
 
         function load() {
             showLoading();
+            clearItems();
             async.waterfall([
                 async.apply(getVKData, user),
                 getServerData,
@@ -208,23 +209,44 @@
             $('#feed_new_posts').css('display', 'block');
         }
 
-        function showItems(items, lastSeen) {
-            var unreadBar = $('#feedback_unread_bar'); 
+        function clearItems() {
+            var unreadBar = $('#feedback_unread_bar');
+            unreadBar.css('display', 'none');
             unreadBar.prevAll().remove();
             unreadBar.nextAll().remove();
 
+            $('#feed_empty').css('display', 'block');
+        }
+
+        function showItems(items, lastSeen) {
+            items.sort(function(a, b) {
+                return b.date - a.date;
+            });
+
             if (items.length > 0) {
                 $('#feed_empty').css('display', 'none');
-            } else {
-                $('#feed_empty').css('display', 'block');
             }
 
-            items.forEach(function (item) {
-                if (item.date > lastSeen) {
-                    unreadBar.before(Template.item(item));
-                } else {
-                    unreadBar.after(Template.item(item));
-                }
+            var unreadItems = items.filter(function (item) {
+                return item.date >= lastSeen;
+            });
+
+            var readItems = items.filter(function (item) {
+                return item.date < lastSeen;
+            });
+
+            var unreadBar = $('#feedback_unread_bar');
+
+            if (unreadItems.length > 0 && readItems.length > 0) {
+                unreadBar.css('display', 'block');
+            }
+
+            unreadItems.forEach(function (item) {
+                unreadBar.before(Template.item(item));
+            });
+
+            readItems.forEach(function (item) {
+                unreadBar.after(Template.item(item));
             });
         }
 
