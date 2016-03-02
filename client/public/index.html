@@ -235,6 +235,14 @@
 
             console.log('runParams:', runParams);
 
+            Handlebars.registerHelper("timestamp", function (date) {
+                 return Math.floor(date.getTime() / 1000);
+            });
+
+            Handlebars.registerHelper("date", function (date) {
+                return printDate(date);
+            });
+
             $('#page_wrap').load('page.html', null, function () {
                 $('#feed_new_posts').click(function () {
                     load();
