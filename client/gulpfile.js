@@ -4,6 +4,7 @@ var gulp = require('gulp');
 
 //browserify
 
+var babelify = require('babelify');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var streamify = require('gulp-streamify');
@@ -11,6 +12,7 @@ var uglify = require('gulp-uglify');
 
 gulp.task('browserify', function() {
     browserify({entries: './src/js/app.js', debug: true})
+        .transform(babelify, {presets: ['es2015']})
         .bundle()
         .pipe(source('bundle.js'))
         .pipe(streamify(uglify()))
