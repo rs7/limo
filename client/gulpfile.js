@@ -1,26 +1,28 @@
 //common
 
 var gulp = require('gulp');
-var concat = require('gulp-concat');
 
-//third-party
+//browserify
 
-var mainBowerFiles = require('main-bower-files');
+var browserify = require('browserify');
+var source = require('vinyl-source-stream');
+var streamify = require('gulp-streamify');
 var uglify = require('gulp-uglify');
 
-gulp.task('third-party', function() {  
-    gulp
-        .src(mainBowerFiles())
-        .pipe(concat('third-party.min.js'))
-        .pipe(uglify())
+gulp.task('browserify', function() {
+    browserify({entries: './src/js/app.js', debug: true})
+        .bundle()
+        .pipe(source('bundle.js'))
+        .pipe(streamify(uglify()))
         .pipe(gulp.dest('./public'));
 });
 
 //templates
 
+var concat = require('gulp-concat');
+var declare = require('gulp-declare');
 var handlebars = require('gulp-handlebars');
 var wrap = require('gulp-wrap');
-var declare = require('gulp-declare');
 
 gulp.task('templates', function () {
     gulp
