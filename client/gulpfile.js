@@ -1,18 +1,19 @@
+//common
+
 var gulp = require('gulp');
+var concat = require('gulp-concat');
 
-//bower
+//third-party
 
-var wiredep = require('wiredep').stream;
+var mainBowerFiles = require('main-bower-files');
+var uglify = require('gulp-uglify');
 
-gulp.task('bower', function () {
+gulp.task('third-party', function() {  
     gulp
-        .src('./public/index.html')
-        .pipe(wiredep({
-            optional: 'configuration',
-            goes: 'here'
-        }))
-        .pipe(gulp.dest('./public'))
-    ;
+        .src(mainBowerFiles())
+        .pipe(concat('third-party.min.js'))
+        .pipe(uglify())
+        .pipe(gulp.dest('./public'));
 });
 
 //templates
@@ -20,8 +21,7 @@ gulp.task('bower', function () {
 var handlebars = require('gulp-handlebars');
 var wrap = require('gulp-wrap');
 var declare = require('gulp-declare');
-var concat = require('gulp-concat');
- 
+
 gulp.task('templates', function () {
     gulp
         .src('templates/*.html')
@@ -38,10 +38,10 @@ gulp.task('templates', function () {
 
 //system
 
-gulp.task('update', ['bower', 'templates']);
+gulp.task('update', ['templates', 'third-party']);
 
 gulp.task('watch', function () {
-    gulp.watch('bower.json', ['bower']);
+    gulp.watch('bower.json', ['third-party']);
     gulp.watch('templates/*.html', ['templates']);
 });
 
