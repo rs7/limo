@@ -13,21 +13,21 @@ mongoose.connect('mongodb://localhost/limo');
 //schema
 
 var historySchema = mongoose.Schema({
-	photo: Number,
-	user: Number,
-	date: {type: Date, required: true}
+    photo: {type: Number, required: true},
+    user: {type: Number, required: true},
+    date: {type: Date, required: true}
 }, {strict: true});
 
-var photoSchema = mongoose.Schema({
-	photo_id: {type: Number, required: true},
-	likers: {type: [Number], default: []}
+var likesSchema = mongoose.Schema({
+    photo: {type: Number, required: true},
+    likes: {type: [Number], default: []}
 }, {strict: true});
 
 var userSchema = mongoose.Schema({
-	user_id: {type: Number, required: true},
-	photos: {type: [photoSchema], required: true},
-	last_seen: {type: Date, required: true},
-	history: {type: [historySchema], default: []}
+    id: {type: Number, required: true},
+    snapshot: {type: [likesSchema], required: true},
+    last_seen: {type: Date, required: true},
+    history: {type: [historySchema], default: []}
 }, {strict: true});
 
 var User = mongoose.model('User', userSchema);
@@ -49,21 +49,31 @@ app.use(bodyParser.json());
 app.use(morgan('dev'));
 
 app.use(function (req, res, next) {
-	if (authCheck(req.body.user_id, req.body.auth_key)) {
-		return next();
-	}
+    if (authCheck(req.body.user_id, req.body.auth_key)) {
+        return next();
+    }
 
-	res.status(403).json({error: 'auth error'});
+    if (authCheck(req.query.user_id, req.query.auth_key)) {
+        return next();
+    }
+
+    res.status(403).json({error: 'auth error'});
 });
 
-app.use(function (err, req, res, next) { res.status(500).send({error: err.message}); });
+app.use(function (err, req, res, next) {
+    res.status(500).send({error: err.message});
+});
+
+app.listen(1337, function () {
+    console.log('1337 listening');
+});
 
 //auth
 
 var md5 = require('md5');
 
 function authCheck(user, authKey) {
-	return authKey == md5(nconf.get('app:id') + '_' + user + '_' + nconf.get('app:secret'));
+    return authKey == md5(nconf.get('app:id') + '_' + user + '_' + nconf.get('app:secret'));
 }
 
 //https
@@ -71,75 +81,137 @@ function authCheck(user, authKey) {
 var https = require('https');
 
 var httpsOptions = {
-	pfx: fs.readFileSync(nconf.get('pfx:path')),
-	passphrase: nconf.get('pfx:pass')
+    pfx: fs.readFileSync(nconf.get('pfx:path')),
+    passphrase: nconf.get('pfx:pass')
 };
 
-https.createServer(httpsOptions, app).listen(433);
+https.createServer(httpsOptions, app).listen(433, function () {
+    console.log('433 listening');
+});
 
 //routes
 
-app.post('/', function (req, res, next) {
-	console.log(req.body);
+//save snapshot
+app.post('/api', function (req, res, next) {
+    var input = req.body;
 
-	var input = req.body;
+    console.log(input);
 
-	User.findOne({user_id: input.user_id}, function (err, userVO) {
-		if (err) return next(err);
+    var userId = input.user_id;
+    var snapshot = input.snapshot;
 
-		if (!userVO) {
-			userVO = new User({
-				user_id: input.user_id,
-				last_seen: new Date(0)
-			});
-		}
+    User.findOne({id: userId}, function (err, user) {
+        if (err) return next(err);
 
-		findUnlikers(input.photos, userVO.photos).forEach(function (photo) {
-			photo.unlikers.forEach(function (user) {
-				var item = {
-					photo: photo.photo_id,
-					user: user,
-					date: new Date()
-				};
-				userVO.history.push(item);
-			});
-		});
+        if (!user) {
+            user = new User({
+                id: userId,
+                snapshot: [],
+                history: []
+            });
+        }
 
-		var response = {
-			items: userVO.history,
-			last_seen: userVO.last_seen
-		};
+        var history = createHistory(user.snapshot, snapshot);
 
-		userVO.photos = input.photos;
-		userVO.last_seen = new Date();
+        console.log(history);
 
-		userVO.save(function (err) {
-			if (err) return next(err);
+        history.forEach(function (like) {
+            user.history.push(like);
+        });
 
-			console.log(response);
+        user.snapshot = snapshot.filter(function (like) {
+            return like.likes.length > 0;
+        });
+        user.last_seen = new Date();
 
-			res.json({response: response});
-		});
-	});
+        user.save(function (err) {
+            if (err) return next(err);
+
+            res.json({response: 1});
+        });
+    });
+});
+
+//get history
+app.get('/api', function (req, res, next) {
+    var input = req.query;
+
+    console.log(input);
+
+    var userId = input.user_id;
+    var page = input.page;
+
+    User.findOne({id: userId}, function (err, user) {
+        if (err) return next(err);
+
+        if (!user) {
+            res.status(404).json({error: 'not fount user'});
+            return;
+        }
+
+        var count = 10;
+        var offset = page * count;
+        var history = user.history.slice(offset, offset + count).map(function (like) {
+            return {
+                photo: like.photo,
+                user: like.user,
+                date: like.date
+            };
+        });
+
+        console.log(history);
+
+        res.json({response: history});
+    });
 });
 
 //logic
 
-function findUnlikers(clientPhotos, serverPhotos) {
-	if (!serverPhotos) return [];
+var diff = require('simple-array-diff');
 
-	var unlikePhotos = [];
+function createHistory(snapshotOld, snapshotNew) {
+    var photosOld = snapshotOld.map(function (like) {
+        return like.photo;
+    });
+    var photosNew = snapshotNew.map(function (like) {
+        return like.photo;
+    });
 
-	clientPhotos.forEach(function (clientPhoto) {
-		var pos = serverPhotos.map(function (serverPhoto) {return serverPhoto.photo_id;}).indexOf(clientPhoto.photo_id);
-		if (pos == -1) return;
-		var serverPhoto = serverPhotos[pos];
-		var unlikers = serverPhoto.likers.filter(function (liker) {return clientPhoto.likers.indexOf(liker) == -1});
-		if (unlikers.length == 0) return;
-		unlikePhotos.push({
-			photo_id: clientPhoto.photo_id, unlikers: unlikers
-		});
-	});
+    var photosMapOld = mapByField(snapshotOld, 'photo');
+    var photosMapNew = mapByField(snapshotNew, 'photo');
 
-	return unlikePhotos;
+    var photosCom = diff(photosOld, photosNew).common;
+
+    var history = [];
+
+    photosCom.forEach(function (photo) {
+        var likesOld = photosMapOld[photo].likes;
+        var likesNew = photosMapNew[photo].likes;
+
+        var unlikes = diff(likesOld, likesNew).removed;
+
+        if (unlikes.length == 0) {
+            return;
+        }
+
+        unlikes.forEach(function (user) {
+            history.push({
+                photo: photo,
+                user: user,
+                date: new Date()
+            });
+        });
+    });
+
+    return history;
+}
+
+function mapByField(array, field) {
+    var map = {};
+
+    array.forEach(function (item) {
+        map[item[field]] = item;
+    });
+
+    return map;
 }

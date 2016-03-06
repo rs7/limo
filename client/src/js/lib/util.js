@@ -1,15 +1,22 @@
-function createFieldMap(array, field) {
-    var map = {};
+'use strict';
 
-    array.forEach(function (item) {
-        var fieldValue = item[field];
-        map[fieldValue] = item;
+import async from 'async-q';
+
+export function auto(tasks, {returnTask, log} = {}) {
+    if (log) {
+        Object.keys(tasks).forEach(task => tasks[`__AUTO_LOG_${task}`] = [task, results => console.log(`AUTO_LOG ${task} => `, results[task])]);
+    }
+
+    return new Promise((resolve, reject) => {
+        async.auto(tasks).then(results => resolve(results[returnTask]), reject);
     });
-
-    return map;
 }
 
-function getUrlVars() {
+export function mapById(array) {
+    return new Map(array.map(item => [item.id, item]));
+}
+
+export function getUrlVars() {
     var vars = {};
     window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
         function (m, key, value) {
@@ -19,7 +26,7 @@ function getUrlVars() {
     return vars;
 }
 
-function printDate(date) {
+export function printDate(date) {
     var boundary;
 
     //пять минут назад
@@ -56,4 +63,12 @@ function printDate(date) {
 
     //в прошлом году и старше
     return date.getDate() + ' ' + months[date.getMonth()] + ' ' + date.getFullYear();
+}
+
+export function uniqueFilter(value, index, self) {
+    return self.indexOf(value) === index;
+}
+
+export function timestamp(date) {
+    return Math.floor(date.getTime() / 1000);
 }
