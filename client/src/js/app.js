@@ -8,6 +8,8 @@ import {saveSnapshot, getHistory} from './lib/logic';
 import {default as Template} from './templates';
 import {initHelpers} from './lib/hbs';
 
+import {updateFrameSize} from './lib/vk'
+
 $(document).ready(init);
 
 function init() {
@@ -17,6 +19,7 @@ function init() {
     initHelpers();
 
     $('#page_wrap').load('page.html', () => {
+        updateFrameSize();
         saveSnapshot().then(showHistory);
     });
 }
@@ -27,6 +30,7 @@ function showHistory() {
     getHistory().then(response => {
         showItems(response);
         hideLoading();
+        updateFrameSize();
     });
 }
 
