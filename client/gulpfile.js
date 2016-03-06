@@ -2,6 +2,8 @@
 
 var gulp = require('gulp');
 
+function errorHandler(err) { console.log(err.toString()); this.emit('end'); }
+
 //browserify
 
 var babelify = require('babelify');
@@ -16,7 +18,7 @@ gulp.task('browserify', function() {
     browserify({entries: './src/js/app.js', debug: false})
         .transform(babelify, {presets: ['es2015']})
         .bundle()
-        .on('error', function (err) { console.log(err.toString()); this.emit('end'); })
+        .on('error', errorHandler)
         .pipe(source('bundle.js'))
         //.pipe(streamify(sourceMap.init({loadMaps: true})))
         //.pipe(streamify(uglify()))
@@ -35,6 +37,7 @@ gulp.task('templates', function () {
     gulp
         .src('./src/hbs/*.hbs')
         .pipe(handlebars({handlebars: require('handlebars')}))
+        .on('error', errorHandler)
         .pipe(defineModule('node'))
         .pipe(concat('templates.js'))
         .pipe(gulp.dest('./src/js'))
