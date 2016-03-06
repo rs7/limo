@@ -13,9 +13,6 @@ import {updateFrameSize} from './lib/vk'
 $(document).ready(init);
 
 function init() {
-    $('#get_history').click(showHistory);
-    $('#set_snapshot').click(saveSnapshot);
-
     initHelpers();
 
     $('#page_wrap').load('page.html', () => {
@@ -35,13 +32,11 @@ function showHistory() {
 }
 
 function showLoading() {
-    $('#feed_new_posts').css('display', 'none');
     $('#feed_progress').css('display', 'block');
 }
 
 function hideLoading() {
     $('#feed_progress').css('display', 'none');
-    $('#feed_new_posts').css('display', 'block');
 }
 
 function clearItems() {
