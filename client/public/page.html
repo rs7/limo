@@ -23,7 +23,7 @@
                             </ul>
                         </div>
                         <div class="summary_wrap clear_fix" id="feed_summary_wrap">
-                            <div style="display: block;" class="fl_r progress" id="feed_progress"></div>
+                            <div id="feed_progress" class="fl_r progress" style="display: none;"></div>
                             <div class="summary" id="feed_summary">Показаны последние события</div>
                         </div>
                         <div class="fl_r" id="feed_rate_tt_place"></div>
@@ -39,12 +39,11 @@
                                             <span class="feedback_unread_bar">Просмотренные события</span>
                                         </div>
                                     </div>
-                                    <a id="show_more_link" onclick="alert('показать ещё');" class="clear more_link"
-                                       style="height: 13px; display: none;">
-                                        <div id="show_more_progress" class="progress"></div>
-                                        <div id="show_more">Показать предыдущие события ↓</div>
+                                    <a id="show_more_link" class="clear more_link" style="height: 13px; display: block;">
+                                        <div id="show_more_progress" class="progress" style="display: block;"></div>
+                                        <div id="show_more" style="display: none;">Показать предыдущие события ↓</div>
                                     </a>
-                                    <div id="all_shown" style="display: block;">Показаны последние события</div>
+                                    <div id="all_shown" style="display: none;">Показаны последние события</div>
                                 </div>
                             </div>
                         </div>

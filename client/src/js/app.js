@@ -17,26 +17,31 @@ function init() {
 
     $('#page_wrap').load('page.html', () => {
         updateFrameSize();
-        saveSnapshot().then(showHistory);
+        saveSnapshot().then(showNextPage);
+
+        $('#show_more_link').click(showNextPage);
     });
 }
 
-function showHistory() {
-    showLoading();
-    clearItems();
-    getHistory().then(response => {
-        showItems(response);
-        hideLoading();
+let page = 0;
+
+function showNextPage() {
+    $('#show_more').css('display', 'none');
+    $('#show_more_progress').css('display', 'block');
+
+    getHistory(page++).then(items => {
+        $('#show_more_progress').css('display', 'none');
+
+        if (items.length == 0) {
+            $('#show_more_link').css('display', 'none');
+            $('#all_shown').css('display', 'block');
+        } else {
+            showItems(items);
+            $('#show_more').css('display', 'block');
+        }
+
         updateFrameSize();
     });
-}
-
-function showLoading() {
-    $('#feed_progress').css('display', 'block');
-}
-
-function hideLoading() {
-    $('#feed_progress').css('display', 'none');
 }
 
 function clearItems() {

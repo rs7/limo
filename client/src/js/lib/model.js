@@ -2,11 +2,15 @@ import * as request from './request';
 
 export let getPhotos = request.getPhotos;
 
-export let getPhotosByList = request.getPhotosByList;
+export function getPhotosByList(photos) {
+    return (photos.length > 0) ? request.getPhotosByList(photos) : [];
+}
 
 export let getLikes = request.getLikes;
 
-export let getUsers = request.getUsers;
+export function getUsers(users) {
+    return (users.length > 0) ? request.getUsers(users) : [];
+}
 
 export let setSnapshot = request.setSnapshot;
 
