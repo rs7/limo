@@ -8,5 +8,10 @@
     "nconf": "^0.8.4",
     "simple-array-diff": "^1.1.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nodemon": "^1.9.1"
+  },
+  "scripts": {
+    "nodemon": "nodemon ./index.js"
+  }
 }
