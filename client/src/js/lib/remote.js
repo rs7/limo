@@ -45,9 +45,7 @@ export class VK {
 }
 
 function ajax(params) {
-    console.log('ajax', params);
-
-    let promise = new Promise((resolve, reject) => {
+    return new Promise((resolve, reject) => {
         $.ajax(params).then(
             response => {
                 if (response.response) {
@@ -56,9 +54,7 @@ function ajax(params) {
 
                 reject(response.error || response);
             },
-            error => reject(error)
+            reject
         );
     });
-
-    return promise;
 }
