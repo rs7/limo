@@ -22,9 +22,9 @@ export function getPhotosByList(photos) {
             let responsePhotosList = responsePhotos.map(photo => photo.id);
             let deletedPhotos = photos.filter(photo => !responsePhotosList.includes(photo));
             Array.prototype.push.apply(responsePhotos, deletedPhotos.map(photo => ({
-                id:photo,
-                owner_id:user,
-                photo_130:'//vk.com/images/camera_100.png'
+                id: photo,
+                owner_id: user,
+                photo_130: '//vk.com/images/camera_100.png'
             })));
         }
 
