@@ -72,3 +72,19 @@ export function uniqueFilter(value, index, self) {
 export function timestamp(date) {
     return Math.floor(date.getTime() / 1000);
 }
+
+export function processArray(array, process) {
+    return array.map(item => processObject(item, process));
+}
+
+export function processObject(object, process) {
+    let res = {};
+    Object.keys(process).forEach(key => {
+        res[key] = process[key](object[key])
+    });
+    return Object.assign({}, object, res);
+}
+
+export function parseDate(date) {
+    return new Date(date);
+}

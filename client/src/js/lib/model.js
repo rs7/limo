@@ -2,6 +2,8 @@ import * as request from './request';
 
 import {user} from './params';
 
+import {processArray, parseDate} from './util';
+
 export let getPhotos = request.getPhotos;
 
 export function getPhotosByList(photos) {
@@ -41,13 +43,7 @@ export function getUsers(users) {
 export let setSnapshot = request.setSnapshot;
 
 export function getHistory(page) {
-    return request.getHistory(page).then(items =>
-        items.map(
-            ({user, photo, date}) => ({
-                user,
-                photo,
-                date:new Date(date)
-            })
-        )
-    );
+    return request.getHistory(page).then(items => processArray(items, {
+        date: parseDate
+    }));
 }

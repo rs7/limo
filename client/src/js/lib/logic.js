@@ -3,7 +3,7 @@
 import async from 'async-q';
 
 import * as model from './model';
-import {uniqueFilter, mapById, auto} from './util';
+import {uniqueFilter, mapById, auto, processArray} from './util';
 
 export function saveSnapshot() {
     return auto({
@@ -43,13 +43,12 @@ export function getHistory(page = 0) {
 
         usersMap: ['users', ({users}) => mapById(users)],
 
-        fillHistory: ['history', 'photosMap', 'usersMap', ({history, photosMap, usersMap}) => history.map(
-            ({user, photo, date}) => ({
-                user: usersMap.get(user),
-                photo: photosMap.get(photo),
-                date
+        fillHistory: ['history', 'photosMap', 'usersMap', ({history, photosMap, usersMap}) =>
+            processArray(history, {
+                user: user => usersMap.get(user),
+                photo: photo => photosMap.get(photo)
             })
-        )]
+        ]
     }, {
         returnTask: 'fillHistory',
         log: false
