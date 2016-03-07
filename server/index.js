@@ -116,7 +116,7 @@ app.post('/api', function (req, res, next) {
         console.log(history);
 
         history.forEach(function (like) {
-            user.history.push(like);
+            user.history.unshift(like);
         });
 
         user.snapshot = snapshot.filter(function (like) {
