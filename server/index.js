@@ -153,6 +153,7 @@ app.get('/api', function (req, res, next) {
         var offset = page * count;
         var history = user.history.slice(offset, offset + count).map(function (like) {
             return {
+                id: like._id.valueOf(),
                 photo: like.photo,
                 user: like.user,
                 date: like.date
