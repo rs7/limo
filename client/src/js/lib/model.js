@@ -44,6 +44,10 @@ export let setSnapshot = request.setSnapshot;
 
 export function getHistory(page) {
     return request.getHistory(page).then(items => processArray(items, {
-        date: parseDate
+        date: parseDate,
+        period: {
+            from: parseDate,
+            to: parseDate
+        }
     }));
 }

@@ -12,20 +12,29 @@ mongoose.connect('mongodb://localhost/limo');
 
 //schema
 
-var historySchema = mongoose.Schema({
-    photo: {type: Number, required: true},
-    user: {type: Number, required: true},
-    date: {type: Date, required: true}
-}, {strict: true});
-
 var likesSchema = mongoose.Schema({
     photo: {type: Number, required: true},
     likes: {type: [Number], default: []}
 }, {strict: true});
 
+var snapshotSchema = mongoose.Schema({
+    date: {type: Date, required: true},
+    items: {type: [likesSchema], default: []}
+});
+
+var historySchema = mongoose.Schema({
+    photo: {type: Number, required: true},
+    user: {type: Number, required: true},
+    date : {type: Date, default: Date.now},
+    period: {
+        from : {type: Date, required: true},
+        to : {type: Date, required: true}
+    }
+}, {strict: true});
+
 var userSchema = mongoose.Schema({
     id: {type: Number, required: true},
-    snapshot: {type: [likesSchema], required: true},
+    snapshot: {type: snapshotSchema, required: true},
     last_seen: {type: Date, required: true},
     history: {type: [historySchema], default: []}
 }, {strict: true});
@@ -98,7 +107,10 @@ app.post('/api', function (req, res, next) {
     console.log(input);
 
     var userId = input.user_id;
-    var snapshot = input.snapshot;
+    var snapshot = {
+        date: new Date(),
+        items: input.snapshot
+    };
 
     User.findOne({id: userId}, function (err, user) {
         if (err) return next(err);
@@ -106,7 +118,10 @@ app.post('/api', function (req, res, next) {
         if (!user) {
             user = new User({
                 id: userId,
-                snapshot: [],
+                snapshot: {
+                    date: new Date(0),
+                    items: []
+                },
                 history: []
             });
         }
@@ -119,9 +134,11 @@ app.post('/api', function (req, res, next) {
             user.history.unshift(like);
         });
 
-        user.snapshot = snapshot.filter(function (like) {
-            return like.likes.length > 0;
+        snapshot.items = snapshot.items.filter(function (item) {
+            return item.likes.length > 0;
         });
+
+        user.snapshot = snapshot;
         user.last_seen = new Date();
 
         user.save(function (err) {
@@ -156,7 +173,8 @@ app.get('/api', function (req, res, next) {
                 id: like._id.valueOf(),
                 photo: like.photo,
                 user: like.user,
-                date: like.date
+                date: like.date,
+                period: like.period
             };
         });
 
@@ -171,15 +189,20 @@ app.get('/api', function (req, res, next) {
 var diff = require('simple-array-diff');
 
 function createHistory(snapshotOld, snapshotNew) {
-    var photosOld = snapshotOld.map(function (like) {
+    var period = {
+        from: snapshotOld.date,
+        to: snapshotNew.date
+    };
+
+    var photosOld = snapshotOld.items.map(function (like) {
         return like.photo;
     });
-    var photosNew = snapshotNew.map(function (like) {
+    var photosNew = snapshotNew.items.map(function (like) {
         return like.photo;
     });
 
-    var photosMapOld = mapByField(snapshotOld, 'photo');
-    var photosMapNew = mapByField(snapshotNew, 'photo');
+    var photosMapOld = mapByField(snapshotOld.items, 'photo');
+    var photosMapNew = mapByField(snapshotNew.items, 'photo');
 
     var photosCom = diff(photosOld, photosNew).common;
 
@@ -199,7 +222,7 @@ function createHistory(snapshotOld, snapshotNew) {
             history.push({
                 photo: photo,
                 user: user,
-                date: new Date()
+                period: period
             });
         });
     });
