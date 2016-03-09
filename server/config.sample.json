@@ -6,5 +6,9 @@
   "app": {
     "id": 0,
     "secret": "secret"
+  },
+  "listen": {
+    "http": 80,
+    "https": 443
   }
 }
