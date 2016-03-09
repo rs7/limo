@@ -78,11 +78,31 @@ export function processArray(array, process) {
 }
 
 export function processObject(object, process) {
-    let res = {};
+    let processed = {};
+
     Object.keys(process).forEach(key => {
-        res[key] = process[key](object[key])
+        let proc = process[key];
+        let val = object[key];
+        let res;
+
+        switch (true) {
+            case proc instanceof Function:
+                res = proc(val);
+                break;
+
+            case proc instanceof Object:
+                res = processObject(val, proc);
+                break;
+
+            default:
+                console.error('Неподдерживаемый тип преобразования объекта');
+                res = val;
+        }
+
+        processed[key] = res;
     });
-    return Object.assign({}, object, res);
+
+    return Object.assign({}, object, processed);
 }
 
 export function parseDate(date) {
