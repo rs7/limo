@@ -1,11 +1,13 @@
 import Handlebars from 'handlebars';
 
-import {printDate, timestamp} from './util';
+import {printDate, printPeriod, timestamp} from './util';
 
 export function initHelpers() {
     Handlebars.registerHelper("timestamp", date => timestamp(date));
 
     Handlebars.registerHelper("date", date => printDate(date));
+
+    Handlebars.registerHelper("period", ({from, to}) => printPeriod(from, to));
 
     Handlebars.registerHelper("user_link", ({domain}) => `//vk.com/${domain}`);
 
