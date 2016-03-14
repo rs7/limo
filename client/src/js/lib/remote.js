@@ -2,7 +2,7 @@
 
 const $ = require('jquery');
 
-import {user, authKey, protocol, language, isSecure} from './params';
+import {user, authKey, protocol, accessToken, language, isSecure} from './params';
 
 const CONST_SERVER_PARAMS = {
     auth: authKey,
@@ -34,12 +34,18 @@ export class Remote {
 
 const CONST_PARAMS = {
     v: 5.50,
+    access_token: accessToken,
     lang: language == 0 ? undefined : language,
     https: isSecure ? 1 : undefined
 };
 
 const CONST_PUBLIC_OPTIONS = {
     v: 1
+};
+
+const CONST_PRIVATE_OPTIONS = {
+    v: 1,
+    access_token: 1
 };
 
 function createQuery(params, options, constOptions = {}) {
@@ -59,6 +65,16 @@ export class VK {
 
         return ajax({
             url: `${protocol}://api.vk.com/method/${method}`,
+            data: query,
+            dataType: 'jsonp'
+        });
+    }
+
+    static private(method, params, options = {}) {
+        let query = createQuery(params, options, CONST_PRIVATE_OPTIONS);
+
+        return ajax({
+            url: `https://api.vk.com/method/${method}`,
             data: query,
             dataType: 'jsonp'
         });

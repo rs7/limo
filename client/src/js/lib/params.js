@@ -12,4 +12,6 @@ export let isSecure = runParams.is_secure;
 
 export let protocol = ['http', 'https'][runParams.is_secure];
 
+export let accessToken = runParams.access_token;
+
 export let language =  runParams.language;
