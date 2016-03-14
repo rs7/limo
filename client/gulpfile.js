@@ -1,10 +1,19 @@
+var output = './build';
+
+var hbs = './src/hbs/*.hbs';
+var html = './src/html/*.html';
+var css = './src/css/*.css';
+var js = './src/js/**/*.js';
+
+var appjs = './src/js/app.js';
+
 //common
 
 var gulp = require('gulp');
 
 function errorHandler(err) { console.log(err.toString()); this.emit('end'); }
 
-//browserify
+//build
 
 var babelify = require('babelify');
 var browserify = require('browserify');
@@ -15,7 +24,7 @@ var streamify = require('gulp-streamify');
 var uglify = require('gulp-uglify');
 
 gulp.task('browserify', function() {
-    browserify({entries: './src/js/app.js', debug: false})
+    browserify({entries: appjs, debug: false})
         .transform(babelify, {presets: ['es2015']})
         .bundle()
         .on('error', errorHandler)
@@ -23,7 +32,7 @@ gulp.task('browserify', function() {
         //.pipe(streamify(sourceMap.init({loadMaps: true})))
         //.pipe(streamify(uglify()))
         //.pipe(streamify(sourceMap.write()))
-        .pipe(gulp.dest('./public'))
+        .pipe(gulp.dest(output))
     ;
 });
 
@@ -35,7 +44,7 @@ var handlebars = require('gulp-handlebars');
 
 gulp.task('templates', function () {
     gulp
-        .src('./src/hbs/*.hbs')
+        .src(hbs)
         .pipe(handlebars({handlebars: require('handlebars')}))
         .on('error', errorHandler)
         .pipe(defineModule('node'))
@@ -44,13 +53,31 @@ gulp.task('templates', function () {
     ;
 });
 
+var rigger = require('gulp-rigger');
+
+gulp.task('html', function () {
+    gulp
+        .src('./src/html/index.html')
+        .pipe(rigger())
+        .pipe(gulp.dest(output));
+});
+
+gulp.task('css', function () {
+    gulp
+        .src(css)
+        .pipe(rigger())
+        .pipe(gulp.dest(output));
+});
+
 //system
 
-gulp.task('update', ['templates', 'browserify']);
+gulp.task('update', ['templates', 'browserify', 'html', 'css']);
 
 gulp.task('watch', function () {
-    gulp.watch('./src/js/**/*.js', ['browserify']);
-    gulp.watch('./src/hbs/**/*.hbs', ['templates']);
+    gulp.watch(js, ['browserify']);
+    gulp.watch(hbs, ['templates']);
+    gulp.watch(html, ['html']);
+    gulp.watch(css, ['css']);
 });
 
 gulp.task('default', ['update', 'watch']);

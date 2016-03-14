@@ -15,12 +15,10 @@ $(document).ready(init);
 function init() {
     initHelpers();
 
-    $('#page_wrap').load('page.html', () => {
-        updateFrameSize();
-        saveSnapshot().then(showNextPage);
+    updateFrameSize();
+    saveSnapshot().then(showNextPage);
 
-        $('#show_more_link').click(showNextPage);
-    });
+    $('#show_more_link').click(showNextPage);
 }
 
 let page = 0;
