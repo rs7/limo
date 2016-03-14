@@ -71,3 +71,7 @@ export function processObject(object, process) {
 export function parseDate(date) {
     return new Date(date);
 }
+
+export function stringSize(string) {
+    return encodeURI(string).split(/%..|./).length - 1;
+}
