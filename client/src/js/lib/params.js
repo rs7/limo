@@ -8,4 +8,8 @@ export let authKey = runParams.auth_key;
 
 export let user = parseInt(runParams.viewer_id);
 
+export let isSecure = runParams.is_secure;
+
 export let protocol = ['http', 'https'][runParams.is_secure];
+
+export let language =  runParams.language;

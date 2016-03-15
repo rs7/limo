@@ -17,6 +17,8 @@ export function getPhotosByList(photos) {
 
     return VK.public('photos.getById', {
         photos: photosFullIds
+    },{
+        https: 1
     });
 }
 
@@ -35,6 +37,8 @@ export function getUsers(users) {
         fields: ['photo_50', 'domain'].join(),
         name_case: 'dat',
         count: 1000
+    },{
+        lang: 1
     });
 }
 
