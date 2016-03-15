@@ -42,6 +42,6 @@ export function setSnapshot(snapshot) {
     return Remote.post('/api', {snapshot});
 }
 
-export function getHistory(page) {
+export function getFeeds(page) {
     return Remote.get('/api', {page});
 }

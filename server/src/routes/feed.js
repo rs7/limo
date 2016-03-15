@@ -22,16 +22,16 @@ router.get('/api', function (req, res, next) {
 
         var count = 10;
         var offset = page * count;
-        var history = user.history.slice(offset, offset + count).map(function (like) {
+        var feeds = user.feeds.slice(offset, offset + count).map(function (feed) {
             return {
-                id: like._id.valueOf(),
-                photo: like.photo,
-                user: like.user,
-                date: like.date,
-                period: like.period
+                id: feed._id.valueOf(),
+                photo: feed.photo,
+                user: feed.user,
+                date: feed.date,
+                period: feed.period
             };
         });
 
-        res.json({response: history});
+        res.json({response: feeds});
     });
 });

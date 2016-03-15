@@ -27,13 +27,13 @@ export function saveSnapshot() {
     });
 }
 
-export function getHistory(page = 0) {
+export function getFeeds(page = 0) {
     return auto({
-        history: () => model.getHistory(page),
+        feeds: () => model.getFeeds(page),
 
-        usersList: ['history', ({history}) => history.map(like => like.user).filter(uniqueFilter)],
+        usersList: ['feeds', ({feeds}) => feeds.map(like => like.user).filter(uniqueFilter)],
 
-        photosList: ['history', ({history}) => history.map(like => like.photo).filter(uniqueFilter)],
+        photosList: ['feeds', ({feeds}) => feeds.map(like => like.photo).filter(uniqueFilter)],
 
         users: ['usersList', ({usersList}) => model.getUsers(usersList)],
 
@@ -43,14 +43,14 @@ export function getHistory(page = 0) {
 
         usersMap: ['users', ({users}) => mapById(users)],
 
-        fillHistory: ['history', 'photosMap', 'usersMap', ({history, photosMap, usersMap}) =>
-            processArray(history, {
+        fillFeeds: ['feeds', 'photosMap', 'usersMap', ({feeds, photosMap, usersMap}) =>
+            processArray(feeds, {
                 user: user => usersMap.get(user),
                 photo: photo => photosMap.get(photo)
             })
         ]
     }, {
-        returnTask: 'fillHistory',
+        returnTask: 'fillFeeds',
         log: false
     });
 }

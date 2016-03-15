@@ -25,14 +25,14 @@ router.post('/api', function (req, res, next) {
                     date: new Date(0),
                     items: []
                 },
-                history: []
+                feeds: []
             });
         }
 
-        var history = createHistory(user.snapshot, snapshot);
+        var feeds = createFeeds(user.snapshot, snapshot);
 
-        history.forEach(function (like) {
-            user.history.unshift(like);
+        feeds.forEach(function (feed) {
+            user.feeds.unshift(feed);
         });
 
         snapshot.items = snapshot.items.filter(function (item) {
@@ -52,7 +52,7 @@ router.post('/api', function (req, res, next) {
 
 let diff = require('simple-array-diff');
 
-function createHistory(from, to) {
+function createFeeds(from, to) {
     let period = {
         from: from.date,
         to: to.date
@@ -64,7 +64,7 @@ function createHistory(from, to) {
     let fromMap = mapByPhoto(from.items);
     let toMap = mapByPhoto(to.items);
 
-    let history = [];
+    let feeds = [];
 
     let com = diff(fromList, toList).common;
 
@@ -75,7 +75,7 @@ function createHistory(from, to) {
         let unlikes = diff(fromLikes, toLikes).removed;
 
         unlikes.forEach(user =>
-            history.push({
+            feeds.push({
                 photo: photo,
                 user: user,
                 period: period
@@ -83,7 +83,7 @@ function createHistory(from, to) {
         );
     });
 
-    return history;
+    return feeds;
 
     function mapByPhoto(array) {
         return new Map(array.map(item => [item.photo, item]));

@@ -16,7 +16,7 @@ let snapshotSchema = mongoose.Schema({
     items: {type: [likesSchema], default: []}
 });
 
-let historySchema = mongoose.Schema({
+let feedSchema = mongoose.Schema({
     photo: {type: Number, required: true},
     user: {type: Number, required: true},
     date: {type: Date, default: Date.now},
@@ -30,7 +30,7 @@ let userSchema = mongoose.Schema({
     id: {type: Number, required: true},
     snapshot: {type: snapshotSchema, required: true},
     last_seen: {type: Date, required: true},
-    history: {type: [historySchema], default: []}
+    feeds: {type: [feedSchema], default: []}
 }, {strict: true});
 
 export let User = mongoose.model('User', userSchema);

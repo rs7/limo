@@ -21,9 +21,9 @@ app.use(function (err, req, res, next) {
     res.status(500).json({error: err.message});
 });
 
-import {history, snapshot} from './routes/index';
+import {feed, snapshot} from './routes/index';
 
-app.use(history);
+app.use(feed);
 app.use(snapshot);
 
 listen();

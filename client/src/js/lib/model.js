@@ -42,8 +42,8 @@ export function getUsers(users) {
 
 export let setSnapshot = request.setSnapshot;
 
-export function getHistory(page) {
-    return request.getHistory(page).then(items => processArray(items, {
+export function getFeeds(page) {
+    return request.getFeeds(page).then(feeds => processArray(feeds, {
         date: parseDate,
         period: {
             from: parseDate,
