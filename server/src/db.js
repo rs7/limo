@@ -46,8 +46,7 @@ export let Feed = mongoose.model('Feed', feedSchema);
 
 let userSchema = mongoose.Schema({
     id: {type: Number, required: true},
-    snapshot: {type: snapshotSchema, required: true},
-    feeds: {type: [feedSchema], default: []}
+    snapshot: {type: snapshotSchema, required: true}
 }, {
     strict: 'throw',
     id: false
