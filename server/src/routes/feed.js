@@ -6,7 +6,7 @@ export let router = express.Router();
 
 import {User} from '../db';
 
-router.get('/api', function (req, res, next) {
+router.get('/feed', function (req, res, next) {
     var input = req.query;
 
     var userId = input.user_id;

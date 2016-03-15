@@ -6,7 +6,7 @@ export let router = express.Router();
 
 import {User} from '../db';
 
-router.post('/api', function (req, res, next) {
+router.post('/snapshot', function (req, res, next) {
     var input = req.body;
 
     var userId = input.user_id;

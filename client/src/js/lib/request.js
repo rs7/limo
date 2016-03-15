@@ -43,9 +43,9 @@ export function getUsers(users) {
 }
 
 export function setSnapshot(snapshot) {
-    return Remote.post('/api', {snapshot});
+    return Remote.post('/snapshot', {snapshot});
 }
 
 export function getFeeds(page) {
-    return Remote.get('/api', {page});
+    return Remote.get('/feed', {page});
 }
