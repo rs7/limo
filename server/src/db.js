@@ -1,6 +1,6 @@
 'use strict';
 
-let mongoose = require('mongoose');
+export let mongoose = require('mongoose');
 
 export let ObjectId = mongoose.Types.ObjectId;
 

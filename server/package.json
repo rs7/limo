@@ -15,6 +15,7 @@
   },
   "scripts": {
     "build": "babel src --watch --out-dir build",
-    "nodemon": "nodemon ./build/index.js"
+    "nodemon": "nodemon ./build/index.js",
+    "test": "node ./build/test.js"
   }
 }
