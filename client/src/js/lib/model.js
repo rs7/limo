@@ -1,3 +1,5 @@
+'use strict';
+
 import * as request from './request';
 
 import {user} from './params';
@@ -44,7 +46,6 @@ export let setSnapshot = request.setSnapshot;
 
 export function getFeeds(page) {
     return request.getFeeds(page).then(feeds => processArray(feeds, {
-        date: parseDate,
         period: {
             from: parseDate,
             to: parseDate

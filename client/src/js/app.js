@@ -1,6 +1,6 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
 import {printDate} from './lib/util';
 import {saveSnapshot, getHistory} from './lib/logic';

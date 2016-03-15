@@ -1,12 +1,12 @@
 'use strict';
 
-import $ from 'jquery';
+const $ = require('jquery');
 
 import {user, authKey, protocol} from './params';
 
 const authParams = {
-    auth_key: authKey,
-    user_id: user
+    authKey: authKey,
+    user: user
 };
 
 export class Remote {

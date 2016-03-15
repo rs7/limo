@@ -6,15 +6,13 @@ import {authCheck} from './util';
 import {app} from './express';
 
 app.use(function (req, res, next) {
-    if (authCheck(req.body.user_id, req.body.auth_key)) {
+    let {user, auth:authKey} = Object.assign({}, req.body, req.query);
+
+    if (authCheck(user, authKey)) {
         return next();
     }
 
-    if (authCheck(req.query.user_id, req.query.auth_key)) {
-        return next();
-    }
-
-    res.status(403).json({error: 'auth error'});
+    res.status(403).json({error: 'Ошибка авторизации'});
 });
 
 app.use(function (err, req, res, next) {

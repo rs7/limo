@@ -27,7 +27,6 @@ router.get('/api', function (req, res, next) {
                 id: feed._id.valueOf(),
                 photo: feed.photo,
                 user: feed.user,
-                date: feed.date,
                 period: feed.period
             };
         });

@@ -1,6 +1,6 @@
 'use strict';
 
-import async from 'async-q';
+const async = require('async-q');
 
 import * as model from './model';
 import {uniqueFilter, mapById, auto, processArray} from './util';
@@ -22,8 +22,7 @@ export function saveSnapshot() {
 
         save: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     }, {
-        returnTask: 'save',
-        log: false
+        returnTask: 'save'
     });
 }
 
@@ -50,7 +49,6 @@ export function getFeeds(page = 0) {
             })
         ]
     }, {
-        returnTask: 'fillFeeds',
-        log: false
+        returnTask: 'fillFeeds'
     });
 }

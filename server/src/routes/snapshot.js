@@ -76,9 +76,9 @@ function createFeeds(from, to) {
 
         unlikes.forEach(user =>
             feeds.push({
-                photo: photo,
-                user: user,
-                period: period
+                photo,
+                user,
+                period
             })
         );
     });

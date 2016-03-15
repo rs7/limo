@@ -1,6 +1,6 @@
 'use strict';
 
-import async from 'async-q';
+const async = require('async-q');
 
 export function auto(tasks, {returnTask, log} = {}) {
     if (log) {
