@@ -46,6 +46,10 @@ export function setSnapshot(snapshot) {
     return Remote.post('/snapshot', {snapshot});
 }
 
-export function getFeeds(page) {
-    return Remote.get('/feed', {page});
+export function getFeeds(from) {
+    return Remote.get('/feed', {from});
+}
+
+export function storageSet(key, value) {
+    return VK.private('storage.set', {key, value});
 }

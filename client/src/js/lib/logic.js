@@ -26,9 +26,9 @@ export function saveSnapshot() {
     });
 }
 
-export function getFeeds(page = 0) {
+export function getFeeds(from) {
     return auto({
-        feeds: () => model.getFeeds(page),
+        feeds: () => model.getFeeds(from),
 
         usersList: ['feeds', ({feeds}) => feeds.map(like => like.user).filter(uniqueFilter)],
 

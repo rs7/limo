@@ -4,33 +4,24 @@ let express = require('express');
 
 export let router = express.Router();
 
-import {User} from '../db';
+import {getFeed, validateObjectId} from '../model';
+import {sliceObject} from '../util';
 
 router.get('/feed', function (req, res, next) {
-    var input = req.query;
+    let {user, from} = req.query;
 
-    var userId = input.user_id;
-    var page = input.page;
+    let query = {
+        user
+    };
 
-    User.findOne({id: userId}, function (err, user) {
-        if (err) return next(err);
+    if (validateObjectId(from)) {
+        Object.assign(query, {from})
+    }
 
-        if (!user) {
-            res.status(404).json({error: 'not fount user'});
-            return;
-        }
+    const OUTPUT_KEYS = ['id', 'photo', 'user', 'period'];
 
-        var count = 10;
-        var offset = page * count;
-        var feeds = user.feeds.slice(offset, offset + count).map(function (feed) {
-            return {
-                id: feed._id.valueOf(),
-                photo: feed.photo,
-                user: feed.user,
-                period: feed.period
-            };
-        });
-
-        res.json({response: feeds});
-    });
+    getFeed(query).then(feeds => {
+        let response = feeds.map(feed => sliceObject(feed, OUTPUT_KEYS));
+        res.json({response});
+    }).catch(next);
 });

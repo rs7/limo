@@ -2,6 +2,22 @@
 
 const async = require('async-q');
 
+Array.prototype.first = function () {
+    return this[0];
+};
+
+Array.prototype.last = function () {
+    return this[this.length - 1];
+};
+
+Array.prototype.isEmpty = function () {
+    return this.length == 0;
+};
+
+Array.prototype.pushAll = function(array) {
+    this.push.apply(this, array);
+};
+
 export function auto(tasks, {returnTask, log} = {}) {
     if (log) {
         Object.keys(tasks).forEach(task => tasks[`__AUTO_LOG_${task}`] = [task, results => console.log(`AUTO_LOG ${task} => `, results[task])]);
@@ -74,4 +90,26 @@ export function parseDate(date) {
 
 export function stringSize(string) {
     return encodeURI(string).split(/%..|./).length - 1;
+}
+
+export class ObjectId {
+    static compare(a, b) {
+        return a.date - b.date || a.machine - b.machine || a.process - b.process || a.counter - b.counter;
+    }
+
+    constructor(value) {
+        this.value = value;
+        this.date = new Date(parseInt(this.value.slice(0, 8), 16) * 1000);
+        this.machine = parseInt(this.value.slice(8, 14), 16);
+        this.process = parseInt(this.value.slice(14, 18), 16);
+        this.counter = parseInt(this.value.slice(18, 25), 16);
+    }
+
+    toString() {
+        return this.value;
+    }
+}
+
+export function parseObjectId(value) {
+    return new ObjectId(value);
 }

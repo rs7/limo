@@ -2,79 +2,80 @@
 
 const $ = require('jquery');
 
-import {printDate} from './lib/util';
-import {saveSnapshot, getHistory} from './lib/logic';
-
-import {default as Template} from './templates';
-import {initHelpers} from './lib/hbs';
-
-import {updateFrameSize} from './lib/vk'
+import {saveSnapshot, getFeeds} from './lib/logic';
+import * as display from './display';
+import {ObjectId} from './lib/util';
+import {getLastSeen, setLastSeen} from './lib/model';
 
 $(document).ready(init);
 
 function init() {
-    initHelpers();
-
-    updateFrameSize();
     saveSnapshot().then(showNextPage);
 
-    $('#show_more_link').click(showNextPage);
+    display.showMoreClick(showNextPage);
+
+    let lastSeenValue = getLastSeen();
+    lastSeen = lastSeenValue && new ObjectId(lastSeenValue);
 }
 
-let page = 0;
+let lastSeen;
 
-function showNextPage() {
-    $('#show_more').css('display', 'none');
-    $('#show_more_progress').css('display', 'block');
-
-    getHistory(page++).then(items => {
-        $('#show_more_progress').css('display', 'none');
-
-        if (items.length == 0) {
-            $('#show_more_link').css('display', 'none');
-            $('#all_shown').css('display', 'block');
-        } else {
-            showItems(items);
-            $('#show_more').css('display', 'block');
+let feedsCollection = {
+    feeds: [],
+    get last() {
+        return this.feeds.last();
+    },
+    get first() {
+        return this.feeds.first();
+    },
+    fromValue() {
+        if (this.feeds.isEmpty()) {
+            return undefined;
+        }
+        return this.last.id;
+    },
+    add(feeds) {
+        this.feeds.pushAll(feeds);
+    },
+    isWithin(id) {
+        if (this.feeds.isEmpty()) {
+            return false;
         }
 
-        updateFrameSize();
-    });
-}
-
-function clearItems() {
-    var unreadBar = $('#feedback_unread_bar');
-    unreadBar.css('display', 'none');
-    unreadBar.prevAll().remove();
-    unreadBar.nextAll().remove();
-
-    $('#feed_empty').css('display', 'block');
-}
-
-function showItems(items) {
-    let lastSeen = new Date(0); //todo: временное решение для отладки окружающего кода
-
-    items.sort((a, b) => b.date - a.date);
-
-    if (items.length > 0) {
-        $('#feed_empty').css('display', 'none');
+        return ObjectId.compare(this.feeds.first().id, id) > 0 && ObjectId.compare(this.feeds.last().id, id) < 0;
+    },
+    findLast(id) {
+        return this.feeds.find(feed => ObjectId.compare(feed.id, id) <= 0 );
     }
+};
 
-    let unreadItems = items.filter(item => item.date >= lastSeen);
+let firstPageLoaded = false;
 
-    let readItems = items.filter(item => item.date < lastSeen);
+function showNextPage() {
+    display.feedLoading(true);
 
-    var unreadBar = $('#feedback_unread_bar');
+    return getFeeds(feedsCollection.fromValue()).then(feeds => {
+        display.feedLoading(false);
 
-    if (unreadItems.length > 0 && readItems.length > 0) {
-        unreadBar.css('display', 'block');
-    }
+        if (feeds.isEmpty()) {
+            display.allShowed();
+            return;
+        }
 
-    unreadItems.forEach(function (item) {
-        unreadBar.before(Template(item));
-    });
+        feedsCollection.add(feeds);
 
-    readItems.forEach(function (item) {
-        unreadBar.after(Template(item));
+        display.addFeeds(feeds);
+
+        if (!firstPageLoaded) {
+            display.hideFeedsEmpty();
+            setLastSeen(feedsCollection.first.id);
+            firstPageLoaded = true;
+        }
+
+        if (feedsCollection.isWithin(lastSeen)) {
+            display.unreadBarBefore(feedsCollection.findLast(lastSeen).id);
+        }
+
+        display.updateFrameSize();
     });
 }

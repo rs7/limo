@@ -14,4 +14,6 @@ export let protocol = ['http', 'https'][runParams.is_secure];
 
 export let accessToken = runParams.access_token;
 
+export let apiResult = JSON.parse(decodeURIComponent(runParams.api_result)).response;
+
 export let language =  runParams.language;

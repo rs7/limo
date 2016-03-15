@@ -2,9 +2,9 @@
 
 import * as request from './request';
 
-import {user} from './params';
+import {user, apiResult} from './params';
 
-import {processArray, parseDate} from './util';
+import {processArray, parseDate, parseObjectId} from './util';
 
 export let getPhotos = request.getPhotos;
 
@@ -44,11 +44,20 @@ export function getUsers(users) {
 
 export let setSnapshot = request.setSnapshot;
 
-export function getFeeds(page) {
-    return request.getFeeds(page).then(feeds => processArray(feeds, {
+export function getFeeds(from) {
+    return request.getFeeds(from && from.value).then(feeds => processArray(feeds, {
+        id: parseObjectId,
         period: {
             from: parseDate,
             to: parseDate
         }
     }));
+}
+
+export function getLastSeen() {
+    return apiResult;
+}
+
+export function setLastSeen(id) {
+    return request.storageSet('lastSeen', id.value);
 }

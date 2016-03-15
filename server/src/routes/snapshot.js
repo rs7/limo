@@ -4,55 +4,29 @@ let express = require('express');
 
 export let router = express.Router();
 
-import {User} from '../db';
+import {getUser, addFeeds} from '../model';
 
 router.post('/snapshot', function (req, res, next) {
-    var input = req.body;
+    let {user, snapshot} = req.body;
 
-    var userId = input.user_id;
-    var snapshot = {
-        date: new Date(),
-        items: input.snapshot
-    };
-
-    User.findOne({id: userId}, function (err, user) {
-        if (err) return next(err);
-
-        if (!user) {
-            user = new User({
-                id: userId,
-                snapshot: {
-                    date: new Date(0),
-                    items: []
-                },
-                feeds: []
-            });
-        }
-
-        var feeds = createFeeds(user.snapshot, snapshot);
-
-        feeds.forEach(function (feed) {
-            user.feeds.unshift(feed);
+    getUser(user).then(user => {
+        let feeds = createFeeds(user.id, user.snapshot, {
+            date: new Date(),
+            items: snapshot
         });
 
-        snapshot.items = snapshot.items.filter(function (item) {
-            return item.likes.length > 0;
-        });
+        user.snapshot.items = snapshot.filter(item => item.likes.length > 0);
+        user.snapshot.date = new Date();
 
-        user.snapshot = snapshot;
-        user.last_seen = new Date();
-
-        user.save(function (err) {
-            if (err) return next(err);
-
-            res.json({response: 1});
-        });
-    });
+        return addFeeds(feeds).then(() => user.save());
+    }).catch(next).then(() =>
+        res.json({response: 1}
+    ));
 });
 
 let diff = require('simple-array-diff');
 
-function createFeeds(from, to) {
+function createFeeds(owner, from, to) {
     let period = {
         from: from.date,
         to: to.date
@@ -78,7 +52,8 @@ function createFeeds(from, to) {
             feeds.push({
                 photo,
                 user,
-                period
+                period,
+                owner
             })
         );
     });
