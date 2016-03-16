@@ -50,5 +50,14 @@ describe('Валидация схем', function () {
             }));
         });
 
+        it('Схема без snapshot items', function () {
+            assert.isDefined(user({
+                id: 5364435,
+                snapshot: {
+                    date: new Date()
+                }
+            }));
+        });
+
     });
 });
