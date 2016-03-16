@@ -1,6 +1,6 @@
 'use strict';
 
-let assert = require('assert');
+let assert = require('chai').assert;
 
 import {Feed, User} from '../src/db';
 
@@ -17,7 +17,7 @@ describe('Валидация схем', function () {
     describe('Feed', function () {
 
         it('Валидная схема', function () {
-            assert.equal(undefined, feed({
+            assert.isUndefined(feed({
                 owner: 1052662,
                 photo: 324186596,
                 user: 53083705,
@@ -33,7 +33,7 @@ describe('Валидация схем', function () {
     describe('User', function () {
 
         it('Валидная схема', function () {
-            assert.equal(undefined, user({
+            assert.isUndefined(user({
                 id: 5364435,
                 snapshot: {
                     date: new Date(), items: [{
