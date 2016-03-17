@@ -16,7 +16,7 @@ mongoose.connect('mongodb://localhost/limo');
 
 let likesSchema = mongoose.Schema({
     photo: {type: Number, required: true},
-    likes: {type: [Number], default: []}
+    likes: [Number]
 }, {
     strict: 'throw',
     _id: false
@@ -24,7 +24,7 @@ let likesSchema = mongoose.Schema({
 
 let snapshotSchema = mongoose.Schema({
     date: {type: Date, required: true},
-    items: {type: [likesSchema], default: []}
+    items: [likesSchema]
 }, {
     strict: 'throw',
     _id: false
