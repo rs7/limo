@@ -6,11 +6,12 @@ import {processArray, parseDate, parseObjectId} from './util';
 
 import * as vkexec from './vk/exec';
 import * as vkr from './vk/request';
+import {fetchAll} from './vk/fetch';
 
 import * as remote from './remote/request';
 
 export function getPhotos() {
-    return vkexec.pub(vkr.getPhotos());
+    return fetchAll(vkr.getPhotos(), vkexec.pub);
 }
 
 export function getPhotosByList(photos) {
@@ -44,7 +45,7 @@ export function getPhotosByList(photos) {
 }
 
 export function getLikes(photo) {
-    return vkexec.pub(vkr.getLikes(photo));
+    return fetchAll(vkr.getLikes(photo), vkexec.pub);
 }
 
 export function getUsers(users) {
