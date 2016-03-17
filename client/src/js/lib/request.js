@@ -43,11 +43,11 @@ export function getUsers(users) {
 }
 
 export function setSnapshot(snapshot) {
-    return Remote.post('/snapshot', null, {snapshot});
+    return Remote.post('/snapshot', {user}, {snapshot});
 }
 
 export function getFeeds(from) {
-    return Remote.get('/feed', {from});
+    return Remote.get('/feed', {user, from});
 }
 
 export function storageSet(key, value) {
