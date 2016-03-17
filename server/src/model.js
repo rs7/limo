@@ -2,8 +2,6 @@
 
 import {User, Feed, validateObjectId, objectId} from './db';
 
-export {validateObjectId};
-
 export function getFeed({user, from}) {
     let query = {
         owner: user

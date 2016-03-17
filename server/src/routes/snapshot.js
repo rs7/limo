@@ -7,7 +7,18 @@ export let router = express.Router();
 import {getUser, addFeeds} from '../model';
 
 router.post('/snapshot', function (req, res, next) {
-    let {user, snapshot} = req.body;
+    req.checkBody('snapshot').isSnapshot();
+    req.checkQuery('user').isUser();
+
+    let errors = req.validationErrors();
+
+    if (errors) {
+        res.status(400).json({error: {message: 'Ошибка валидации параметров', debug: errors}});
+        return;
+    }
+
+    let {snapshot} = req.body;
+    let {user} = req.query;
 
     getUser(user).then(user => {
         let feeds = createFeeds(user.id, user.snapshot, {

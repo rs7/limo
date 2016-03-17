@@ -8,7 +8,7 @@ export function objectId(value) {
     return validateObjectId(value) && new ObjectId(value);
 }
 
-export function validateObjectId(id) {
+function validateObjectId(id) {
     return /^[0-9a-fA-F]{24}$/.test(id);
 }
 

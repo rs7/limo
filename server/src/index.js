@@ -6,13 +6,27 @@ import {authCheck} from './util';
 import {app} from './express';
 
 app.use(function (req, res, next) {
-    let {user, auth:authKey} = Object.assign({}, req.body, req.query);
+    req.check('auth').isAuthKey();
+    req.check('user').isUser();
 
-    if (authCheck(user, authKey)) {
+    let errors = req.validationErrors();
+
+    if (errors) {
+        res.status(400).json({error: {message: 'Ошибка валидации параметров', debug: errors}});
+        return;
+    }
+
+    next();
+});
+
+app.use(function (req, res, next) {
+    let {user, auth} = req.query;
+
+    if (authCheck(user, auth)) {
         return next();
     }
 
-    res.status(403).json({error: 'Ошибка авторизации'});
+    res.status(403).json({error: {message: 'Ошибка авторизации', debug: {user, auth}}});
 });
 
 app.use(function (err, req, res, next) {
