@@ -50,11 +50,12 @@ describe('Валидация схем', function () {
             }));
         });
 
-        it('Схема без snapshot items', function () {
-            assert.isDefined(user({
+        it('Пустой items', function () {
+            assert.isUndefined(user({
                 id: 5364435,
                 snapshot: {
-                    date: new Date()
+                    date: new Date(),
+                    items: []
                 }
             }));
         });
