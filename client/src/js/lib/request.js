@@ -8,7 +8,7 @@ export function getPhotos() {
         owner_id: user,
         album_id: 'profile',
         rev: 1,
-        count: 10
+        count: 20
     });
 }
 
@@ -27,7 +27,7 @@ export function getLikes(photo) {
         type: 'photo',
         owner_id: user,
         item_id: photo,
-        count: 100
+        count: 1000
     });
 }
 
