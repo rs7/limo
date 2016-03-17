@@ -19,13 +19,21 @@ export class Remote {
         });
     }
 
-    static post(endpoint, data) {
-        let query = Object.assign({}, data, CONST_SERVER_PARAMS);
+    static post(endpoint, params, data) {
+        let url = endpoint;
+
+        let query = Object.assign({}, params, CONST_SERVER_PARAMS);
+
+        let queryStr = $.param(query);
+
+        if (queryStr) {
+            url += `?${queryStr}`;
+        }
 
         return ajax({
-            url: endpoint,
+            url: url,
             type: 'POST',
-            data: JSON.stringify(query),
+            data: JSON.stringify(data),
             contentType: 'application/json; charset=utf-8',
             dataType: 'json'
         });
