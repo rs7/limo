@@ -1,5 +1,6 @@
 'use strict';
 
+const $ = require('jquery');
 const async = require('async-q');
 
 Array.prototype.first = function () {
@@ -14,7 +15,7 @@ Array.prototype.isEmpty = function () {
     return this.length == 0;
 };
 
-Array.prototype.pushAll = function(array) {
+Array.prototype.pushAll = function (array) {
     this.push.apply(this, array);
 };
 
@@ -112,4 +113,19 @@ export class ObjectId {
 
 export function parseObjectId(value) {
     return new ObjectId(value);
+}
+
+export function ajax(params) {
+    return new Promise((resolve, reject) => {
+        $.ajax(params).then(
+            response => {
+                if (response.response) {
+                    return resolve(response.response);
+                }
+
+                reject(response.error || response);
+            },
+            reject
+        );
+    });
 }

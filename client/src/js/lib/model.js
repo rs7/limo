@@ -1,19 +1,24 @@
 'use strict';
 
-import * as request from './request';
-
 import {user, apiResult} from './params';
 
 import {processArray, parseDate, parseObjectId} from './util';
 
-export let getPhotos = request.getPhotos;
+import * as vkexec from './vk/exec';
+import * as vkr from './vk/request';
+
+import * as remote from './remote/request';
+
+export function getPhotos() {
+    return vkexec.pub(vkr.getPhotos());
+}
 
 export function getPhotosByList(photos) {
-    if (photos.length == 0) {
+    if (photos.isEmpty()) {
         return [];
     }
 
-    return request.getPhotosByList(photos).catch(error => {
+    return vkexec.pub(vkr.getPhotosByList(photos)).catch(error => {
         if (error.error_code == 200) {
             //Код 200 возвращается, если все фотографии в запрашиваемом списке удалены
             return [];
@@ -22,6 +27,8 @@ export function getPhotosByList(photos) {
         throw error;
     }).then(responsePhotos => {
         //В запрашиваемом списке были удалённые фотографии, добавляем заглушку вместо них
+
+        //todo: Отрефакторить это место
         if (responsePhotos.length < photos.length) {
             let responsePhotosList = responsePhotos.map(photo => photo.id);
             let deletedPhotos = photos.filter(photo => !responsePhotosList.includes(photo));
@@ -36,16 +43,24 @@ export function getPhotosByList(photos) {
     });
 }
 
-export let getLikes = request.getLikes;
-
-export function getUsers(users) {
-    return (users.length > 0) ? request.getUsers(users) : [];
+export function getLikes(photo) {
+    return vkexec.pub(vkr.getLikes(photo));
 }
 
-export let setSnapshot = request.setSnapshot;
+export function getUsers(users) {
+    if (users.isEmpty()) {
+        return [];
+    }
+
+    return vkexec.pub(vkr.getUsers(users));
+}
+
+export function setSnapshot(snapshot) {
+    return remote.setSnapshot(snapshot);
+}
 
 export function getFeeds(from) {
-    return request.getFeeds(from && from.value).then(feeds => processArray(feeds, {
+    return remote.getFeeds(from && from.value).then(feeds => processArray(feeds, {
         id: parseObjectId,
         period: {
             from: parseDate,
@@ -59,5 +74,5 @@ export function getLastSeen() {
 }
 
 export function setLastSeen(id) {
-    return request.storageSet('lastSeen', id.value);
+    return vkexec.priv(vkr.storageSet('lastSeen', id.value));
 }
