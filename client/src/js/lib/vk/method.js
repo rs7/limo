@@ -1,5 +1,7 @@
 'use strict';
 
+const _ = '_';
+
 export let API = {
     photos: {
         get: {
@@ -30,15 +32,27 @@ export let API = {
 
     storage: {
         set: {}
+    },
+
+    [_]: {
+        execute: {}
     }
 };
 
 function createNames() {
     Object.keys(API).forEach(group =>
         Object.keys(API[group]).forEach(method =>
-            API[group][method].name = `${group}.${method}`
+            API[group][method].name = createName(group, method)
         )
     );
+
+    function createName(group, method) {
+        if (group == _) {
+            return method;
+        }
+
+        return `${group}.${method}`;
+    }
 }
 
 createNames();

@@ -129,3 +129,26 @@ export function ajax(params) {
         );
     });
 }
+
+export function throttle(callback, limit) {
+    let wait = false;
+    return function () {
+        if (!wait) {
+            callback.call();
+            wait = true;
+            setTimeout(function () {
+                wait = false;
+            }, limit);
+        }
+    }
+}
+
+export function Deferred() {
+    this.resolve = null;
+    this.reject = null;
+    this.promise = new Promise(function (resolve, reject) {
+        this.resolve = resolve;
+        this.reject = reject;
+    }.bind(this));
+    Object.freeze(this);
+}

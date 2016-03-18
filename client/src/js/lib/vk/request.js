@@ -52,3 +52,7 @@ export function storageSet(key, value) {
         value
     });
 }
+
+export function execute(code) {
+    return create(API._.execute, {code});
+}
