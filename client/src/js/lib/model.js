@@ -4,14 +4,15 @@ import {user, apiResult} from './params';
 
 import {processArray, parseDate, parseObjectId} from './util';
 
-import * as vkexec from './vk/exec';
-import * as vkr from './vk/request';
-import {fetchAll} from './vk/fetch';
-
+import * as vk from './vk/request';
 import * as remote from './remote/request';
 
+import {exec} from './vk/exec/exec';
+
+import * as list from './vk/list';
+
 export function getPhotos() {
-    return fetchAll(vkr.getPhotos(), vkexec.pub);
+    return list.get(vk.getPhotos(), exec);
 }
 
 export function getPhotosByList(photos) {
@@ -19,7 +20,7 @@ export function getPhotosByList(photos) {
         return [];
     }
 
-    return vkexec.pub(vkr.getPhotosByList(photos)).catch(error => {
+    return exec(vk.getPhotosByList(photos)).catch(error => {
         if (error.error_code == 200) {
             //Код 200 возвращается, если все фотографии в запрашиваемом списке удалены
             return [];
@@ -45,7 +46,7 @@ export function getPhotosByList(photos) {
 }
 
 export function getLikes(photo) {
-    return fetchAll(vkr.getLikes(photo), vkexec.pub);
+    return list.get(vk.getLikes(photo), exec);
 }
 
 export function getUsers(users) {
@@ -53,7 +54,7 @@ export function getUsers(users) {
         return [];
     }
 
-    return vkexec.pub(vkr.getUsers(users));
+    return exec(vk.getUsers(users));
 }
 
 export function setSnapshot(snapshot) {
@@ -75,5 +76,5 @@ export function getLastSeen() {
 }
 
 export function setLastSeen(id) {
-    return vkexec.priv(vkr.storageSet('lastSeen', id.value));
+    return exec(vk.storageSet('lastSeen', id.value));
 }
