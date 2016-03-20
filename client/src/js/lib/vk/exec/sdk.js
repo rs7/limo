@@ -1,15 +1,13 @@
 'use strict';
 
+import {promiseCb} from '../../util';
+
 import {api} from '../../vk_sdk';
 
 export function sdk({method, params}) {
-    return new Promise((resolve, reject) => {
-        api(method.name, params, response => {
-            if (response.response) {
-                return resolve(response.response);
-            }
+    console.log('sdk', {method, params});
 
-            reject(response.error || response);
-        });
-    });
+    return new Promise((resolve, reject) =>
+        api(method.name, params, promiseCb(resolve, reject))
+    );
 }

@@ -4,12 +4,12 @@ const async = require('async-q');
 
 import {auto} from '../util';
 
-export function get(request, exec, from = 0, to = undefined, limit = 0) {
+export function get(request, exec, from = 0, to = -1, limit = 0) {
     if (limit == 0) {
         limit = request.method.list.limit;
     }
 
-    if (to === undefined) {
+    if (to === -1) {
         return doGet(request, exec, from, limit, limit).then(({count, items}) => {
             from = limit;
             to = count;

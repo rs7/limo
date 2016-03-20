@@ -9,6 +9,8 @@ const PARAMS = {
 };
 
 export function priv({method, params}) {
+    console.log('priv', {method, params});
+
     return ajax({
         url: `https://api.vk.com/method/${method.name}`,
         data: Object.assign({}, params, PARAMS),

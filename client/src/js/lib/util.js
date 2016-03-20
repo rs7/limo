@@ -118,16 +118,20 @@ export function parseObjectId(value) {
 export function ajax(params) {
     return new Promise((resolve, reject) => {
         $.ajax(params).then(
-            response => {
-                if (response.response) {
-                    return resolve(response.response);
-                }
-
-                reject(response.error || response);
-            },
+            promiseCb(resolve, reject),
             reject
         );
     });
+}
+
+export function promiseCb(resolve, reject) {
+    return function (response) {
+        if (response.response) {
+            return resolve(response.response);
+        }
+
+        reject(response.error || response);
+    };
 }
 
 export function throttle(callback, limit) {

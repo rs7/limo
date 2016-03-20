@@ -5,6 +5,8 @@ import {protocol} from '../../params';
 import {ajax} from '../../util';
 
 export function pub({method, params}) {
+    console.log('pub', {method, params});
+
     return ajax({
         url: `${protocol}://api.vk.com/method/${method.name}`,
         data: params,

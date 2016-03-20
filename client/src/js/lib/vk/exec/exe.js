@@ -2,13 +2,15 @@
 
 import {execute} from '../request';
 
-import {exec} from './exec';
+import {sdk} from './sdk';
 
 export function exe(requests) {
+    console.log('exe', requests);
+
     let code = `return [${requests.map(getApiCall).join()}];`;
     let request = execute(code);
 
-    return exec(request);
+    return sdk(request);
 }
 
 function getApiCall(request) {

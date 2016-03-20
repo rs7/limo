@@ -4,8 +4,6 @@ import {Deferred} from '../../util';
 
 import {populate} from '../options';
 
-import {pub} from './pub';
-import {priv} from './priv';
 import {exe} from './exe';
 import {sdk} from './sdk';
 
