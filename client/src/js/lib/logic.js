@@ -2,8 +2,9 @@
 
 const async = require('async-q');
 
+import {uniqueFilter, auto, processArray} from './util';
+
 import * as model from './model';
-import {uniqueFilter, mapById, auto, processArray} from './util';
 
 export function saveSnapshot() {
     return auto({
@@ -51,4 +52,8 @@ export function getFeeds(from) {
     }, {
         returnTask: 'fillFeeds'
     });
+}
+
+function mapById(array) {
+    return new Map(array.map(item => [item.id, item]));
 }

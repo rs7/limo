@@ -4,15 +4,15 @@ import {user, apiResult} from './params';
 
 import {processArray, parseDate, parseObjectId} from './util';
 
-import * as vk from './vk/request';
+import * as vk from './vk_request';
 import * as remote from './remote/request';
 
-import {exec} from './vk/exec/exec';
+import {execute} from './vk/executor';
 
-import * as list from './vk/list';
+import {aggregate} from './vk/listAggregator';
 
 export function getPhotos() {
-    return list.get(vk.getPhotos(), exec);
+    return aggregate(vk.getPhotos(), execute);
 }
 
 export function getPhotosByList(photos) {
@@ -20,7 +20,7 @@ export function getPhotosByList(photos) {
         return [];
     }
 
-    return exec(vk.getPhotosByList(photos)).catch(error => {
+    return execute(vk.getPhotosByList(photos)).catch(error => {
         if (error.error_code == 200) {
             //Код 200 возвращается, если все фотографии в запрашиваемом списке удалены
             return [];
@@ -46,7 +46,7 @@ export function getPhotosByList(photos) {
 }
 
 export function getLikes(photo) {
-    return list.get(vk.getLikes(photo), exec);
+    return aggregate(vk.getLikes(photo), execute);
 }
 
 export function getUsers(users) {
@@ -54,7 +54,7 @@ export function getUsers(users) {
         return [];
     }
 
-    return exec(vk.getUsers(users));
+    return execute(vk.getUsers(users));
 }
 
 export function setSnapshot(snapshot) {
@@ -62,13 +62,18 @@ export function setSnapshot(snapshot) {
 }
 
 export function getFeeds(from) {
-    return remote.getFeeds(from && from.value).then(feeds => processArray(feeds, {
-        id: parseObjectId,
-        period: {
-            from: parseDate,
-            to: parseDate
-        }
-    }));
+    let fromValue = from && from.value;
+
+    return remote
+        .getFeeds(fromValue)
+        .then(feeds => processArray(feeds, {
+            id: parseObjectId,
+            period: {
+                from: parseDate,
+                to: parseDate
+            }
+        }))
+    ;
 }
 
 export function getLastSeen() {
@@ -76,5 +81,5 @@ export function getLastSeen() {
 }
 
 export function setLastSeen(id) {
-    return exec(vk.storageSet('lastSeen', id.value));
+    return execute(vk.storageSet('lastSeen', id.value));
 }

@@ -1,17 +1,15 @@
 'use strict';
 
-import {accessToken} from '../../params';
+import {accessToken} from '../params';
 
-import {ajax} from '../../util';
+import {fetch} from '../util';
 
 const PARAMS = {
     access_token: accessToken
 };
 
-export function priv({method, params}) {
-    console.log('priv', {method, params});
-
-    return ajax({
+export function execute({method, params}) {
+    return fetch({
         url: `https://api.vk.com/method/${method.name}`,
         data: Object.assign({}, params, PARAMS),
         dataType: 'jsonp'

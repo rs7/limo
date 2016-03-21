@@ -1,8 +1,8 @@
 'use strict';
 
-import {user} from '../params';
+import {user} from './params';
 
-import {API} from './method';
+import {API} from './vk/method';
 
 function create(method, params, options) {
     return {

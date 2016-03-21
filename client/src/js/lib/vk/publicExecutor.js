@@ -1,11 +1,11 @@
 'use strict';
 
-import {protocol} from '../../params';
+import {protocol} from '../params';
 
-import {ajax} from '../../util';
+import {ajax} from '../util';
 
-export function pub({method, params}) {
-    console.log('pub', {method, params});
+export function execute({method, params}) {
+    console.log('execute', {method, params});
 
     return ajax({
         url: `${protocol}://api.vk.com/method/${method.name}`,

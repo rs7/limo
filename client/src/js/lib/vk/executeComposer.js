@@ -1,16 +1,12 @@
 'use strict';
 
-import {execute} from '../request';
+import {execute} from '../vk_request';
 
-import {sdk} from './sdk';
-
-export function exe(requests) {
-    console.log('exe', requests);
-
+export function compose(requests) {
     let code = `return [${requests.map(getApiCall).join()}];`;
     let request = execute(code);
 
-    return sdk(request);
+    return request;
 }
 
 function getApiCall(request) {

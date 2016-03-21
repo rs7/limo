@@ -4,7 +4,7 @@ const $ = require('jquery');
 
 import {user, authKey} from '../params';
 
-import {ajax} from '../util';
+import {fetch} from '../util';
 
 const CONST_SERVER_PARAMS = {
     auth: authKey,
@@ -14,7 +14,7 @@ const CONST_SERVER_PARAMS = {
 export function get(endpoint, params) {
     let query = Object.assign({}, params, CONST_SERVER_PARAMS);
 
-    return ajax({
+    return fetch({
         url: endpoint,
         data: query
     });
@@ -31,7 +31,7 @@ export function post(endpoint, params, data) {
         url += `?${queryStr}`;
     }
 
-    return ajax({
+    return fetch({
         url: url,
         type: 'POST',
         data: JSON.stringify(data),

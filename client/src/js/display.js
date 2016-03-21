@@ -5,7 +5,7 @@ const $ = require('jquery');
 const FeedRowTemplate = require('./templates');
 
 import {initHelpers} from './lib/hbs';
-import {resizeFrame} from './lib/vk';
+import {frameHeight} from './lib/vk_sdk';
 
 $(window).load(init);
 
@@ -15,7 +15,7 @@ function init() {
 }
 
 export function updateFrameSize() {
-    resizeFrame($('body').outerHeight());
+    frameHeight($('body').outerHeight());
 }
 
 export function showMoreClick(handler) {

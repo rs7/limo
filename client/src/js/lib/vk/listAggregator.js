@@ -2,15 +2,13 @@
 
 const async = require('async-q');
 
-import {auto} from '../util';
-
-export function get(request, exec, from = 0, to = -1, limit = 0) {
+export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
     if (limit == 0) {
         limit = request.method.list.limit;
     }
 
     if (to === -1) {
-        return doGet(request, exec, from, limit, limit).then(({count, items}) => {
+        return getList(request, executor, from, limit, limit).then(({count, items}) => {
             from = limit;
             to = count;
 
@@ -20,7 +18,7 @@ export function get(request, exec, from = 0, to = -1, limit = 0) {
 
             let firstItems = items;
 
-            return doGet(request, exec, from, to, limit).then(({from, to, items: otherItems}) => {
+            return getList(request, executor, from, to, limit).then(({from, to, items: otherItems}) => {
                 let items = [].concat(firstItems, otherItems);
 
                 return {from, to, count, items};
@@ -28,10 +26,10 @@ export function get(request, exec, from = 0, to = -1, limit = 0) {
         });
     }
 
-    return doGet(request, exec, from, to, limit);
+    return getList(request, executor, from, to, limit);
 }
 
-export function doGet(request, exec, from, to, limit) {
+function getList(request, exec, from, to, limit) {
     let requests = getListParams(from, to, limit).map(params => populateRequest(request, params));
 
     return async.map(requests, exec).then(results => {

@@ -1,37 +1,12 @@
 'use strict';
 
-const $ = require('jquery');
-const async = require('async-q');
-
-Array.prototype.first = function () {
-    return this[0];
-};
-
-Array.prototype.last = function () {
-    return this[this.length - 1];
-};
-
-Array.prototype.isEmpty = function () {
-    return this.length == 0;
-};
-
-Array.prototype.pushAll = function (array) {
-    this.push.apply(this, array);
-};
-
-export function auto(tasks, {returnTask, log} = {}) {
-    if (log) {
-        Object.keys(tasks).forEach(task => tasks[`__AUTO_LOG_${task}`] = [task, results => console.log(`AUTO_LOG ${task} => `, results[task])]);
-    }
-
-    return new Promise((resolve, reject) => {
-        async.auto(tasks).then(results => resolve(results[returnTask]), reject);
-    });
-}
-
-export function mapById(array) {
-    return new Map(array.map(item => [item.id, item]));
-}
+export {printDate, printPeriod} from './date';
+export {fetch, responseCallback} from './net';
+export {auto} from './util/async';
+export {Deferred, timeout} from './util/promise';
+export {uniqueFilter} from './util/array';
+export {ObjectId} from './util/objectId';
+export {parseDate, parseObjectId} from './util/parse';
 
 export function getUrlVars() {
     var vars = {};
@@ -43,14 +18,12 @@ export function getUrlVars() {
     return vars;
 }
 
-export {printDate, printPeriod} from './date';
-
-export function uniqueFilter(value, index, self) {
-    return self.indexOf(value) === index;
-}
-
 export function timestamp(date) {
     return Math.floor(date.getTime() / 1000);
+}
+
+export function stringSize(string) {
+    return encodeURI(string).split(/%..|./).length - 1;
 }
 
 export function processArray(array, process) {
@@ -83,76 +56,4 @@ export function processObject(object, process) {
     });
 
     return Object.assign({}, object, processed);
-}
-
-export function parseDate(date) {
-    return new Date(date);
-}
-
-export function stringSize(string) {
-    return encodeURI(string).split(/%..|./).length - 1;
-}
-
-export class ObjectId {
-    static compare(a, b) {
-        return a.date - b.date || a.machine - b.machine || a.process - b.process || a.counter - b.counter;
-    }
-
-    constructor(value) {
-        this.value = value;
-        this.date = new Date(parseInt(this.value.slice(0, 8), 16) * 1000);
-        this.machine = parseInt(this.value.slice(8, 14), 16);
-        this.process = parseInt(this.value.slice(14, 18), 16);
-        this.counter = parseInt(this.value.slice(18, 25), 16);
-    }
-
-    toString() {
-        return this.value;
-    }
-}
-
-export function parseObjectId(value) {
-    return new ObjectId(value);
-}
-
-export function ajax(params) {
-    return new Promise((resolve, reject) => {
-        $.ajax(params).then(
-            promiseCb(resolve, reject),
-            reject
-        );
-    });
-}
-
-export function promiseCb(resolve, reject) {
-    return function (response) {
-        if (response.response) {
-            return resolve(response.response);
-        }
-
-        reject(response.error || response);
-    };
-}
-
-export function throttle(callback, limit) {
-    let wait = false;
-    return function () {
-        if (!wait) {
-            callback.call();
-            wait = true;
-            setTimeout(function () {
-                wait = false;
-            }, limit);
-        }
-    }
-}
-
-export function Deferred() {
-    this.resolve = null;
-    this.reject = null;
-    this.promise = new Promise(function (resolve, reject) {
-        this.resolve = resolve;
-        this.reject = reject;
-    }.bind(this));
-    Object.freeze(this);
 }
