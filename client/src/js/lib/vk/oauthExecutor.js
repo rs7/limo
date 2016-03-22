@@ -4,11 +4,17 @@ import {accessToken} from '../params';
 
 import {fetch} from '../util';
 
+import {stripDefault} from './options';
+
 const PARAMS = {
     access_token: accessToken
 };
 
-export function execute({method, params}) {
+export function execute(request) {
+    let {method, params} = stripDefault(request);
+
+    console.log('oauth', {method, params});
+
     return fetch({
         url: `https://api.vk.com/method/${method.name}`,
         data: Object.assign({}, params, PARAMS),

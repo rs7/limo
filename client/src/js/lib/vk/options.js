@@ -17,3 +17,19 @@ export function populate(params, options = {}) {
 
     return result;
 }
+
+export function stripDefault({method, params: source}) {
+    let defaults = method.default;
+
+    if (!defaults) {
+        return {method, params: source};
+    }
+
+    let params = {};
+    Object.keys(source).forEach(key => {
+        if (source[key] != defaults[key]) {
+            params[key] = source[key];
+        }
+    });
+    return {method, params};
+}

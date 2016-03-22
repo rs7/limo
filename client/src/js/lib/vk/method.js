@@ -1,5 +1,7 @@
 'use strict';
 
+import {user} from '../params';
+
 const _ = '_';
 
 export let API = {
@@ -8,6 +10,11 @@ export let API = {
             public: 1,
             list: {
                 limit: 1000
+            },
+            default: {
+                owner_id: user,
+                offset: 0,
+                count: 1000
             }
         },
         getById: {
@@ -20,6 +27,11 @@ export let API = {
             public: 1,
             list: {
                 limit: 1000
+            },
+            default: {
+                owner_id: user,
+                offset: 0,
+                count: 100
             }
         }
     },
