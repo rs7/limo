@@ -1,14 +1,8 @@
 'use strict';
 
-import {Deferred} from '../util';
-
 import {populate} from './options';
 
-import {throttle} from './throttle';
-
-//import {compose} from './executeComposer';
-
-import {execute as run} from './sdkExecutor';
+import {addRequest} from './queue';
 
 export function execute({method, params, options}) {
     let request = {
@@ -16,5 +10,5 @@ export function execute({method, params, options}) {
         params: populate(params, options)
     };
 
-    return throttle(request, run);
+    return addRequest(request);
 }

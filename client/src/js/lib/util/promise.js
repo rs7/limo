@@ -13,5 +13,9 @@ export function Deferred() {
         this.reject = reject;
     });
 
+    this.follow = function (promise) {
+        promise.then(this.resolve, this.reject);
+    };
+
     Object.freeze(this);
 }

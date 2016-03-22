@@ -1,37 +1,31 @@
 'use strict';
 
-import {timeout} from '../util';
-
-const params = {
-    time: 3000,
-    count: 9
-};
-
-let last = [];
-
-export function throttle(request, executer) {
-    let delay = add();
-
-    return timeout(delay).then(() => executer(request));
+function currentTime() {
+    return new Date().getTime();
 }
 
-function add() {
-    let delay = when();
-    remember(delay);
-    return delay;
-}
-
-function remember(delay) {
-    last.push(new Date(new Date().getTime() + delay));
-    last = last.slice(-params.count);
-}
-
-function when() {
-    if (last.length < params.count) {
-        return 0;
+class Throttle {
+    constructor(time, count) {
+        this.time = time;
+        this.count = count;
+        this.memory = new Array(count).fill(currentTime() - time);
     }
 
-    let time = params.time - (new Date().getTime() - last.first().getTime());
+    next() {
+        let delay = this.delay();
+        let time = currentTime() + delay;
 
-    return Math.max(0, time);
+        this.memory.push(time);
+        this.memory = this.memory.slice(-this.count);
+
+        return delay;
+    }
+
+    delay() {
+        let time = this.memory.first() + this.time - currentTime();
+
+        return Math.max(0, time);
+    }
 }
+
+export let throttle = new Throttle(3000, 9);
