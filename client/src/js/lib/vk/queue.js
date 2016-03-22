@@ -2,78 +2,123 @@
 
 import {Deferred} from '../util';
 
-import {execute as run} from './sdkExecutor';
-//import {execute as run} from './oauthExecutor';
+import {execute} from './sdkExecutor';
 
 import {throttle} from './throttle';
 
-import {timeout} from '../util';
-
-import {compose} from './executeComposer';
+import {group, canGroup, groupLimit} from './group';
 
 export function addRequest(request) {
-    let deferred = new Deferred();
-
     let task = {
         request,
-        deferred
+        deferred: new Deferred()
     };
 
-    if (request.method.name == 'execute') {
-        schedule(task)
-    } else {
-        addToBucket(task)
-    }
+    add(task);
 
-    return deferred.promise;
+    return task.deferred.promise;
 }
 
-function schedule(task) {
-    let delay = throttle.next();
+//----------------------------------------
 
-    console.log('schedule', delay, task);
+let queue = [];
 
-    setTimeout(() => {
-        task.deferred.follow(run(task.request));
-    }, delay);
+const bufferDelay = 100;
+let bufferTimer;
+
+let bucket = -1;
+function bucketBlocked() {
+    return !!bufferTimer;
 }
 
-function addToBucket(task) {
-    bucket.push(task);
-
-    clearTimeout(bucketFlushTimer);
-
-    if (bucket.length == 25) {
-        flushBucket();
+function add(task) {
+    if (!canGroup(task)) {
+        queue.push([task]);
+        start();
         return;
     }
 
-    bucketFlushTimer = setTimeout(flushBucket, 100);
-}
-
-function flushBucket() {
-    console.log('flushBucket', bucket.length);
-
-    let task;
-
-    if (bucket.length == 1) {
-
-        task = bucket.first();
-
-    } else {
-
-        let request = compose(bucket.map(task => task.request));
-        let deferred = new Deferred();
-        bucket.forEach((task, index) => task.deferred.follow(deferred.promise.then(results => results[index])));
-
-        task = {request, deferred};
-
+    if (bucket == -1) {
+        bucket = queue.push([]) - 1;
     }
 
-    schedule(task);
+    if (bufferTimer) {
+        clearTimeout(bufferTimer);
+        bufferTimer = null;
+    }
 
-    bucket.length = 0;
+    queue[bucket].push(task);
+
+    if (queue[bucket].length == groupLimit) {
+        bucket = -1;
+        start();
+        return;
+    }
+
+    bufferTimer = setTimeout(() => {
+        bufferTimer = null;
+        start();
+    }, bufferDelay);
 }
 
-let bucket = [];
-let bucketFlushTimer;
+let nextTimer;
+
+function start() {
+    if (nextTimer) {
+        return;
+    }
+
+    next();
+}
+
+function next() {
+    if (nextTimer) {
+        return;
+    }
+
+    if (!send()) {
+        return;
+    }
+
+    nextTimer = setTimeout(() => {
+        nextTimer = null;
+        next();
+    }, throttle.when());
+}
+
+function send() {
+    let count = 0;
+
+    queue.slice(0, throttle.vacancy()).forEach((tasks, index) => {
+        if (index == bucket) {
+            if (bucketBlocked()) {
+                return;
+            }
+
+            bucket = -1;
+        }
+
+        count += tasks.length;
+        queue.remove(tasks);
+        processTasks(tasks);
+    });
+
+    return count;
+}
+
+//----------------------------------------
+
+function run(task) {
+    task.deferred.follow(execute(task.request));
+}
+
+function schedule(task) {
+    setTimeout(run, throttle.next(), task);
+}
+
+function processTasks(tasks) {
+    let task = tasks.length == 1 ? tasks.first() : group(tasks);
+    schedule(task);
+}
+
+//----------------------------------------

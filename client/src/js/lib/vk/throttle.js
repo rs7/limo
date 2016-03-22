@@ -1,18 +1,23 @@
 'use strict';
 
-function currentTime() {
-    return new Date().getTime();
-}
+import {currentTime} from '../util';
 
 class Throttle {
     constructor(time, count) {
         this.time = time;
         this.count = count;
-        this.memory = new Array(count).fill(currentTime() - time);
+        this.memory = new Array(count).fill(currentTime() - this.time);
+        this.timer = null;
+    }
+
+    when(n = 0) {
+        let time = this.memory[n] + this.time - currentTime();
+
+        return Math.max(0, time);
     }
 
     next() {
-        let delay = this.delay();
+        let delay = this.when();
         let time = currentTime() + delay;
 
         this.memory.push(time);
@@ -21,10 +26,9 @@ class Throttle {
         return delay;
     }
 
-    delay() {
-        let time = this.memory.first() + this.time - currentTime();
-
-        return Math.max(0, time);
+    vacancy() {
+        let now = currentTime();
+        return this.memory.filter(time => time + this.time <= now).length;
     }
 }
 

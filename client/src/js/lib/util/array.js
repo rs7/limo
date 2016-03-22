@@ -16,6 +16,11 @@ Array.prototype.pushAll = function (array) {
     this.push.apply(this, array);
 };
 
+Array.prototype.remove = function (item) {
+    var index = this.indexOf(item);
+    return ~index ? this.splice(index, 1) : [];
+};
+
 export function uniqueFilter(value, index, self) {
     return self.indexOf(value) === index;
 }

@@ -57,3 +57,7 @@ export function processObject(object, process) {
 
     return Object.assign({}, object, processed);
 }
+
+export function currentTime() {
+    return new Date().getTime();
+}

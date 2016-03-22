@@ -9,12 +9,13 @@ export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
 
     if (to === -1) {
         return getList(request, executor, from, limit, limit).then(({count, items}) => {
-            from = limit;
             to = count;
 
-            if (from >= to) {
+            if (limit >= to) {
                 return {from, to, count, items};
             }
+
+            from = limit;
 
             let firstItems = items;
 

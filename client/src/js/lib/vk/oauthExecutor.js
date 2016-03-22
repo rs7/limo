@@ -13,8 +13,6 @@ const PARAMS = {
 export function execute(request) {
     let {method, params} = stripDefault(request);
 
-    console.log('oauth', {method, params});
-
     return fetch({
         url: `https://api.vk.com/method/${method.name}`,
         data: Object.assign({}, params, PARAMS),
