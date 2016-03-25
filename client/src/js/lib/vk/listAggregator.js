@@ -19,7 +19,7 @@ export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
 
             let firstItems = items;
 
-            return getList(request, executor, from, to, limit).then(({from, to, items: otherItems}) => {
+            return getList(request, executor, from, to, limit).then(({items: otherItems}) => {
                 let items = [].concat(firstItems, otherItems);
 
                 return {from, to, count, items};

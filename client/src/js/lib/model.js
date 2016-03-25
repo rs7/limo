@@ -7,12 +7,12 @@ import {processArray, parseDate, parseObjectId} from './util';
 import * as vk from './vk_request';
 import * as remote from './remote/request';
 
-import {execute} from './vk/executor';
+import {execute} from './vk/execute/autoExecutor';
 
 import {aggregate} from './vk/listAggregator';
 
 export function getPhotos() {
-    return aggregate(vk.getPhotos(), execute);
+    return aggregate(vk.getAllPhotos(), execute);
 }
 
 export function getPhotosByList(photos) {

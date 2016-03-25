@@ -1,11 +1,11 @@
 'use strict';
 
-import {protocol} from '../params';
+import {protocol} from './../../../params';
 
-import {ajax} from '../util';
+import {fetch} from './../../../util';
 
 export function execute({method, params}) {
-    return ajax({
+    return fetch({
         url: `${protocol}://api.vk.com/method/${method.name}`,
         data: params,
         dataType: 'jsonp'

@@ -21,6 +21,10 @@ Array.prototype.remove = function (item) {
     return ~index ? this.splice(index, 1) : [];
 };
 
+Array.prototype.clear = function () {
+    this.length = 0;
+};
+
 export function uniqueFilter(value, index, self) {
     return self.indexOf(value) === index;
 }

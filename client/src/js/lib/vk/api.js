@@ -19,6 +19,16 @@ export let API = {
         },
         getById: {
             public: 1
+        },
+        getAll: {
+            list: {
+                limit: 200
+            },
+            default: {
+                owner_id: user,
+                offset: 0,
+                count: 20
+            }
         }
     },
 

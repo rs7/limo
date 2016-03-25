@@ -2,7 +2,7 @@
 
 import {user} from './params';
 
-import {API} from './vk/method';
+import {API} from './vk/api';
 
 function create(method, params, options) {
     return {
@@ -17,6 +17,12 @@ export function getPhotos() {
         owner_id: user,
         album_id: 'profile',
         rev: 1
+    });
+}
+
+export function getAllPhotos() {
+    return create(API.photos.getAll, {
+        owner_id: user
     });
 }
 

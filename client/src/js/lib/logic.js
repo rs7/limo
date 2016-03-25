@@ -24,6 +24,7 @@ export function saveSnapshot() {
         save: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     }, {
         returnTask: 'save'
+        , log: true
     });
 }
 

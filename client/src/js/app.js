@@ -10,7 +10,9 @@ import {getLastSeen, setLastSeen} from './lib/model';
 $(document).ready(init);
 
 function init() {
-    saveSnapshot().then(showNextPage);
+    saveSnapshot().then(showNextPage).catch(error => {
+        console.log('ОШИБКА', error);
+    });
 
     display.showMoreClick(showNextPage);
 

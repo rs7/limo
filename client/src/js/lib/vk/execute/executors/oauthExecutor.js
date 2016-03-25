@@ -1,10 +1,10 @@
 'use strict';
 
-import {accessToken} from '../params';
+import {accessToken} from './../../../params';
 
-import {fetch} from '../util';
+import {fetch} from './../../../util';
 
-import {stripDefault} from './options';
+import {stripDefault} from '././../../options';
 
 const PARAMS = {
     access_token: accessToken
