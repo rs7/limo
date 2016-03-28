@@ -11,38 +11,44 @@ var appjs = './src/js/app.js';
 
 var gulp = require('gulp');
 
-function errorHandler(err) { console.log(err.toString()); this.emit('end'); }
+function errorHandler(err) {
+    console.log(err.toString());
+    this.emit('end');
+}
 
-//build
+//clean
+
+var clean = require('gulp-clean');
+
+gulp.task('clean', function () {
+    return gulp
+        .src(output + '/**/*', {read: false})
+        .pipe(clean())
+    ;
+});
+
+//js
 
 var babelify = require('babelify');
 var browserify = require('browserify');
-var buffer = require('vinyl-buffer');
-var source = require('vinyl-source-stream');
-var sourceMap = require('gulp-sourcemaps');
-var streamify = require('gulp-streamify');
-var uglify = require('gulp-uglify');
 
-gulp.task('browserify', function() {
-    browserify({entries: appjs, debug: false})
-        .transform(babelify, {presets: ['es2015']})
+gulp.task('js', function () {
+    browserify({entries: appjs, debug: true})
+        .transform(babelify, {presets: ['es2015'], sourceMaps: true})
         .bundle()
         .on('error', errorHandler)
         .pipe(source('bundle.js'))
-        //.pipe(streamify(sourceMap.init({loadMaps: true})))
-        //.pipe(streamify(uglify()))
-        //.pipe(streamify(sourceMap.write()))
         .pipe(gulp.dest(output))
     ;
 });
 
-//templates
+//hbs
 
 var concat = require('gulp-concat');
 var defineModule = require('gulp-define-module');
 var handlebars = require('gulp-handlebars');
 
-gulp.task('templates', function () {
+gulp.task('hbs', function () {
     gulp
         .src(hbs)
         .pipe(handlebars({handlebars: require('handlebars')}))
@@ -53,29 +59,34 @@ gulp.task('templates', function () {
     ;
 });
 
+//html
+
 var rigger = require('gulp-rigger');
 
 gulp.task('html', function () {
     gulp
         .src('./src/html/index.html')
         .pipe(rigger())
-        .pipe(gulp.dest(output));
+        .pipe(gulp.dest(output))
+    ;
 });
+
+//css
 
 gulp.task('css', function () {
     gulp
         .src(css)
-        .pipe(rigger())
-        .pipe(gulp.dest(output));
+        .pipe(gulp.dest(output))
+    ;
 });
 
 //system
 
-gulp.task('update', ['templates', 'browserify', 'html', 'css']);
+gulp.task('update', ['clean', 'hbs', 'js', 'html', 'css']);
 
 gulp.task('watch', function () {
-    gulp.watch(js, ['browserify']);
-    gulp.watch(hbs, ['templates']);
+    gulp.watch(js, ['js']);
+    gulp.watch(hbs, ['hbs']);
     gulp.watch(html, ['html']);
     gulp.watch(css, ['css']);
 });
