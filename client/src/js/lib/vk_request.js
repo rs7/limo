@@ -12,18 +12,19 @@ function create(method, params, options) {
     }
 }
 
-export function getPhotos() {
+export function getPhotos(album) {
     return create(API.photos.get, {
         owner_id: user,
-        album_id: 'profile',
+        album_id: album,
+        extended: 1,
         rev: 1
     });
 }
 
-export function getAllPhotos() {
-    return create(API.photos.getAll, {
+export function getAlbums() {
+    return create(API.photos.getAlbums, {
         owner_id: user,
-        extended: 1
+        need_system: 1
     });
 }
 

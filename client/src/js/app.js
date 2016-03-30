@@ -12,6 +12,7 @@ $(document).ready(init);
 function init() {
     saveSnapshot().then(showNextPage).catch(error => {
         console.log('ОШИБКА', error);
+        throw error;
     });
 
     display.showMoreClick(showNextPage);

@@ -11,8 +11,12 @@ import {execute} from './vk/execute/autoExecutor';
 
 import {aggregate} from './vk/listAggregator';
 
-export function getPhotos() {
-    return aggregate(vk.getAllPhotos(), execute);
+export function getAlbums() {
+    return execute(vk.getAlbums());
+}
+
+export function getPhotos(album) {
+    return aggregate(vk.getPhotos(album), execute);
 }
 
 export function getPhotosByList(photos) {

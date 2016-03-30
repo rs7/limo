@@ -17,6 +17,11 @@ export let API = {
                 count: 1000
             }
         },
+        getAlbums: {
+            default: {
+                owner_id: user
+            }
+        },
         getById: {
             public: 1
         },

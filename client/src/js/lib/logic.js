@@ -8,11 +8,16 @@ import * as model from './model';
 
 export function saveSnapshot() {
     return auto({
-        photos: model.getPhotos,
+        albums: () => model.getAlbums().then(response => response.items),
 
-        photosList: ['photos', ({photos:{items:photos}}) => photos.map(photo => photo.id)],
+        photos: ['albums', ({albums}) => async.map(
+            albums.filter(album => album.size > 0).map(album => album.id),
+            model.getPhotos
+        ).then(responses => Array.prototype.concat.apply([], responses.map(response => response.items)))],
 
-        photosWithLikes: ['photos', ({photos:{items:photos}}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
+        photosList: ['photos', ({photos}) => photos.map(photo => photo.id)],
+
+        photosWithLikes: ['photos', ({photos}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
 
         likes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getLikes)],
 
