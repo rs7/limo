@@ -30,7 +30,8 @@ export function getUser(user) {
             id: user,
             snapshot: {
                 date: new Date(0),
-                items: []
+                photos: [],
+                likes: []
             }
         });
     }

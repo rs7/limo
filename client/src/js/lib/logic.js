@@ -12,13 +12,18 @@ export function saveSnapshot() {
 
         photosList: ['photos', ({photos:{items:photos}}) => photos.map(photo => photo.id)],
 
-        likes: ['photosList', ({photosList}) => async.map(photosList, model.getLikes)],
+        photosWithLikes: ['photos', ({photos:{items:photos}}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
 
-        snapshot: ['photosList', 'likes',
-            ({photosList, likes}) => photosList.map((photo, index) => ({
-                photo,
-                likes: likes[index].items
-            }))
+        likes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getLikes)],
+
+        snapshot: ['photosList', 'photosWithLikes', 'likes',
+            ({photosList, photosWithLikes, likes}) => ({
+                photos: photosList,
+                likes: photosWithLikes.map((photo, index) => ({
+                    photo,
+                    likes: likes[index].items
+                }))
+            })
         ],
 
         save: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]

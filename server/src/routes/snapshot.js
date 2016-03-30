@@ -20,14 +20,14 @@ router.post('/snapshot', function (req, res, next) {
     let {snapshot} = req.body;
     let {user} = req.query;
 
-    getUser(user).then(user => {
-        let feeds = createFeeds(user.id, user.snapshot, {
-            date: new Date(),
-            items: snapshot
-        });
+    Object.assign(snapshot, {
+        date: new Date()
+    });
 
-        user.snapshot.items = snapshot.filter(item => item.likes.length > 0);
-        user.snapshot.date = new Date();
+    getUser(user).then(user => {
+        let feeds = createFeeds(user.id, user.snapshot, snapshot);
+
+        user.snapshot = snapshot;
 
         return addFeeds(feeds).then(() => user.save());
     }).catch(next).then(() =>
@@ -43,19 +43,16 @@ function createFeeds(owner, from, to) {
         to: to.date
     };
 
-    let fromList = from.items.map(item => item.photo);
-    let toList = to.items.map(item => item.photo);
+    let fromMap = mapByPhoto(from.likes);
+    let toMap = mapByPhoto(to.likes);
 
-    let fromMap = mapByPhoto(from.items);
-    let toMap = mapByPhoto(to.items);
+    let commonPhotos = diff(from.photos, to.photos).common;
 
     let feeds = [];
 
-    let com = diff(fromList, toList).common;
-
-    com.forEach(photo => {
-        let fromLikes = fromMap.get(photo).likes;
-        let toLikes = toMap.get(photo).likes;
+    commonPhotos.forEach(photo => {
+        let fromLikes = fromMap.get(photo) && fromMap.get(photo).likes || [];
+        let toLikes = toMap.get(photo) && toMap.get(photo).likes || [];
 
         let unlikes = diff(fromLikes, toLikes).removed;
 

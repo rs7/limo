@@ -24,7 +24,8 @@ let likesSchema = mongoose.Schema({
 
 let snapshotSchema = mongoose.Schema({
     date: {type: Date, required: true},
-    items: [likesSchema]
+    photos: [Number],
+    likes: [likesSchema]
 }, {
     strict: 'throw',
     _id: false

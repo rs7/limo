@@ -22,7 +22,8 @@ export function getPhotos() {
 
 export function getAllPhotos() {
     return create(API.photos.getAll, {
-        owner_id: user
+        owner_id: user,
+        extended: 1
     });
 }
 
