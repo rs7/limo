@@ -9,12 +9,11 @@ function create(method, params, options) {
         method,
         params,
         options
-    }
+    };
 }
 
 export function getPhotos(album) {
     return create(API.photos.get, {
-        owner_id: user,
         album_id: album,
         extended: 1,
         rev: 1
@@ -23,7 +22,6 @@ export function getPhotos(album) {
 
 export function getAlbums() {
     return create(API.photos.getAlbums, {
-        owner_id: user,
         need_system: 1
     });
 }
@@ -39,7 +37,6 @@ export function getPhotosByList(photos) {
 export function getLikes(photo) {
     return create(API.likes.getList, {
         type: 'photo',
-        owner_id: user,
         item_id: photo
     });
 }
@@ -47,8 +44,7 @@ export function getLikes(photo) {
 export function getUsers(users) {
     return create(API.users.get, {
         user_ids: users.join(),
-        fields: ['photo_50', 'domain'].join(),
-        name_case: 'dat'
+        fields: ['photo_50', 'domain'].join()
     }, {
         lang: 1
     });
@@ -63,4 +59,16 @@ export function storageSet(key, value) {
 
 export function execute(code) {
     return create(API._.execute, {code});
+}
+
+export function getFriends() {
+    return create(API.friends.get);
+}
+
+export function getSubscriptions() {
+    return create(API.subscriptions.get);
+}
+
+export function getFollowers() {
+    return create(API.users.getFollowers);
 }

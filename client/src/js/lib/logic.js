@@ -21,9 +21,16 @@ export function saveSnapshot() {
 
         likes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getLikes)],
 
-        snapshot: ['photosList', 'photosWithLikes', 'likes',
-            ({photosList, photosWithLikes, likes}) => ({
+        friends: () => model.getFriends().then(response => response.items),
+        subscriptions: () => model.getSubscriptions().then(response => response.items),
+        followers: () => model.getFollowers().then(response => response.items),
+
+        snapshot: ['photosList', 'photosWithLikes', 'likes', 'friends', 'subscriptions', 'followers',
+            ({photosList, photosWithLikes, likes, friends, subscriptions, followers}) => ({
                 photos: photosList,
+                friends,
+                subscriptions,
+                followers,
                 likes: photosWithLikes.map((photo, index) => ({
                     photo,
                     likes: likes[index].items
@@ -62,6 +69,7 @@ export function getFeeds(from) {
         ]
     }, {
         returnTask: 'fillFeeds'
+        , log: true
     });
 }
 

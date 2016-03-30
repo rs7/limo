@@ -1,9 +1,11 @@
 var output = './build';
 
-var hbs = './src/hbs/*.hbs';
+var hbsDir = './src/hbs';
+var hbs = hbsDir + '/*.hbs';
 var html = './src/html/*.html';
 var css = './src/css/*.css';
-var js = './src/js/**/*.js';
+var jsDir = './src/js';
+var js = jsDir + '/**/*.js';
 
 var appjs = './src/js/app.js';
 
@@ -46,17 +48,27 @@ gulp.task('js', function () {
 //hbs
 
 var concat = require('gulp-concat');
-var defineModule = require('gulp-define-module');
+var declare = require('gulp-declare');
 var handlebars = require('gulp-handlebars');
+var path = require('path');
+var wrap = require('gulp-wrap');
 
 gulp.task('hbs', function () {
     gulp
         .src(hbs)
         .pipe(handlebars({handlebars: require('handlebars')}))
         .on('error', errorHandler)
-        .pipe(defineModule('node'))
+        .pipe(wrap('Handlebars.template(<%= contents %>)'))
+        .pipe(declare({
+            root: 'exports',
+            noRedeclare: true,
+            processName: function(filePath) {
+                return declare.processNameByPath(filePath.replace(path.normalize(hbsDir), ''));
+            }
+        }))
         .pipe(concat('templates.js'))
-        .pipe(gulp.dest('./src/js'))
+        .pipe(wrap('var Handlebars = require("handlebars");\n <%= contents %>'))
+        .pipe(gulp.dest(jsDir))
     ;
 });
 

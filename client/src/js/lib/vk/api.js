@@ -1,13 +1,37 @@
 'use strict';
 
-import {user} from '../params';
-
-const _ = '_';
+import {user} from './../params';
 
 export let API = {
+
+    _: {
+        execute: {
+        }
+    },
+
+    friends: {
+        get: {
+            default: {
+                user_id: user
+            }
+        }
+    },
+
+    likes: {
+        getList: {
+            list: {
+                limit: 1000
+            },
+            default: {
+                owner_id: user,
+                offset: 0,
+                count: 100
+            }
+        }
+    },
+
     photos: {
         get: {
-            public: 1,
             list: {
                 limit: 1000
             },
@@ -23,28 +47,21 @@ export let API = {
             }
         },
         getById: {
-            public: 1
-        },
-        getAll: {
-            list: {
-                limit: 200
-            },
-            default: {
-                owner_id: user,
-                offset: 0,
-                count: 20
-            }
         }
     },
 
-    likes: {
-        getList: {
-            public: 1,
+    storage: {
+        set: {
+        }
+    },
+
+    subscriptions:{
+        get: {
             list: {
                 limit: 1000
             },
             default: {
-                owner_id: user,
+                uid: user,
                 offset: 0,
                 count: 100
             }
@@ -53,17 +70,19 @@ export let API = {
 
     users: {
         get: {
-            public: 1
+        },
+        getFollowers : {
+            list: {
+                limit: 1000
+            },
+            default: {
+                user_id: user,
+                offset: 0,
+                count: 100
+            }
         }
-    },
-
-    storage: {
-        set: {}
-    },
-
-    [_]: {
-        execute: {}
     }
+
 };
 
 function createNames() {
@@ -74,7 +93,7 @@ function createNames() {
     );
 
     function createName(group, method) {
-        if (group == _) {
+        if (group == '_') {
             return method;
         }
 

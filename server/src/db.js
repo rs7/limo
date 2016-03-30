@@ -12,6 +12,13 @@ function validateObjectId(id) {
     return /^[0-9a-fA-F]{24}$/.test(id);
 }
 
+export function renameId(object) {
+    let result = Object.assign({}, object);
+    result.id = result._id;
+    delete result._id;
+    return result;
+}
+
 mongoose.connect('mongodb://localhost/limo');
 
 let likesSchema = mongoose.Schema({
@@ -25,6 +32,9 @@ let likesSchema = mongoose.Schema({
 let snapshotSchema = mongoose.Schema({
     date: {type: Date, required: true},
     photos: [Number],
+    friends: [Number],
+    subscriptions: [Number],
+    followers: [Number],
     likes: [likesSchema]
 }, {
     strict: 'throw',
@@ -32,13 +42,14 @@ let snapshotSchema = mongoose.Schema({
 });
 
 let feedSchema = mongoose.Schema({
+    type: {type: String, required: true, enum: ['unlike_photo', 'unfriend', 'unfollower']},
     owner: {type: Number, required: true},
-    photo: {type: Number, required: true},
     user: {type: Number, required: true},
     period: {
         from: {type: Date, required: true},
         to: {type: Date, required: true}
-    }
+    },
+    photo: {type: Number, required: false} //только для типа 'unlike_photo'
 }, {
     strict: 'throw'
 });

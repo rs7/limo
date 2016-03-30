@@ -12,7 +12,15 @@ let isPhoto = value => /^[1-9]\d*$/.test(value);
 let isPhotos = value => isArray(value) && value.every(isPhoto);
 let isLike = value => isPhoto(value.photo) && isUsers(value.likes);
 let isLikes = value => isArray(value) && value.every(isLike);
-let isSnapshot = value => isPhotos(value.photos) && isLikes(value.likes);
+
+let isSnapshot =
+    value =>
+        isPhotos(value.photos) &&
+        isLikes(value.likes) &&
+        isUsers(value.friends) &&
+        isUsers(value.subscriptions) &&
+        isUsers(value.followers)
+;
 
 export let validators = {
     isAuthKey,

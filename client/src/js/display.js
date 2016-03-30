@@ -2,7 +2,7 @@
 
 const $ = require('jquery');
 
-const FeedRowTemplate = require('./templates');
+const templates = require('./templates');
 
 import {initHelpers} from './lib/hbs';
 import {frameHeight} from './lib/vk_sdk';
@@ -26,7 +26,7 @@ export function addFeeds(feeds) {
     let feedRows = $('#feed_rows');
 
     feeds.forEach(feed => {
-        feedRows.append(FeedRowTemplate(feed));
+        feedRows.append(templates[`feed_${feed.type}`](feed));
     });
 }
 

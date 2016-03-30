@@ -1,6 +1,6 @@
 'use strict';
 
-import {User, Feed, validateObjectId, objectId} from './db';
+import {User, Feed, objectId, renameId} from './db';
 
 export function getFeed({user, from}) {
     let query = {
@@ -11,7 +11,7 @@ export function getFeed({user, from}) {
         Object.assign(query, {_id: {$lt: objectId(from)}});
     }
 
-    return Feed.find(query).sort({_id: -1}).limit(10).exec();
+    return Feed.find(query).sort({_id: -1}).limit(10).lean().exec().then(feeds => feeds.map(renameId));
 }
 
 export function addFeeds(feeds) {
@@ -31,6 +31,9 @@ export function getUser(user) {
             snapshot: {
                 date: new Date(0),
                 photos: [],
+                friends: [],
+                subscriptions: [],
+                followers: [],
                 likes: []
             }
         });

@@ -43,12 +43,14 @@ function createFeeds(owner, from, to) {
         to: to.date
     };
 
+    let feeds = [];
+
+    let type = 'unlike_photo';
+
     let fromMap = mapByPhoto(from.likes);
     let toMap = mapByPhoto(to.likes);
 
     let commonPhotos = diff(from.photos, to.photos).common;
-
-    let feeds = [];
 
     commonPhotos.forEach(photo => {
         let fromLikes = fromMap.get(photo) && fromMap.get(photo).likes || [];
@@ -58,6 +60,7 @@ function createFeeds(owner, from, to) {
 
         unlikes.forEach(user =>
             feeds.push({
+                type,
                 photo,
                 user,
                 period,
@@ -65,6 +68,32 @@ function createFeeds(owner, from, to) {
             })
         );
     });
+
+    type = 'unfriend';
+
+    let unfriended = diff(from.friends, to.friends).removed.filter(user => to.followers.indexOf(user) == -1);
+
+    unfriended.forEach(user =>
+        feeds.push({
+            type,
+            owner,
+            user,
+            period
+        })
+    );
+
+    type = 'unfollower';
+
+    let unfollowered = diff(from.followers, to.followers).removed.filter(user => to.friends.indexOf(user) == -1);
+
+    unfollowered.forEach(user =>
+        feeds.push({
+            type,
+            owner,
+            user,
+            period
+        })
+    );
 
     return feeds;
 

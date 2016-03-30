@@ -31,22 +31,27 @@ export function getPhotosByList(photos) {
         }
 
         throw error;
-    }).then(responsePhotos => {
-        //В запрашиваемом списке были удалённые фотографии, добавляем заглушку вместо них
-
-        //todo: Отрефакторить это место
-        if (responsePhotos.length < photos.length) {
-            let responsePhotosList = responsePhotos.map(photo => photo.id);
-            let deletedPhotos = photos.filter(photo => !responsePhotosList.includes(photo));
-            Array.prototype.push.apply(responsePhotos, deletedPhotos.map(photo => ({
-                id: photo,
-                owner_id: user,
-                photo_130: '//vk.com/images/camera_100.png'
-            })));
+    }).then(response => {
+        if (response.length == photos.length) {
+            return response;
         }
 
-        return responsePhotos;
+        //В запрашиваемом списке были удалённые фотографии, добавляем заглушку вместо них
+
+        let responseList = response.map(photo => photo.id);
+        let deleted = photos.filter(photo => !responseList.includes(photo));
+        Array.prototype.push.apply(response, deleted.map(photo => deletedPhoto(photo)));
+
+        return response;
     });
+
+    function deletedPhoto(photo) {
+        return {
+            id: photo,
+            owner_id: user,
+            photo_130: '//vk.com/images/camera_100.png'
+        };
+    }
 }
 
 export function getLikes(photo) {
@@ -86,4 +91,16 @@ export function getLastSeen() {
 
 export function setLastSeen(id) {
     return execute(vk.storageSet('lastSeen', id.value));
+}
+
+export function getFriends() {
+    return execute(vk.getFriends());
+}
+
+export function getSubscriptions() {
+    return aggregate(vk.getSubscriptions(), execute);
+}
+
+export function getFollowers() {
+    return aggregate(vk.getFollowers(), execute);
 }
