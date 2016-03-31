@@ -21,7 +21,7 @@ export function getPhotos(album) {
 
 export function getPhotosByList(photos) {
     if (photos.isEmpty()) {
-        return [];
+        return Promise.resolve([]);
     }
 
     return execute(vk.getPhotosByList(photos)).catch(error => {
@@ -60,7 +60,7 @@ export function getLikes(photo) {
 
 export function getUsers(users) {
     if (users.isEmpty()) {
-        return [];
+        return Promise.resolve([]);
     }
 
     return auto({
