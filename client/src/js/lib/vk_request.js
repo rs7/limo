@@ -41,10 +41,11 @@ export function getLikes(photo) {
     });
 }
 
-export function getUsers(users) {
+export function getUsers(users, fields, nameCase) {
     return create(API.users.get, {
         user_ids: users.join(),
-        fields: ['photo_50', 'domain'].join()
+        fields: fields.join(),
+        name_case: nameCase
     }, {
         lang: 1
     });

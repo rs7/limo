@@ -14,4 +14,13 @@ export function initHelpers() {
     Handlebars.registerHelper("photo_link", ({owner_id, id}) => `//vk.com/photo${owner_id}_${id}`);
 
     Handlebars.registerHelper("user_name", ({first_name, last_name}) => `${first_name} ${last_name}`);
+
+    Handlebars.registerHelper("user_name_dat", ({first_name_dat, last_name_dat}) => `${first_name_dat} ${last_name_dat}`);
+
+    Handlebars.registerHelper('ifCond', function (v1, v2, options) {
+        if (v1 === v2) {
+            return options.fn(this);
+        }
+        return options.inverse(this);
+    });
 }

@@ -49,22 +49,22 @@ export function getFeeds(from) {
     return auto({
         feeds: () => model.getFeeds(from),
 
-        usersList: ['feeds', ({feeds}) => feeds.map(like => like.user).filter(uniqueFilter)],
+        photos: ['feeds', ({feeds}) => {
+            let photos = feeds.filter(feed => feed.photo).map(like => like.photo).filter(uniqueFilter);
 
-        photosList: ['feeds', ({feeds}) => feeds.map(like => like.photo).filter(uniqueFilter)],
+            return model.getPhotosByList(photos).then(photos => mapById(photos));
+        }],
 
-        users: ['usersList', ({usersList}) => model.getUsers(usersList)],
+        users: ['feeds', ({feeds}) => {
+            let users = feeds.filter(feed => feed.user).map(like => like.user).filter(uniqueFilter);
 
-        photos: ['photosList', ({photosList}) => model.getPhotosByList(photosList)],
+            return model.getUsers(users).then(users => mapById(users));
+        }],
 
-        photosMap: ['photos', ({photos}) => mapById(photos)],
-
-        usersMap: ['users', ({users}) => mapById(users)],
-
-        fillFeeds: ['feeds', 'photosMap', 'usersMap', ({feeds, photosMap, usersMap}) =>
+        fillFeeds: ['feeds', 'photos', 'users', ({feeds, photos, users}) =>
             processArray(feeds, {
-                user: user => usersMap.get(user),
-                photo: photo => photosMap.get(photo)
+                user: user => users.get(user),
+                photo: photo => photos.get(photo)
             })
         ]
     }, {

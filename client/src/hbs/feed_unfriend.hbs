@@ -15,7 +15,12 @@
                         <td class="feedback_row_content">
                             <div class="feedback_row_group_names">
                                 <a href="{{user_link user}}" target="_blank" class="mem_link">{{user_name user}}</a>
-                                удалил вас из друзей
+                                {{#ifCond user.sex 1}}
+                                удалила
+                                {{else}}
+                                удалил
+                                {{/ifCond}}
+                                вас из друзей
                             </div>
                             <div class="feedback_row_group_photos clear_fix"></div>
                             <div class="feedback_row_date">

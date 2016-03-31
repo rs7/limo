@@ -39,6 +39,9 @@ export function processObject(object, process) {
         let res;
 
         switch (true) {
+            case typeof proc == 'undefined':
+                return;
+
             case proc instanceof Function:
                 res = proc(val);
                 break;

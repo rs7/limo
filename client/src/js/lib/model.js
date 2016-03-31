@@ -2,7 +2,7 @@
 
 import {user, apiResult} from './params';
 
-import {processArray, parseDate, parseObjectId} from './util';
+import {processArray, parseDate, parseObjectId, auto} from './util';
 
 import * as vk from './vk_request';
 import * as remote from './remote/request';
@@ -63,7 +63,21 @@ export function getUsers(users) {
         return [];
     }
 
-    return execute(vk.getUsers(users));
+    return auto({
+        users: () => execute(vk.getUsers(users, ['photo_50', 'domain', 'sex'], 'nom')),
+
+        dats: () => execute(vk.getUsers(users, [], 'dat')),
+
+        result: ['users', 'dats', ({users, dats}) =>
+            users.map((user, index) => {
+                let dat = dats[index];
+                return Object.assign({}, user, {
+                    first_name_dat: dat.first_name,
+                    last_name_dat: dat.last_name
+                });
+            })
+        ]
+    });
 }
 
 export function setSnapshot(snapshot) {

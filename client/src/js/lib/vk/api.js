@@ -70,6 +70,11 @@ export let API = {
 
     users: {
         get: {
+            default: {
+                user_ids: user,
+                fields: '',
+                name_case: 'nom'
+            }
         },
         getFollowers : {
             list: {
