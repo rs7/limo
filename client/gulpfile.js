@@ -60,14 +60,14 @@ gulp.task('hbs', function () {
         .on('error', errorHandler)
         .pipe(wrap('Handlebars.template(<%= contents %>)'))
         .pipe(declare({
-            root: 'exports',
+            root: '\nmodule.exports',
             noRedeclare: true,
             processName: function(filePath) {
                 return declare.processNameByPath(filePath.replace(path.normalize(hbsDir), ''));
             }
         }))
         .pipe(concat('templates.js'))
-        .pipe(wrap('var Handlebars = require("handlebars");\n <%= contents %>'))
+        .pipe(wrap('const Handlebars = require("handlebars");\n<%= contents %>'))
         .pipe(gulp.dest(jsDir))
     ;
 });
