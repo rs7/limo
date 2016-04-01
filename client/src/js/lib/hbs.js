@@ -15,7 +15,7 @@ export function initHelpers() {
 
     Handlebars.registerHelper('user_name', ({first_name, last_name}) => `${first_name} ${last_name}`);
 
-    Handlebars.registerHelper('user_name_case', (nameCase, user) =>
+    Handlebars.registerHelper('user_name_case', (user, nameCase) =>
         `${user[`first_name_${nameCase}`]} ${user[`last_name_${nameCase}`]}`
     );
 

@@ -41,7 +41,7 @@ export function saveSnapshot() {
         save: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     }, {
         returnTask: 'save'
-        , log: true
+        //, log: true
     });
 }
 
@@ -69,7 +69,7 @@ export function getFeeds(from) {
         ]
     }, {
         returnTask: 'fillFeeds'
-        , log: true
+        //, log: true
     });
 }
 
