@@ -27,11 +27,15 @@
                             <div class="summary" id="feed_summary">Показаны последние события</div>
                         </div>
                         <div class="fl_r" id="feed_rate_tt_place"></div>
-                        <div id="feed_empty" style="display: block;">
+                        <div id="feed_empty" style="display: none;">
                             Здесь вы будете видеть тех
                             кто удалил вас из друзей,
                             кто отписался от ваших обновлений,
                             кому разонравились ваши фотографии
+                        </div>
+                        <div id="feed_new" style="display: block;">
+                            Подождите, идёт поиск новостей...
+                            <div id="feed_new_progress" class="progress" style="display: block;"></div>
                         </div>
                         <div id="feed_new_posts" style="display: none;">Обновить</div>
                         <div class="wall_wrap clear_fix">
@@ -42,7 +46,7 @@
                                             <span class="feedback_unread_bar">Просмотренные события</span>
                                         </div>
                                     </div>
-                                    <a id="show_more_link" class="clear more_link" style="height: 13px; display: block;">
+                                    <a id="show_more_link" class="clear more_link" style="height: 13px; display: none;">
                                         <div id="show_more_progress" class="progress" style="display: block;"></div>
                                         <div id="show_more" style="display: none;">Показать предыдущие события ↓</div>
                                     </a>

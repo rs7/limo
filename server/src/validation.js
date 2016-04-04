@@ -5,7 +5,7 @@ let isArray = value => Array.isArray(value);
 let isAuthKey = value => /^[0-9a-f]{32}$/.test(value);
 let isUser = value => /^[1-9]\d*$/.test(value);
 
-let isFrom = value => /^[0-9a-f]{24}$/.test(value);
+let isObjectId = value => /^[0-9a-f]{24}$/.test(value);
 
 let isUsers = value => isArray(value) && value.every(isUser);
 let isPhoto = value => /^[1-9]\d*$/.test(value);
@@ -25,6 +25,6 @@ let isSnapshot =
 export let validators = {
     isAuthKey,
     isUser,
-    isFrom,
+    isObjectId,
     isSnapshot
 };

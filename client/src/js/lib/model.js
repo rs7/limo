@@ -2,7 +2,7 @@
 
 import {user, apiResult} from './params';
 
-import {processArray, parseDate, parseObjectId, auto} from './util';
+import {processArray, processObject, parseDate, parseObjectId, auto, ObjectId} from './util';
 
 import * as vk from './vk_request';
 import * as remote from './remote/request';
@@ -132,23 +132,39 @@ export function setSnapshot(snapshot) {
     return remote.setSnapshot(snapshot);
 }
 
-export function getFeeds(from) {
-    let fromValue = from && from.value;
-
+export function getFeeds({from}) {
     return remote
-        .getFeeds(fromValue)
-        .then(feeds => processArray(feeds, {
+        .getFeeds(from && from.value)
+        .then(processFeedsResponse)
+    ;
+}
+
+export function getNewFeeds({to}) {
+    return remote
+        .getNewFeeds(to && to.value)
+        .then(processFeedsResponse)
+    ;
+}
+
+function processFeedsResponse(response) {
+    return processObject(response, {
+        feeds: processFeeds,
+        next: parseObjectId
+    });
+
+    function processFeeds(feeds) {
+        return processArray(feeds, {
             id: parseObjectId,
             period: {
                 from: parseDate,
                 to: parseDate
             }
-        }))
-    ;
+        });
+    }
 }
 
 export function getLastSeen() {
-    return apiResult;
+    return apiResult && new ObjectId(apiResult) || undefined;
 }
 
 export function setLastSeen(id) {

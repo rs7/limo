@@ -2,83 +2,123 @@
 
 const $ = require('jquery');
 
-import {saveSnapshot, getFeeds} from './lib/logic';
-import * as display from './display';
-import {ObjectId} from './lib/util';
+import {ObjectId, isBetween} from './lib/util';
+import {saveSnapshot, getFeeds, getNewFeeds} from './lib/logic';
 import {getLastSeen, setLastSeen} from './lib/model';
+
+import * as display from './display';
 
 $(document).ready(init);
 
 function init() {
-    saveSnapshot().then(showNextPage).catch(error => {
-        console.log('ОШИБКА', error);
-        throw error;
+    nextPage = lastSeen = getLastSeen();
+
+    Promise.all([
+        showNextPage(),
+        snapshot()
+    ]).then(checkNew).then(() => {
+        if (feedsCollection.feeds.isEmpty()) {
+            display.showEmpty();
+            return;
+        }
+
+        display.showMoreClick(showNextPage);
     });
-
-    display.showMoreClick(showNextPage);
-
-    let lastSeenValue = getLastSeen();
-    lastSeen = lastSeenValue && new ObjectId(lastSeenValue);
 }
 
 let lastSeen;
 
 let feedsCollection = {
     feeds: [],
-    get last() {
-        return this.feeds.last();
+    get lastId() {
+        return this.feeds.last() && this.feeds.last().id;
     },
-    get first() {
-        return this.feeds.first();
-    },
-    fromValue() {
-        if (this.feeds.isEmpty()) {
-            return undefined;
-        }
-        return this.last.id;
+    get firstId() {
+        return this.feeds.first() && this.feeds.first().id;
     },
     add(feeds) {
         this.feeds.pushAll(feeds);
+        this.feeds.sort((a, b) => ObjectId.compare(a.id, b.id));
     },
     isWithin(id) {
         if (this.feeds.isEmpty()) {
             return false;
         }
 
-        return ObjectId.compare(this.feeds.first().id, id) > 0 && ObjectId.compare(this.feeds.last().id, id) < 0;
+        return isBetween(id, this.firstId, this.lastId, ObjectId.compare);
     },
     findLast(id) {
-        return this.feeds.find(feed => ObjectId.compare(feed.id, id) <= 0 );
+        return this.feeds.find(feed => ObjectId.compare(feed.id, id) <= 0);
     }
 };
 
-let firstPageLoaded = false;
+let nextPage;
 
 function showNextPage() {
     display.feedLoading(true);
 
-    return getFeeds(feedsCollection.fromValue()).then(feeds => {
+    let from = nextPage;
+
+    return getFeeds({from}).then(({feeds, next}) => {
         display.feedLoading(false);
 
-        if (feeds.isEmpty()) {
+        nextPage = next;
+
+        if (next) {
+            nextPage = next;
+            display.showMoreLink();
+        } else {
             display.allShowed();
+        }
+
+        if (feeds.isEmpty()) {
             return;
         }
 
-        feedsCollection.add(feeds);
+        feeds.forEach(feed => {
+            display.addFeed(feed, {after: feedsCollection.lastId});
+            feedsCollection.feeds.push(feed);
+        });
 
-        display.addFeeds(feeds);
-
-        if (!firstPageLoaded) {
-            display.hideFeedsEmpty();
-            setLastSeen(feedsCollection.first.id);
-            firstPageLoaded = true;
-        }
-
-        if (feedsCollection.isWithin(lastSeen)) {
-            display.unreadBarBefore(feedsCollection.findLast(lastSeen).id);
-        }
-
-        display.updateFrameSize();
+        update();
     });
+}
+
+function checkNew() {
+    let to = feedsCollection.firstId || lastSeen;
+
+    return getNewFeeds({to}).then(({feeds}) => {
+        if (feeds.isEmpty()) {
+            return;
+        }
+
+        feeds.forEach(feed => {
+            display.addFeed(feed, {before: feedsCollection.firstId});
+            feedsCollection.feeds.unshift(feed);
+        });
+
+        setLastSeen(feedsCollection.firstId);
+
+        update();
+    });
+}
+
+function snapshot() {
+    display.snapshotProgress(0);
+
+    let promise = saveSnapshot();
+
+    promise.then(() => {
+        display.snapshotProgress(1);
+    });
+
+    return promise;
+}
+
+function update() {
+    if (feedsCollection.isWithin(lastSeen)) {
+        display.unreadBarBefore(feedsCollection.findLast(lastSeen).id);
+    }
+
+    display.updateFrameSize();
 }

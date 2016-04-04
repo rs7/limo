@@ -26,41 +26,59 @@ export function stringSize(string) {
     return encodeURI(string).split(/%..|./).length - 1;
 }
 
-export function processArray(array, process) {
-    return array.map(item => processObject(item, process));
+export function processArray(array, transform) {
+    return array.map(item => processObject(item, transform));
 }
 
-export function processObject(object, process) {
+export function processObject(object, transform) {
     let processed = {};
 
-    Object.keys(process).forEach(key => {
-        let proc = process[key];
-        let val = object[key];
-        let res;
-
-        switch (true) {
-            case typeof proc == 'undefined':
-                return;
-
-            case proc instanceof Function:
-                res = proc(val);
-                break;
-
-            case proc instanceof Object:
-                res = processObject(val, proc);
-                break;
-
-            default:
-                console.error('Неподдерживаемый тип преобразования объекта');
-                res = val;
+    Object.keys(transform).forEach(key => {
+        let result = process(object[key], transform[key]);
+        if (result) {
+            processed[key] = result;
         }
-
-        processed[key] = res;
     });
 
     return Object.assign({}, object, processed);
 }
 
+function process(value, transform) {
+    switch (true) {
+        case isUndefined(value):
+        case isUndefined(transform):
+            return;
+
+        case isScalar(transform):
+            return transform;
+
+        case transform instanceof Function:
+            return transform(value);
+
+        case Array.isArray(transform):
+            return processArray(value, transform[0]);
+
+        case transform instanceof Object:
+            return processObject(value, transform);
+
+        default:
+            console.error('Неподдерживаемый тип преобразования объекта');
+            return value;
+    }
+}
+
 export function currentTime() {
     return new Date().getTime();
+}
+
+export function isBetween(value, from, to, compare) {
+    return compare(from, value) > 0 && compare(to, value) < 0;
+}
+
+export function isUndefined(value) {
+    return typeof value == 'undefined';
+}
+
+export function isScalar(value) {
+    return /boolean|number|string/.test(typeof value);
 }

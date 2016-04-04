@@ -7,3 +7,16 @@
     border: 0 none;
     padding: 0;
 }
+
+#feed_new {
+    color: #777;
+    display: none;
+    font-size: 1.09em;
+    line-height: 170%;
+    padding: 100px 30px;
+    text-align: center;
+}
+
+#feed_new .progress {
+    margin: 0 auto;
+}

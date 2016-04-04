@@ -2,7 +2,7 @@
 
 const async = require('async-q');
 
-import {uniqueFilter, auto, processArray} from './util';
+import {uniqueFilter, auto, processArray, parseObjectId} from './util';
 
 import * as model from './model';
 
@@ -38,16 +38,35 @@ export function saveSnapshot() {
             })
         ],
 
-        save: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
-    }, {
-        returnTask: 'save'
-        //, log: true
+        result: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     });
 }
 
-export function getFeeds(from) {
+export function getFeeds({from}) {
     return auto({
-        feeds: () => model.getFeeds(from),
+        response: () => model.getFeeds({from}),
+
+        feeds: ['response', ({response}) => fillFeeds(response.feeds)],
+
+        next: ['response', ({response}) => response.next],
+
+        result: ['feeds', 'next', ({feeds, next}) => ({feeds, next})]
+    });
+}
+
+export function getNewFeeds({to}) {
+    return auto({
+        response: () => model.getNewFeeds({to}),
+
+        feeds: ['response', ({response}) => fillFeeds(response.feeds)],
+
+        result: ['feeds', ({feeds}) => ({feeds})]
+    });
+}
+
+function fillFeeds(feeds) {
+    return auto({
+        feeds: () => feeds,
 
         photos: ['feeds', ({feeds}) => {
             let photos = feeds.filter(feed => feed.photo).map(like => like.photo).filter(uniqueFilter);
@@ -61,15 +80,12 @@ export function getFeeds(from) {
             return model.getUsers(users).then(users => mapById(users));
         }],
 
-        fillFeeds: ['feeds', 'photos', 'users', ({feeds, photos, users}) =>
+        result: ['feeds', 'photos', 'users', ({feeds, photos, users}) =>
             processArray(feeds, {
                 user: user => users.get(user),
                 photo: photo => photos.get(photo)
             })
         ]
-    }, {
-        returnTask: 'fillFeeds'
-        //, log: true
     });
 }
 

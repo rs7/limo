@@ -22,12 +22,22 @@ export function showMoreClick(handler) {
     $('#show_more_link').click(handler);
 }
 
-export function addFeeds(feeds) {
-    let feedRows = $('#feed_rows');
+export function addFeed(feed, {after, before}) {
+    if (after) {
+        $(`#feed_row_${after.value}`).after(createFeed(feed));
+        return;
+    }
 
-    feeds.forEach(feed => {
-        feedRows.append(templates[`feed_${feed.type}`](feed));
-    });
+    if (before) {
+        $(`#feed_row_${before.value}`).before(createFeed(feed));
+        return;
+    }
+
+    $('#feed_rows').append(createFeed(feed));
+}
+
+function createFeed(feed) {
+    return templates[`feed_${feed.type}`](feed);
 }
 
 export function hideFeedsEmpty() {
@@ -47,6 +57,25 @@ export function feedLoading(value) {
         $('#show_more_progress').css('display', 'none');
         $('#show_more').css('display', 'block');
     }
+}
+
+export function showMoreLink() {
+    $('#show_more_link').css('display', 'block');
+    updateFrameSize();
+}
+
+export function showEmpty() {
+    $('#feed_empty').css('display', 'block');
+    updateFrameSize();
+}
+
+export function snapshotProgress(value) {
+    if (value == 1) {
+        $('#feed_new').css('display', 'none');
+    } else {
+        $('#feed_new').css('display', 'block');
+    }
+    updateFrameSize();
 }
 
 export function unreadBarBefore(id) {

@@ -11,3 +11,7 @@ export function setSnapshot(snapshot) {
 export function getFeeds(from) {
     return get('/feed', {user, from});
 }
+
+export function getNewFeeds(to) {
+    return get('/feed/new', {user, to});
+}
