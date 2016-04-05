@@ -22,6 +22,20 @@ export function showMoreClick(handler) {
     $('#show_more_link').click(handler);
 }
 
+export function feedNewPostsClick(handler) {
+    $('#feed_new_posts').click(handler);
+}
+
+export function feedNewPosts(count) {
+    if (count) {
+        $('#feed_new_posts').css('display', 'block');
+    } else {
+        $('#feed_new_posts').css('display', 'none');
+    }
+
+    $('#feed_new_posts_count').text(count);
+}
+
 export function addFeed(feed, {after, before}) {
     if (after) {
         $(`#feed_row_${after.value}`).after(createFeed(feed));
@@ -69,11 +83,11 @@ export function showEmpty() {
     updateFrameSize();
 }
 
-export function snapshotProgress(value) {
+export function checkNewProgress(value) {
     if (value == 1) {
-        $('#feed_new').css('display', 'none');
+        $('#feed_new_progress').css('display', 'none');
     } else {
-        $('#feed_new').css('display', 'block');
+        $('#feed_new_progress').css('display', 'block');
     }
     updateFrameSize();
 }

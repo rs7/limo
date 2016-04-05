@@ -8,15 +8,15 @@
     padding: 0;
 }
 
-#feed_new {
-    color: #777;
-    display: none;
-    font-size: 1.09em;
-    line-height: 170%;
-    padding: 100px 30px;
+/* повторяет vk стиль #feed_new_posts */
+#feed_new_progress {
+    color: #71869B;
+    background: #E9EDF1;
+    padding: 10px;
     text-align: center;
+    margin: 15px 15px 0 15px;
 }
 
-#feed_new .progress {
+#feed_new_progress .progress {
     margin: 0 auto;
 }

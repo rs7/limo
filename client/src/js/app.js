@@ -17,12 +17,15 @@ function init() {
         showNextPage(),
         snapshot()
     ]).then(checkNew).then(() => {
+        display.checkNewProgress(1);
+
         if (feedsCollection.feeds.isEmpty()) {
             display.showEmpty();
             return;
         }
 
         display.showMoreClick(showNextPage);
+        display.feedNewPostsClick(showNewFeeds);
     });
 }
 
@@ -49,7 +52,8 @@ let feedsCollection = {
     },
     findLast(id) {
         return this.feeds.find(feed => ObjectId.compare(feed.id, id) <= 0);
-    }
+    },
+    newFeeds: []
 };
 
 let nextPage;
@@ -80,7 +84,9 @@ function showNextPage() {
             feedsCollection.feeds.push(feed);
         });
 
-        update();
+        unread();
+
+        display.updateFrameSize();
     });
 }
 
@@ -92,33 +98,39 @@ function checkNew() {
             return;
         }
 
-        feeds.forEach(feed => {
-            display.addFeed(feed, {before: feedsCollection.firstId});
-            feedsCollection.feeds.unshift(feed);
-        });
+        display.feedNewPosts(feeds.length);
 
-        setLastSeen(feedsCollection.firstId);
+        feedsCollection.newFeeds = feeds;
 
-        update();
+        display.updateFrameSize();
     });
 }
 
 function snapshot() {
-    display.snapshotProgress(0);
+    display.checkNewProgress(0);
 
-    let promise = saveSnapshot();
-
-    promise.then(() => {
-        display.snapshotProgress(1);
-    });
-
-    return promise;
+    return saveSnapshot();
 }
 
-function update() {
+function showNewFeeds() {
+    feedsCollection.newFeeds.forEach(feed => {
+        display.addFeed(feed, {before: feedsCollection.firstId});
+        feedsCollection.feeds.unshift(feed);
+    });
+
+    feedsCollection.newFeeds.length = 0;
+
+    display.feedNewPosts(0);
+
+    unread();
+
+    display.updateFrameSize();
+
+    setLastSeen(feedsCollection.firstId);
+}
+
+function unread() {
     if (feedsCollection.isWithin(lastSeen)) {
         display.unreadBarBefore(feedsCollection.findLast(lastSeen).id);
     }
-
-    display.updateFrameSize();
 }

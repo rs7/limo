@@ -165,6 +165,7 @@ function processFeedsResponse(response) {
 
 export function getLastSeen() {
     return apiResult && new ObjectId(apiResult) || undefined;
+    //return new ObjectId('56fb9bc6a5af0ef80f6da782');
 }
 
 export function setLastSeen(id) {
