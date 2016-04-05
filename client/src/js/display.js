@@ -27,13 +27,15 @@ export function feedNewPostsClick(handler) {
 }
 
 export function feedNewPosts(count) {
+    let feedNewPosts = $('#feed_new_posts');
+
     if (count) {
-        $('#feed_new_posts').css('display', 'block');
+        feedNewPosts.css('display', 'block');
     } else {
-        $('#feed_new_posts').css('display', 'none');
+        feedNewPosts.css('display', 'none');
     }
 
-    $('#feed_new_posts_count').text(count);
+    feedNewPosts.html(templates['feed_new_posts']({count}));
 }
 
 export function addFeed(feed, {after, before}) {

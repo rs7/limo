@@ -82,3 +82,33 @@ export function isUndefined(value) {
 export function isScalar(value) {
     return /boolean|number|string/.test(typeof value);
 }
+
+export function numeralDeclension(value, forms012) {
+    return forms012[index(value)];
+
+    function index(value) {
+        switch (value % 100) {
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+                return 0;
+        }
+
+        switch (value % 10) {
+            case 1:
+                return 1;
+            case 2:
+            case 3:
+            case 4:
+                return 2;
+            case 5:
+            case 6:
+            case 7:
+            case 8:
+            case 9:
+            case 0:
+                return 0;
+        }
+    }
+}

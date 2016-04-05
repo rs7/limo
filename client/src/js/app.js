@@ -20,7 +20,13 @@ function init() {
         display.checkNewProgress(1);
 
         if (feedsCollection.feeds.isEmpty()) {
-            display.showEmpty();
+
+            if (feedsCollection.newFeeds.isEmpty()) {
+                display.showEmpty();
+            } else {
+                showNewFeeds();
+            }
+
             return;
         }
 
@@ -73,6 +79,7 @@ function showNextPage() {
             display.showMoreLink();
         } else {
             display.allShowed();
+            display.updateFrameSize();
         }
 
         if (feeds.isEmpty()) {
