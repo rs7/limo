@@ -7,26 +7,42 @@ const templates = require('./templates');
 import {initHelpers} from './lib/hbs';
 import {frameHeight} from './lib/vk_sdk';
 
-$(window).load(init);
+$(document).ready(initHelpers);
 
-function init() {
-    initHelpers();
-    updateFrameSize();
-}
+$(window).load(updateFrameSize);
 
-export function updateFrameSize() {
+function updateFrameSize() {
     frameHeight($('body').outerHeight());
 }
 
-export function showMoreClick(handler) {
+//----------------------------------------
+
+export function feedPageAll() {
+    $('#show_more_link').css('display', 'none');
+    $('#all_shown').css('display', 'block');
+
+    updateFrameSize();
+}
+
+export function feedPageNextHandler(handler) {
     $('#show_more_link').click(handler);
 }
 
-export function feedNewPostsClick(handler) {
-    $('#feed_new_posts').click(handler);
+export function feedPageProgress(progress) {
+    if (progress == 1) {
+        $('#show_more_progress').css('display', 'none');
+        $('#show_more').css('display', 'block');
+    } else {
+        $('#show_more').css('display', 'none');
+        $('#show_more_progress').css('display', 'block');
+    }
+
+    updateFrameSize();
 }
 
-export function feedNewPosts(count) {
+//----------------------------------------
+
+export function feedNewCount(count) {
     let feedNewPosts = $('#feed_new_posts');
 
     if (count) {
@@ -36,72 +52,51 @@ export function feedNewPosts(count) {
     }
 
     feedNewPosts.html(templates['feed_new_posts']({count}));
-}
 
-export function addFeed(feed, {after, before}) {
-    if (after) {
-        $(`#feed_row_${after.value}`).after(createFeed(feed));
-        return;
-    }
-
-    if (before) {
-        $(`#feed_row_${before.value}`).before(createFeed(feed));
-        return;
-    }
-
-    $('#feed_rows').append(createFeed(feed));
-}
-
-function createFeed(feed) {
-    return templates[`feed_${feed.type}`](feed);
-}
-
-export function hideFeedsEmpty() {
-    $('#feed_empty').css('display', 'none');
-}
-
-export function allShowed() {
-    $('#show_more_link').css('display', 'none');
-    $('#all_shown').css('display', 'block');
-}
-
-export function feedLoading(value) {
-    if (value) {
-        $('#show_more').css('display', 'none');
-        $('#show_more_progress').css('display', 'block');
-    } else {
-        $('#show_more_progress').css('display', 'none');
-        $('#show_more').css('display', 'block');
-    }
-}
-
-export function showMoreLink() {
-    $('#show_more_link').css('display', 'block');
     updateFrameSize();
 }
 
-export function showEmpty() {
-    $('#feed_empty').css('display', 'block');
-    updateFrameSize();
+export function feedNewOpenHandler(handler) {
+    $('#feed_new_posts').click(handler);
 }
 
-export function checkNewProgress(value) {
-    if (value == 1) {
+export function feedNewProgress(progress) {
+    if (progress == 1) {
         $('#feed_new_progress').css('display', 'none');
     } else {
         $('#feed_new_progress').css('display', 'block');
     }
+
     updateFrameSize();
 }
 
-export function unreadBarBefore(id) {
-    let unreadBar = $('#feedback_unread_bar');
+//----------------------------------------
 
-    if (!id) {
-        unreadBar.css('display', 'none');
-        return;
+export function feedAdd(feed, {after, before}) {
+    let feedElement = templates[`feed_${feed.type}`](feed);
+
+    if (after) {
+        $(`#feed_row_${after.value}`).after(feedElement);
+    } else if (before) {
+        $(`#feed_row_${before.value}`).before(feedElement);
+    } else {
+        $('#feed_rows').append(feedElement);
     }
 
-    unreadBar.detach().insertBefore($(`#feed_row_${id.value}`));
+    updateFrameSize();
+}
+
+export function feedEmpty() {
+    $('#feed_empty').css('display', 'block');
+
+    updateFrameSize();
+}
+
+export function feedUnread(before) {
+    let unreadBar = $('#feedback_unread_bar');
+
+    unreadBar.detach().insertBefore($(`#feed_row_${before.value}`));
     unreadBar.css('display', 'block');
+
+    updateFrameSize();
 }

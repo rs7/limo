@@ -2,142 +2,84 @@
 
 const $ = require('jquery');
 
-import {ObjectId, isBetween} from './lib/util';
 import {saveSnapshot, getFeeds, getNewFeeds} from './lib/logic';
 import {getLastSeen, setLastSeen} from './lib/model';
 
+import * as fd from './feed';
+
 import * as display from './display';
+
+let lastSeen;
+
+let nextPage;
 
 $(document).ready(init);
 
 function init() {
     nextPage = lastSeen = getLastSeen();
 
-    Promise.all([
-        showNextPage(),
-        snapshot()
-    ]).then(checkNew).then(() => {
-        display.checkNewProgress(1);
+    fd.setLastSeen(lastSeen);
 
-        if (feedsCollection.feeds.isEmpty()) {
-
-            if (feedsCollection.newFeeds.isEmpty()) {
-                display.showEmpty();
-            } else {
-                showNewFeeds();
-            }
-
-            return;
-        }
-
-        display.showMoreClick(showNextPage);
-        display.feedNewPostsClick(showNewFeeds);
-    });
+    start();
 }
 
-let lastSeen;
+function start() {
+    Promise.all([
+        showNextPage(),
+        doSnapshot()
+    ]).then(
+        checkNew
+    ).then(
+        finish
+    );
 
-let feedsCollection = {
-    feeds: [],
-    get lastId() {
-        return this.feeds.last() && this.feeds.last().id;
-    },
-    get firstId() {
-        return this.feeds.first() && this.feeds.first().id;
-    },
-    add(feeds) {
-        this.feeds.pushAll(feeds);
-        this.feeds.sort((a, b) => ObjectId.compare(a.id, b.id));
-    },
-    isWithin(id) {
-        if (this.feeds.isEmpty()) {
-            return false;
-        }
+    display.feedPageNextHandler(showNextPage);
+    display.feedNewOpenHandler(openNew);
+}
 
-        return isBetween(id, this.firstId, this.lastId, ObjectId.compare);
-    },
-    findLast(id) {
-        return this.feeds.find(feed => ObjectId.compare(feed.id, id) <= 0);
-    },
-    newFeeds: []
-};
+function finish() {
+    if (fd.isEmpty()) {
+        display.feedEmpty();
+        return;
+    }
 
-let nextPage;
+    if (fd.isOnlyNew()) {
+        openNew();
+    }
+}
 
 function showNextPage() {
-    display.feedLoading(true);
+    display.feedPageProgress(0);
 
-    let from = nextPage;
-
-    return getFeeds({from}).then(({feeds, next}) => {
-        display.feedLoading(false);
+    return getFeeds({from: nextPage}).then(({feeds, next}) => {
+        display.feedPageProgress(1);
 
         nextPage = next;
 
-        if (next) {
-            nextPage = next;
-            display.showMoreLink();
-        } else {
-            display.allShowed();
-            display.updateFrameSize();
-        }
-
-        if (feeds.isEmpty()) {
-            return;
-        }
-
-        feeds.forEach(feed => {
-            display.addFeed(feed, {after: feedsCollection.lastId});
-            feedsCollection.feeds.push(feed);
-        });
-
-        unread();
-
-        display.updateFrameSize();
+        fd.showPage(feeds, !nextPage);
     });
 }
 
 function checkNew() {
-    let to = feedsCollection.firstId || lastSeen;
+    display.feedNewProgress(0);
+
+    let to = fd.getLastSeen() || lastSeen;
 
     return getNewFeeds({to}).then(({feeds}) => {
-        if (feeds.isEmpty()) {
-            return;
-        }
+        display.feedNewProgress(1);
 
-        display.feedNewPosts(feeds.length);
-
-        feedsCollection.newFeeds = feeds;
-
-        display.updateFrameSize();
+        fd.setNewFeeds(feeds);
     });
 }
 
-function snapshot() {
-    display.checkNewProgress(0);
+function openNew() {
+    fd.showNewFeeds();
 
-    return saveSnapshot();
+    setLastSeen(fd.getLastSeen());
+}
+function doSnapshot() {
+    display.feedNewProgress(0);
+
+    return saveSnapshot().then(() => display.feedNewProgress(1));
 }
 
-function showNewFeeds() {
-    feedsCollection.newFeeds.forEach(feed => {
-        display.addFeed(feed, {before: feedsCollection.firstId});
-        feedsCollection.feeds.unshift(feed);
-    });
-
-    feedsCollection.newFeeds.length = 0;
-
-    display.feedNewPosts(0);
-
-    unread();
-
-    display.updateFrameSize();
-
-    setLastSeen(feedsCollection.firstId);
-}
-
-function unread() {
-    if (feedsCollection.isWithin(lastSeen)) {
-        display.unreadBarBefore(feedsCollection.findLast(lastSeen).id);
-    }
-}

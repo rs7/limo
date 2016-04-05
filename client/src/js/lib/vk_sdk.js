@@ -2,12 +2,8 @@
 
 import {responseCallback} from './util';
 
-function resize(width, height) {
-    return VK.callMethod('resizeWindow', width, height);
-}
-
 export function frameHeight(height) {
-    resize(null, height);
+    VK.callMethod('resizeWindow', null, height)
 }
 
 export function callMethod(method, params) {
