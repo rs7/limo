@@ -5,140 +5,83 @@ const $ = require('jquery');
 import {saveSnapshot, getFeeds, getNewFeeds} from './lib/logic';
 import {getLastSeen, setLastSeen} from './lib/model';
 
-import {ObjectId} from './lib/util';
-
 import * as fd from './feed';
-
 import * as display from './display';
-
-let newTo;
-
-let nextPage;
 
 $(window).load(init);
 
 function init() {
-    let lastSeen = getLastSeen();
-
-    fd.setLastSeen(lastSeen);
-
-    newTo = nextPage = lastSeen || ObjectId.now();
+    fd.setLastSeen(getLastSeen());
 
     display.feedNewUpdateHandler(updateNew);
     display.feedNewOpenHandler(openNew);
     display.feedPageNextHandler(showNextPage);
 
-    showNextPage();
-    updateNew();
+    Promise.all([
+        showNextPage(),
+        updateNew()
+    ]).then(() => {
+        display.feedEmptyVisible(fd.isEmpty());
+    });
 }
 
 //----------------------------------------
 
-const FINISH_NEW = 1;
-const FINISH_PAGE = 2;
-const FINISH_ALL = 3;
-
-let finished = 0;
-
-function finish(value) {
-    finished |= value;
-
-    if (finished != FINISH_ALL) {
-        return;
-    }
-
-    if (fd.isEmpty()) {
-        display.feedEmpty();
-    }
-}
-
-//----------------------------------------
-
-function showError(error) {
-    console.error('ошибка', error);
+function errorHandler(error) {
     display.showError(error);
+    console.error(error);
+    throw error;
 }
 
 //----------------------------------------
 
 function updateNew() {
-    showProgress();
-    display.feedNewUpdateHide();
+    display.feedNewUpdateVisible(false);
+    display.feedNewProgressVisible(true);
 
-    return saveSnapshot().then(getNew).finally(hideProgress).then(({feeds}) => {
-        setNew(feeds);
+    return saveSnapshot().then(() => {
+        return getNewFeeds({to: fd.getPrev()});
+    }).finally(() => {
+        display.feedNewProgressVisible(false);
+    }).then(({feeds}) => {
+        fd.addPrev(feeds);
+        display.feedNewOpenCount(fd.countPrev());
+        display.feedNewOpenVisible(fd.countPrev());
+        display.feedNewEmptyVisible(!fd.countPrev());
 
-        if (fd.isOnlyNew()) {
+        if (fd.isOnlyPrev()) {
             return openNew();
         }
-
-        if (fd.isNewEmpty()) {
-            display.feedNewEmpty();
-        }
-    }).then(() => {
-        finish(FINISH_NEW);
     }).catch(error => {
-        display.feedNewUpdateShow();
-        showError(error);
-    });
-
-    function getNew() {
-        return getNewFeeds({to: newTo});
-    }
-
-    function setNew(feeds) {
-        set(feeds);
-        saveTo();
-
-        function set(feeds) {
-            fd.setNewFeeds(feeds);
-        }
-
-        function saveTo() {
-            newTo = fd.getLast();
-        }
-    }
-
-    function showProgress() {
-        display.feedNewProgress(0);
-    }
-
-    function hideProgress() {
-        display.feedNewProgress(1);
-    }
+        display.feedNewUpdateVisible(true);
+        throw error;
+    }).catch(errorHandler);
 }
 
 function openNew() {
-    fd.showNewFeeds();
-
-    return setLastSeen(fd.getLastSeen()).catch(showError);
+    display.feedAddPrev(fd.flushPrev());
+    display.feedUnread(fd.findLastRead());
+    display.feedNewOpenCount(fd.countPrev());
+    display.feedNewOpenVisible(fd.countPrev());
+    return setLastSeen(fd.getLastSeen()).catch(errorHandler);
 }
 
 //----------------------------------------
 
 function showNextPage() {
-    showProgress();
-
-    return getFeeds({from: nextPage}).then(({feeds, next}) => {
-        show(feeds, next);
-        saveNext(next);
-    }).finally(hideProgress).then(() => {
-        finish(FINISH_PAGE);
-    }).catch(showError);
-
-    function saveNext(next) {
-        nextPage = next;
-    }
-
-    function show(feeds, next) {
-        fd.showPage(feeds, !next);
-    }
-
-    function showProgress() {
-        display.feedPageProgress(0);
-    }
-
-    function hideProgress() {
-        display.feedPageProgress(1);
-    }
+    display.feedPageNextVisible(false);
+    display.feedPageProgressVisible(true);
+    return getFeeds({from: fd.getNext()}).finally(() => {
+        display.feedPageProgressVisible(false);
+    }).then(({feeds, next}) => {
+        fd.setNext(next);
+        fd.addNext(feeds);
+        display.feedAddNext(fd.flushNext());
+        display.feedUnread(fd.findLastRead());
+        display.feedPageNextVisible(fd.getNext());
+        display.feedAllShownVisible(!fd.getNext() && !fd.isEmpty());
+    }).catch(error => {
+        display.feedPageNextVisible(true);
+        throw error;
+    }).catch(errorHandler);
 }

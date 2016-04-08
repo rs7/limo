@@ -16,6 +16,10 @@ Array.prototype.pushAll = function (array) {
     this.push.apply(this, array);
 };
 
+Array.prototype.unshiftAll = function (array) {
+    this.unshift.apply(this, array);
+};
+
 Array.prototype.remove = function (item) {
     var index = this.indexOf(item);
     return ~index ? this.splice(index, 1) : [];

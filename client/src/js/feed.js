@@ -2,94 +2,102 @@
 
 import {ObjectId, isBetween} from './lib/util';
 
-import * as display from './display';
-
 let feeds = [];
-let feedsNew = [];
+
+let feedsPrev = [];
+let feedsNext = [];
 
 let lastSeen;
 
+let prev;
+let next;
+
+//----------------------------------------
+
 export function setLastSeen(value) {
     lastSeen = value;
-}
 
-export function getLast() {
-    return firstWithNew();
+    prev = lastSeen || ObjectId.now();
+    next = lastSeen || ObjectId.now();
 }
 
 export function getLastSeen() {
-    return first();
+    return id(feeds.first());
+}
+
+function setPrev(value) {
+    prev = value;
+}
+
+export function getPrev() {
+    return prev;
+}
+
+export function setNext(value) {
+    next = value;
+}
+
+export function getNext() {
+    return next;
+}
+
+//----------------------------------------
+
+function id(feed) {
+    return feed && feed.id;
+}
+
+//----------------------------------------
+
+export function addPrev(feedsNew) {
+    feedsPrev.pushAll(feedsNew);
+    setPrev(id(feedsPrev.last()));
+}
+
+export function addNext(feedsNew) {
+    feedsNext.pushAll(feedsNew);
+}
+
+//----------------------------------------
+
+export function flushPrev() {
+    let result = feedsPrev.slice();
+    feeds.unshiftAll(feedsPrev);
+    feedsPrev.clear();
+    return result;
+}
+
+export function flushNext() {
+    let result = feedsNext.slice();
+    feeds.pushAll(feedsNext);
+    feedsNext.clear();
+    return result;
+}
+
+//----------------------------------------
+
+export function countPrev() {
+    return feedsPrev.length;
+}
+
+export function findLastRead() {
+    if (feeds.isEmpty() || !lastSeen) {
+        return;
+    }
+
+    if(!isBetween(lastSeen, id(feeds.first()), id(feeds.last()), ObjectId.compare)) {
+        return;
+    }
+
+    return id(feeds.find(feed => ObjectId.compare(feed.id, lastSeen) <= 0));
+}
+
+//----------------------------------------
+
+export function isOnlyPrev() {
+    return !feedsPrev.isEmpty() && feeds.isEmpty() && feedsNext.isEmpty();
 }
 
 export function isEmpty() {
-    return feeds.isEmpty() && feedsNew.isEmpty();
-}
-
-export function isOnlyNew() {
-    return feeds.isEmpty() && !feedsNew.isEmpty();
-}
-
-export function isNewEmpty() {
-    return feedsNew.isEmpty();
-}
-
-function firstWithNew() {
-    return feedsNew.last() && feedsNew.last().id || first();
-}
-
-function first() {
-    return feeds.first() && feeds.first().id;
-}
-
-function last() {
-    return feeds.last() && feeds.last().id;
-}
-
-function hasUnread() {
-    if (feeds.isEmpty() || !lastSeen) {
-        return false;
-    }
-
-    return isBetween(lastSeen, first(), last(), ObjectId.compare);
-}
-
-function findLastRead() {
-    return feeds.find(feed => ObjectId.compare(feed.id, lastSeen) <= 0);
-}
-
-export function showNewFeeds() {
-    feedsNew.forEach(feed => {
-        display.feedAdd(feed, {before: first()});
-        feeds.unshift(feed);
-    });
-
-    feedsNew.length = 0;
-
-    display.feedNewCount(0);
-
-    showUnreadBar();
-}
-
-function showUnreadBar() {
-    if (hasUnread()) {
-        display.feedUnread(findLastRead().id);
-    }
-}
-
-export function showPage(feedsNew, isLastPage) {
-    feedsNew.forEach(feed => {
-        display.feedAdd(feed, {after: last()});
-        feeds.push(feed);
-    });
-
-    if (isLastPage) {
-        display.feedPageAll();
-    }
-
-    showUnreadBar();
-}
-
-export function setNewFeeds(feeds) {
-    feedsNew = feeds;
-    display.feedNewCount(feeds.length);
+    return feedsPrev.isEmpty() && feeds.isEmpty() && feedsNext.isEmpty();
 }

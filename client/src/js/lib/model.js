@@ -164,9 +164,9 @@ function processFeedsResponse(response) {
 }
 
 export function getLastSeen() {
-    return parseObjectId(apiResult);
-    //return parseObjectId('');
     //return parseObjectId('57061f04d0f0aa081b4be932');
+    //return parseObjectId('');
+    return parseObjectId(apiResult);
 }
 
 export function setLastSeen(id) {

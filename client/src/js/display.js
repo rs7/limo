@@ -11,6 +11,10 @@ $(document).ready(initHelpers);
 
 $(window).load(updateFrameSize);
 
+function visible(elem, value) {
+    elem.css('display', value? 'block' : 'none');
+}
+
 function updateFrameSize() {
     frameHeight($('body').outerHeight());
 }
@@ -25,61 +29,63 @@ export function showError(error) {
 
 //----------------------------------------
 
-export function feedPageAll() {
-    $('#show_more_link').css('display', 'none');
-    $('#all_shown').css('display', 'block');
-
-    updateFrameSize();
-}
-
 export function feedPageNextHandler(handler) {
     $('#show_more_link').click(handler);
 }
 
-export function feedPageProgress(progress) {
-    if (progress == 1) {
-        $('#show_more_progress').css('display', 'none');
-        $('#show_more').css('display', 'block');
+export function feedPageNextVisible(value) {
+    feedPageNextVisibleUpdate(FPVS.NEXT, value);
+}
+
+export function feedPageProgressVisible(value) {
+    feedPageNextVisibleUpdate(FPVS.PROGRESS, value);
+}
+
+const FPVS = {
+    state: 0,
+    NEXT: 1,
+    PROGRESS: 2
+};
+
+function feedPageNextVisibleUpdate(state, value) {
+    if (value) {
+        FPVS.state |= state;
     } else {
-        $('#show_more').css('display', 'none');
-        $('#show_more_progress').css('display', 'block');
+        FPVS.state &= ~state;
     }
+
+    visible($('#show_more_link'), FPVS.state);
+
+    visible($('#show_more'), FPVS.state & FPVS.NEXT);
+    visible($('#show_more_progress'), FPVS.state & FPVS.PROGRESS);
 
     updateFrameSize();
 }
 
 //----------------------------------------
 
-export function feedNewCount(count) {
-    let feedNewPosts = $('#feed_new_posts');
-
-    if (count) {
-        feedNewPosts.css('display', 'block');
-    } else {
-        feedNewPosts.css('display', 'none');
-    }
-
-    feedNewPosts.html(templates['feed_new_posts']({count}));
+export function feedNewEmptyVisible(value) {
+    visible($('#feed_new_empty'), value);
 
     updateFrameSize();
 }
 
-export function feedNewEmpty() {
-    $('#feed_new_empty').css('display', 'block');
-
-    updateFrameSize();
+export function feedNewOpenCount(count) {
+    $('#feed_new_posts').html(templates['feed_new_posts']({count}));
 }
 
 export function feedNewOpenHandler(handler) {
     $('#feed_new_posts').click(handler);
 }
 
-export function feedNewProgress(progress) {
-    if (progress == 1) {
-        $('#feed_new_progress').css('display', 'none');
-    } else {
-        $('#feed_new_progress').css('display', 'block');
-    }
+export function feedNewOpenVisible(value) {
+    visible($('#feed_new_posts'), value);
+
+    updateFrameSize();
+}
+
+export function feedNewProgressVisible(value) {
+    visible($('#feed_new_progress'), value);
 
     updateFrameSize();
 }
@@ -88,36 +94,42 @@ export function feedNewUpdateHandler(handler) {
     $('#feed_new_update').click(handler);
 }
 
-export function feedNewUpdateHide() {
-    $('#feed_new_update').css('display', 'none');
-
-    updateFrameSize();
-}
-
-export function feedNewUpdateShow() {
-    $('#feed_new_update').css('display', 'block');
+export function feedNewUpdateVisible(value) {
+    visible($('#feed_new_update'), value);
 
     updateFrameSize();
 }
 
 //----------------------------------------
 
-export function feedAdd(feed, {after, before}) {
-    let feedElement = templates[`feed_${feed.type}`](feed);
+function createFeedElement(feed) {
+    return templates[`feed_${feed.type}`](feed);
+}
 
-    if (after) {
-        $(`#feed_row_${after.value}`).after(feedElement);
-    } else if (before) {
-        $(`#feed_row_${before.value}`).before(feedElement);
-    } else {
-        $('#feed_rows').append(feedElement);
-    }
+function createFeedList(feeds) {
+    return feeds.map(createFeedElement).join('\n');
+}
+
+export function feedAddPrev(feeds) {
+    $('#feed_rows').prepend(createFeedList(feeds.reverse()));
 
     updateFrameSize();
 }
 
-export function feedEmpty() {
-    $('#feed_empty').css('display', 'block');
+export function feedAddNext(feeds) {
+    $('#feed_rows').append(createFeedList(feeds));
+
+    updateFrameSize();
+}
+
+export function feedAllShownVisible(value) {
+    visible($('#all_shown'), value);
+
+    updateFrameSize();
+}
+
+export function feedEmptyVisible(value) {
+    visible($('#feed_empty'), value);
 
     updateFrameSize();
 }
@@ -125,8 +137,11 @@ export function feedEmpty() {
 export function feedUnread(before) {
     let unreadBar = $('#feedback_unread_bar');
 
-    unreadBar.detach().insertBefore($(`#feed_row_${before.value}`));
-    unreadBar.css('display', 'block');
+    visible(unreadBar, before);
+
+    if (before) {
+        unreadBar.detach().insertBefore($(`#feed_row_${before.value}`));
+    }
 
     updateFrameSize();
 }
