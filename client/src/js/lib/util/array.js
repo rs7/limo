@@ -17,7 +17,7 @@ Array.prototype.pushAll = function (array) {
 };
 
 Array.prototype.unshiftAll = function (array) {
-    this.unshift.apply(this, array);
+    this.unshift.apply(this, array.reverse());
 };
 
 Array.prototype.remove = function (item) {

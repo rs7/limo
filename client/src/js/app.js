@@ -63,6 +63,7 @@ function openNew() {
     display.feedUnread(fd.findLastRead());
     display.feedNewOpenCount(fd.countPrev());
     display.feedNewOpenVisible(fd.countPrev());
+    display.feedAllShownVisible(!fd.getNext() && !fd.isEmpty());
     return setLastSeen(fd.getLastSeen()).catch(errorHandler);
 }
 
