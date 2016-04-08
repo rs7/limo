@@ -1,38 +1,28 @@
 'use strict';
 
+const OWNER = [{
+    id: 1052662,
+    photos: [404, 186063354, 265643362, 273263115, 280134965, 284160443, 298490651, 299328128, 300859215, 300908802, 304101403, 312964640, 315332500, 318194034, 296458165, 318700763, 320139016, 320139102, 323571338, 324186596, 323349119, 328161314, 313779488, 335355885, 336774329, 338104511, 290355736, 346605826, 349652797, 354872156, 375161548, 382069629, 393135726, 285076967, 344561132, 358693393]
+}, {
+    id: 45147844,
+    photos: [404, 356693075]
+}];
+
+let argv = require('optimist')
+    .usage('Usage: $0 [-x] -c[number] -u[index]')
+    .boolean('x')
+    .default('c', 5)
+    .check(({u}) => {
+        if(!OWNER[u]) throw `available user index:\n${OWNER.map(({id}, index) => `${index}: ${id}`).join('\n')}`;
+    })
+    .argv
+;
+
+let user = OWNER[argv.u];
+
 import {mongoose, Feed} from './db';
 
-const OWNER = 1052662;
-const PHOTOS = [404, 186063354, 265643362, 273263115, 280134965, 284160443, 298490651, 299328128, 300859215, 300908802, 304101403, 312964640, 315332500, 318194034, 296458165, 318700763, 320139016, 320139102, 323571338, 324186596, 323349119, 328161314, 313779488, 335355885, 336774329, 338104511, 290355736, 346605826, 349652797, 354872156, 375161548, 382069629, 393135726, 285076967, 344561132, 358693393];
-const USERS = [{
-    id: 301419447,
-    first_name: 'Патриарх',
-    last_name: 'Кирилл'
-}, {
-    id: 53083705,
-    first_name: 'Дмитрий',
-    last_name: 'Медведев'
-}, {
-    id: 150923881,
-    first_name: 'Анатолий',
-    last_name: 'Локоть'
-}, {
-    id: 38940203,
-    first_name: 'Владимир',
-    last_name: 'Жириновский'
-}, {
-    id: 41362423,
-    first_name: 'Геннадий',
-    last_name: 'Зюганов'
-}, {
-    id: 209991765,
-    first_name: 'Sasha',
-    last_name: 'Grey'
-}, {
-    id: 205387401,
-    first_name: 'Tom',
-    last_name: 'Cruise'
-}];
+const USERS = [301419447/*Патриарх Кирилл*/, 53083705/*Дмитрий Медведев*/, 150923881/*Анатолий Локоть*/, 38940203/*Владимир Жириновский*/, 41362423/*Геннадий Зюганов*/, 209991765/*Sasha Grey*/, 205387401/*Tom Cruise*/];
 
 const NOW = new Date();
 
@@ -40,83 +30,62 @@ function getRandomArrayItem(array) {
     return array[Math.floor(Math.random() * array.length)];
 }
 
-function getRandomDate(from, to) {
-    return new Date(from.getTime() + Math.random() * (to.getTime() - from.getTime()));
+let count = 0;
+let date = NOW;
+
+function getPeriod() {
+    let from = new Date(date.getTime() - getRandomArrayItem([3, 12, 24, 24 * 3, 24 * 30].slice(0, ++count)) * 1000 * 60 * 60);
+    let to = new Date(date.getTime());
+    date = from;
+    return {from, to};
 }
 
-const PERIOD = [
-    function () {
-        let from = getRandomDate(new Date(2013, 0), NOW);
-        let to = getRandomDate(from, NOW);
-        return {from, to};
-    },
-    function () {
-        let from = getRandomDate(new Date(2014, 0), NOW);
-        let to = getRandomDate(from, new Date(from.getFullYear(), from.getMonth(), from.getDate() + 1));
-        return {from, to};
-    },
-    function () {
-        let from = getRandomDate(new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() - 2), NOW);
-        let to = getRandomDate(from, NOW);
-        return {from, to};
-    },
-    function () {
-        let from = getRandomDate(new Date(2014, 0), new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() - 2));
-        let to = getRandomDate(new Date(NOW.getFullYear(), NOW.getMonth(), NOW.getDate() - 2), NOW);
-        return {from, to};
-    }
-];
+function getUser() {
+    return Math.floor(1 + Math.random() * 359446589);
+}
+
+function getFeed() {
+    return {
+        user : getUser(),
+        owner : user.id,
+        period : getPeriod()
+    };
+}
 
 function unlikePhotoFeed() {
-    return {
+    return Object.assign({
         type : 'unlike_photo',
-        photo : getRandomArrayItem(PHOTOS),
-        user : getRandomArrayItem(USERS).id,
-        owner : OWNER,
-        period : getRandomArrayItem(PERIOD)()
-    };
+        photo : getRandomArrayItem(user.photos)
+    }, getFeed());
 }
 
 function unfriendFeed() {
-    return {
-        type : 'unfriend',
-        user : getRandomArrayItem(USERS).id,
-        owner : OWNER,
-        period : getRandomArrayItem(PERIOD)()
-    };
+    return Object.assign({
+        type : 'unfriend'
+    }, getFeed());
 }
 
 function unfollowerFeed() {
-    return {
-        type : 'unfollower',
-        user : getRandomArrayItem(USERS).id,
-        owner : OWNER,
-        period : getRandomArrayItem(PERIOD)()
-    };
+    return Object.assign({
+        type : 'unfollower'
+    }, getFeed());
 }
 
-const FEED = [
-    unlikePhotoFeed, unfriendFeed, unfollowerFeed
-];
+const FEED = [unlikePhotoFeed, unfriendFeed, unfollowerFeed];
 
 function createRandomFeed() {
     return getRandomArrayItem(FEED)();
 }
 
-let feeds = [];
-
-let i = 50;
-while(i--) {
-    feeds.push(createRandomFeed());
+function clear() {
+    console.log('>_<', user.id);
+    return Feed.remove({owner: user.id});
 }
 
-Feed.remove({}).then(() => {
-    console.log('--- очищено');
-    Feed.insertMany(feeds).then(() => {
-        console.log('--- тестовые данные добавлены');
-        mongoose.disconnect().then(() => {
-            console.log('--- соединение закрыто');
-        });
-    });
-});
+function insert(count) {
+    console.log('^_^', user.id, count);
+    let feeds = new Array(count).fill(1).map(createRandomFeed).reverse();
+    return Feed.insertMany(feeds);
+}
 
+(argv.x?clear():Promise.resolve()).then(() => insert(argv.c)).then(() => mongoose.disconnect());
