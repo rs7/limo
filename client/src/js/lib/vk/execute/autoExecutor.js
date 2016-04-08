@@ -47,7 +47,6 @@ function fail(task, error) {
 
     if (task.repeatCount == maxRepeatCount) {
         task.deferred.reject(task.errors);
-        console.log('!! reject', task);
         return;
     }
 

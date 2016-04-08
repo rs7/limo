@@ -6,9 +6,17 @@ export function fetch(params) {
     return new Promise((resolve, reject) =>
         $.ajax(params).then(
             responseCallback(resolve, reject),
-            reject
+            (jqXHR) => reject(jqXHRError(jqXHR))
         )
     );
+}
+
+function jqXHRError(jqXHR) {
+    return {
+        response: jqXHR.responseText,
+        status: jqXHR.status,
+        statusText: jqXHR.statusText
+    };
 }
 
 export function responseCallback(resolve, reject) {

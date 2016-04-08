@@ -2,7 +2,7 @@
 
 import {user, apiResult} from './params';
 
-import {processArray, processObject, parseDate, parseObjectId, auto, ObjectId} from './util';
+import {processArray, processObject, parseDate, parseObjectId, auto} from './util';
 
 import * as vk from './vk_request';
 import * as remote from './remote/request';
@@ -164,8 +164,9 @@ function processFeedsResponse(response) {
 }
 
 export function getLastSeen() {
-    return apiResult && new ObjectId(apiResult) || undefined;
-    //return new ObjectId('56fd5974d1df5f4414640f8f');
+    return parseObjectId(apiResult);
+    //return parseObjectId('');
+    //return parseObjectId('57061f04d0f0aa081b4be932');
 }
 
 export function setLastSeen(id) {

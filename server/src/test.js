@@ -67,13 +67,40 @@ const PERIOD = [
     }
 ];
 
-function createRandomFeed() {
+function unlikePhotoFeed() {
     return {
-        "photo" : getRandomArrayItem(PHOTOS),
-        "user" : getRandomArrayItem(USERS).id,
-        "owner" : OWNER,
-        "period" : getRandomArrayItem(PERIOD)()
+        type : 'unlike_photo',
+        photo : getRandomArrayItem(PHOTOS),
+        user : getRandomArrayItem(USERS).id,
+        owner : OWNER,
+        period : getRandomArrayItem(PERIOD)()
     };
+}
+
+function unfriendFeed() {
+    return {
+        type : 'unfriend',
+        user : getRandomArrayItem(USERS).id,
+        owner : OWNER,
+        period : getRandomArrayItem(PERIOD)()
+    };
+}
+
+function unfollowerFeed() {
+    return {
+        type : 'unfollower',
+        user : getRandomArrayItem(USERS).id,
+        owner : OWNER,
+        period : getRandomArrayItem(PERIOD)()
+    };
+}
+
+const FEED = [
+    unlikePhotoFeed, unfriendFeed, unfollowerFeed
+];
+
+function createRandomFeed() {
+    return getRandomArrayItem(FEED)();
 }
 
 let feeds = [];

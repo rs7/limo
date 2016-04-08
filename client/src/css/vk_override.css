@@ -9,7 +9,7 @@
 }
 
 /* повторяет vk стиль #feed_new_posts */
-#feed_new_progress {
+.feed_new_bar {
     color: #71869B;
     background: #E9EDF1;
     padding: 10px;
@@ -19,4 +19,23 @@
 
 #feed_new_progress .progress {
     margin: 0 auto;
+}
+
+#feed_new_update {
+    cursor: pointer;
+}
+
+#feed_errors {
+    margin: 15px 15px 0 15px;
+}
+
+.feed_error {
+    color: #000;
+    background-color: #FFB4A3;
+    padding: 10px;
+    margin: 5px 0 0 0;
+}
+
+.feed_error pre {
+    white-space: pre-wrap;
 }

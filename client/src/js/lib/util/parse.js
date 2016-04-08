@@ -1,9 +1,9 @@
 'use strict';
 
-import {ObjectId} from '../util';
+import {ObjectId} from './../util';
 
 export function parseObjectId(value) {
-    return new ObjectId(value);
+    return ObjectId.validate(value)? new ObjectId(value) : undefined;
 }
 
 export function parseDate(date) {

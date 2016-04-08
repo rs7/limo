@@ -1,6 +1,6 @@
 const Handlebars = require('handlebars');
 
-import {printDate, printPeriod, timestamp, numeralDeclension} from './util';
+import {printDate, printPeriod, timestamp, numeralDeclension, escapeSecret} from './util';
 
 export function initHelpers() {
     Handlebars.registerHelper('timestamp', date => timestamp(date));
@@ -22,4 +22,8 @@ export function initHelpers() {
     Handlebars.registerHelper('item', (index, ...values) => values[index]);
 
     Handlebars.registerHelper('num_decl', (value, ...forms012) => numeralDeclension(value, forms012));
+
+    Handlebars.registerHelper('json', value => JSON.stringify(value, null, 2));
+
+    Handlebars.registerHelper('escape', value => escapeSecret(value));
 }

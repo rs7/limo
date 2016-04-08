@@ -1,8 +1,18 @@
 'use strict';
 
+import {currentTimestamp} from './../util';
+
 export class ObjectId {
     static compare(a, b) {
         return a.date - b.date || a.machine - b.machine || a.process - b.process || a.counter - b.counter;
+    }
+
+    static now() {
+        return new ObjectId(`${currentTimestamp().toString(16)}${'0'.repeat(16)}`);
+    }
+
+    static validate(value) {
+        return /^[0-9a-fA-F]{24}$/.test(value);
     }
 
     constructor(value) {

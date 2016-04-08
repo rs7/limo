@@ -5,81 +5,140 @@ const $ = require('jquery');
 import {saveSnapshot, getFeeds, getNewFeeds} from './lib/logic';
 import {getLastSeen, setLastSeen} from './lib/model';
 
+import {ObjectId} from './lib/util';
+
 import * as fd from './feed';
 
 import * as display from './display';
 
-let lastSeen;
+let newTo;
 
 let nextPage;
 
-$(document).ready(init);
+$(window).load(init);
 
 function init() {
-    nextPage = lastSeen = getLastSeen();
+    let lastSeen = getLastSeen();
 
     fd.setLastSeen(lastSeen);
 
-    start();
-}
+    newTo = nextPage = lastSeen || ObjectId.now();
 
-function start() {
-    Promise.all([
-        showNextPage(),
-        doSnapshot()
-    ]).then(
-        checkNew
-    ).then(
-        finish
-    );
-
-    display.feedPageNextHandler(showNextPage);
+    display.feedNewUpdateHandler(updateNew);
     display.feedNewOpenHandler(openNew);
+    display.feedPageNextHandler(showNextPage);
+
+    showNextPage();
+    updateNew();
 }
 
-function finish() {
-    if (fd.isEmpty()) {
-        display.feedEmpty();
+//----------------------------------------
+
+const FINISH_NEW = 1;
+const FINISH_PAGE = 2;
+const FINISH_ALL = 3;
+
+let finished = 0;
+
+function finish(value) {
+    finished |= value;
+
+    if (finished != FINISH_ALL) {
         return;
     }
 
-    if (fd.isOnlyNew()) {
-        openNew();
+    if (fd.isEmpty()) {
+        display.feedEmpty();
     }
 }
 
-function showNextPage() {
-    display.feedPageProgress(0);
+//----------------------------------------
 
-    return getFeeds({from: nextPage}).then(({feeds, next}) => {
-        display.feedPageProgress(1);
-
-        nextPage = next;
-
-        fd.showPage(feeds, !nextPage);
-    });
+function showError(error) {
+    console.error('ошибка', error);
+    display.showError(error);
 }
 
-function checkNew() {
-    display.feedNewProgress(0);
+//----------------------------------------
 
-    let to = fd.getLastSeen() || lastSeen;
+function updateNew() {
+    showProgress();
+    display.feedNewUpdateHide();
 
-    return getNewFeeds({to}).then(({feeds}) => {
-        display.feedNewProgress(1);
+    return saveSnapshot().then(getNew).finally(hideProgress).then(({feeds}) => {
+        setNew(feeds);
 
-        fd.setNewFeeds(feeds);
+        if (fd.isOnlyNew()) {
+            return openNew();
+        }
+
+        if (fd.isNewEmpty()) {
+            display.feedNewEmpty();
+        }
+    }).then(() => {
+        finish(FINISH_NEW);
+    }).catch(error => {
+        display.feedNewUpdateShow();
+        showError(error);
     });
+
+    function getNew() {
+        return getNewFeeds({to: newTo});
+    }
+
+    function setNew(feeds) {
+        set(feeds);
+        saveTo();
+
+        function set(feeds) {
+            fd.setNewFeeds(feeds);
+        }
+
+        function saveTo() {
+            newTo = fd.getLast();
+        }
+    }
+
+    function showProgress() {
+        display.feedNewProgress(0);
+    }
+
+    function hideProgress() {
+        display.feedNewProgress(1);
+    }
 }
 
 function openNew() {
     fd.showNewFeeds();
 
-    setLastSeen(fd.getLastSeen());
-}
-function doSnapshot() {
-    display.feedNewProgress(0);
-
-    return saveSnapshot().then(() => display.feedNewProgress(1));
+    return setLastSeen(fd.getLastSeen()).catch(showError);
 }
 
+//----------------------------------------
+
+function showNextPage() {
+    showProgress();
+
+    return getFeeds({from: nextPage}).then(({feeds, next}) => {
+        show(feeds, next);
+        saveNext(next);
+    }).finally(hideProgress).then(() => {
+        finish(FINISH_PAGE);
+    }).catch(showError);
+
+    function saveNext(next) {
+        nextPage = next;
+    }
+
+    function show(feeds, next) {
+        fd.showPage(feeds, !next);
+    }
+
+    function showProgress() {
+        display.feedPageProgress(0);
+    }
+
+    function hideProgress() {
+        display.feedPageProgress(1);
+    }
+}

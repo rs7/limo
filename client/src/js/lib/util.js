@@ -5,7 +5,7 @@ export {fetch, responseCallback} from './net';
 export {auto} from './util/async';
 export {Deferred, timeout} from './util/promise';
 export {uniqueFilter} from './util/array';
-export {ObjectId} from './util/objectId';
+export {ObjectId} from './util/ObjectId';
 export {parseDate, parseObjectId} from './util/parse';
 
 export function getUrlVars() {
@@ -20,6 +20,14 @@ export function getUrlVars() {
 
 export function timestamp(date) {
     return Math.floor(date.getTime() / 1000);
+}
+
+export function currentTime() {
+    return new Date().getTime();
+}
+
+export function currentTimestamp() {
+    return timestamp(new Date());
 }
 
 export function stringSize(string) {
@@ -67,10 +75,6 @@ function process(value, transform) {
     }
 }
 
-export function currentTime() {
-    return new Date().getTime();
-}
-
 export function isBetween(value, from, to, compare) {
     return compare(from, value) > 0 && compare(to, value) < 0;
 }
@@ -111,4 +115,14 @@ export function numeralDeclension(value, forms012) {
                 return 0;
         }
     }
+}
+
+export function escapeSecret(value) {
+    return [
+        [/[0-9a-fA-F]{85}/g, '%HASH85%'],
+        [/[0-9a-fA-F]{32}/g, '%HASH32%'],
+        ['X:\\\\work\\\\limo\\\\server', '%SERVER_PATH%']
+    ].reduce(
+        (value, [pattern, replace]) => value.replace(pattern, replace), value
+    );
 }

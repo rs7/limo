@@ -13,8 +13,12 @@ export function setLastSeen(value) {
     lastSeen = value;
 }
 
+export function getLast() {
+    return firstWithNew();
+}
+
 export function getLastSeen() {
-    return firstId();
+    return first();
 }
 
 export function isEmpty() {
@@ -25,11 +29,19 @@ export function isOnlyNew() {
     return feeds.isEmpty() && !feedsNew.isEmpty();
 }
 
-function firstId() {
+export function isNewEmpty() {
+    return feedsNew.isEmpty();
+}
+
+function firstWithNew() {
+    return feedsNew.last() && feedsNew.last().id || first();
+}
+
+function first() {
     return feeds.first() && feeds.first().id;
 }
 
-function lastId() {
+function last() {
     return feeds.last() && feeds.last().id;
 }
 
@@ -38,7 +50,7 @@ function hasUnread() {
         return false;
     }
 
-    return isBetween(lastSeen, firstId(), lastId(), ObjectId.compare);
+    return isBetween(lastSeen, first(), last(), ObjectId.compare);
 }
 
 function findLastRead() {
@@ -47,7 +59,7 @@ function findLastRead() {
 
 export function showNewFeeds() {
     feedsNew.forEach(feed => {
-        display.feedAdd(feed, {before: firstId()});
+        display.feedAdd(feed, {before: first()});
         feeds.unshift(feed);
     });
 
@@ -64,9 +76,9 @@ function showUnreadBar() {
     }
 }
 
-export function showPage(newFeeds, isLastPage) {
-    newFeeds.forEach(feed => {
-        display.feedAdd(feed, {after: lastId()});
+export function showPage(feedsNew, isLastPage) {
+    feedsNew.forEach(feed => {
+        display.feedAdd(feed, {after: last()});
         feeds.push(feed);
     });
 

@@ -17,6 +17,14 @@ function updateFrameSize() {
 
 //----------------------------------------
 
+export function showError(error) {
+    $('#feed_errors').append(templates['error'](error));
+
+    updateFrameSize();
+}
+
+//----------------------------------------
+
 export function feedPageAll() {
     $('#show_more_link').css('display', 'none');
     $('#all_shown').css('display', 'block');
@@ -56,6 +64,12 @@ export function feedNewCount(count) {
     updateFrameSize();
 }
 
+export function feedNewEmpty() {
+    $('#feed_new_empty').css('display', 'block');
+
+    updateFrameSize();
+}
+
 export function feedNewOpenHandler(handler) {
     $('#feed_new_posts').click(handler);
 }
@@ -66,6 +80,22 @@ export function feedNewProgress(progress) {
     } else {
         $('#feed_new_progress').css('display', 'block');
     }
+
+    updateFrameSize();
+}
+
+export function feedNewUpdateHandler(handler) {
+    $('#feed_new_update').click(handler);
+}
+
+export function feedNewUpdateHide() {
+    $('#feed_new_update').css('display', 'none');
+
+    updateFrameSize();
+}
+
+export function feedNewUpdateShow() {
+    $('#feed_new_update').css('display', 'block');
 
     updateFrameSize();
 }

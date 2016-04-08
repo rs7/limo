@@ -4,21 +4,28 @@ let express = require('express');
 
 export let router = express.Router();
 
-import {getUser, addFeeds} from '../model';
+import {getUser, addFeeds} from './../model';
 
 router.post('/snapshot', function (req, res, next) {
-    req.checkBody('snapshot').isSnapshot();
-    req.checkQuery('user').isUser();
+    req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
+
+    req.checkBody('photos', 'Недопустимый снимок данных').isPhotos();
+    req.checkBody('likes', 'Недопустимый снимок данных').isLikes();
+    req.checkBody('friends', 'Недопустимый снимок данных').isUsers();
+    req.checkBody('subscriptions', 'Недопустимый снимок данных').isUsers();
+    req.checkBody('followers', 'Недопустимый снимок данных').isUsers();
 
     let errors = req.validationErrors();
 
     if (errors) {
-        res.status(400).json({error: {message: 'Ошибка валидации параметров', debug: errors}});
+        next({message: 'Недопустимые параметры', errors});
         return;
     }
 
-    let {snapshot} = req.body;
+    let {photos, likes, friends, subscriptions, followers} = req.body;
     let {user} = req.query;
+
+    let snapshot = {photos, likes, friends, subscriptions, followers};
 
     Object.assign(snapshot, {
         date: new Date()
@@ -31,8 +38,8 @@ router.post('/snapshot', function (req, res, next) {
 
         return addFeeds(feeds).then(() => user.save());
     }).catch(next).then(() =>
-        res.json({response: 1}
-    ));
+        res.json({response: 1})
+    );
 });
 
 let diff = require('simple-array-diff');

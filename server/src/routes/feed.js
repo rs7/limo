@@ -7,12 +7,13 @@ export let router = express.Router();
 import {getFeedsPage, checkNewFeeds} from './../model';
 
 router.get('/feed', function (req, res, next) {
-    req.checkQuery('from').optional().isObjectId();
+    req.checkQuery('from', 'Недопустимый идентификатор записи').optional().isFeedId();
+    req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
 
     let errors = req.validationErrors();
 
     if (errors) {
-        res.status(400).json({error: {message: 'Ошибка валидации параметров', debug: errors}});
+        next({message: 'Недопустимые параметры', errors});
         return;
     }
 
@@ -24,12 +25,13 @@ router.get('/feed', function (req, res, next) {
 });
 
 router.get('/feed/new', function (req, res, next) {
-    req.checkQuery('to').optional().isObjectId();
+    req.checkQuery('to', 'Недопустимый идентификатор записи').optional().isFeedId();
+    req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
 
     let errors = req.validationErrors();
 
     if (errors) {
-        res.status(400).json({error: {message: 'Ошибка валидации параметров', debug: errors}});
+        next({message: 'Недопустимые параметры', errors});
         return;
     }
 
