@@ -86,6 +86,22 @@ export let API = {
                 count: 100
             }
         }
+    },
+
+    wall: {
+        get: {
+            list: {
+                limit: 100
+            },
+            default: {
+                owner: user,
+                offset: 0,
+                count: 20
+            }
+        },
+        getById: {
+
+        }
     }
 
 };

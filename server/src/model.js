@@ -58,11 +58,13 @@ export function getUser(user) {
             id: user,
             snapshot: {
                 date: new Date(0),
-                photos: [],
                 friends: [],
-                subscriptions: [],
                 followers: [],
-                likes: []
+                subscriptions: [],
+                photos: [],
+                photosLikes: [],
+                posts: [],
+                postsLikes: []
             }
         });
     }

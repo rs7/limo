@@ -21,8 +21,16 @@ export function renameId(object) {
 
 mongoose.connect('mongodb://localhost/limo');
 
-let likesSchema = mongoose.Schema({
+let photosLikesSchema = mongoose.Schema({
     photo: {type: Number, required: true},
+    likes: [Number]
+}, {
+    strict: 'throw',
+    _id: false
+});
+
+let postsLikesSchema = mongoose.Schema({
+    post: {type: Number, required: true},
     likes: [Number]
 }, {
     strict: 'throw',
@@ -31,25 +39,28 @@ let likesSchema = mongoose.Schema({
 
 let snapshotSchema = mongoose.Schema({
     date: {type: Date, required: true},
-    photos: [Number],
     friends: [Number],
-    subscriptions: [Number],
     followers: [Number],
-    likes: [likesSchema]
+    subscriptions: [Number],
+    photos: [Number],
+    photosLikes: [photosLikesSchema],
+    posts: [Number],
+    postsLikes: [postsLikesSchema]
 }, {
     strict: 'throw',
     _id: false
 });
 
 let feedSchema = mongoose.Schema({
-    type: {type: String, required: true, enum: ['unlike_photo', 'unfriend', 'unfollower']},
+    type: {type: String, required: true, enum: ['unfriend', 'unfollower', 'unlike_photo', 'unlike_post']},
     owner: {type: Number, required: true},
     user: {type: Number, required: true},
     period: {
         from: {type: Date, required: true},
         to: {type: Date, required: true}
     },
-    photo: {type: Number, required: false} //только для типа 'unlike_photo'
+    photo: {type: Number, required: false}, //только для типа 'unlike_photo'
+    post: {type: Number, required: false} //только для типа 'unlike_post'
 }, {
     strict: 'throw'
 });

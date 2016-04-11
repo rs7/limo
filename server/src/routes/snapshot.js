@@ -9,11 +9,13 @@ import {getUser, addFeeds} from './../model';
 router.post('/snapshot', function (req, res, next) {
     req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
 
-    req.checkBody('photos', 'Недопустимый снимок данных').isPhotos();
-    req.checkBody('likes', 'Недопустимый снимок данных').isLikes();
     req.checkBody('friends', 'Недопустимый снимок данных').isUsers();
     req.checkBody('subscriptions', 'Недопустимый снимок данных').isUsers();
     req.checkBody('followers', 'Недопустимый снимок данных').isUsers();
+    req.checkBody('photos', 'Недопустимый снимок данных').isPhotos();
+    req.checkBody('photosLikes', 'Недопустимый снимок данных').isPhotosLikes();
+    req.checkBody('posts', 'Недопустимый снимок данных').isPosts();
+    req.checkBody('postsLikes', 'Недопустимый снимок данных').isPostsLikes();
 
     let errors = req.validationErrors();
 
@@ -22,10 +24,10 @@ router.post('/snapshot', function (req, res, next) {
         return;
     }
 
-    let {photos, likes, friends, subscriptions, followers} = req.body;
+    let {friends, subscriptions, followers, photos, photosLikes, posts, postsLikes} = req.body;
     let {user} = req.query;
 
-    let snapshot = {photos, likes, friends, subscriptions, followers};
+    let snapshot = {friends, subscriptions, followers, photos, photosLikes, posts, postsLikes};
 
     Object.assign(snapshot, {
         date: new Date()
@@ -52,29 +54,7 @@ function createFeeds(owner, from, to) {
 
     let feeds = [];
 
-    let type = 'unlike_photo';
-
-    let fromMap = mapByPhoto(from.likes);
-    let toMap = mapByPhoto(to.likes);
-
-    let commonPhotos = diff(from.photos, to.photos).common;
-
-    commonPhotos.forEach(photo => {
-        let fromLikes = fromMap.get(photo) && fromMap.get(photo).likes || [];
-        let toLikes = toMap.get(photo) && toMap.get(photo).likes || [];
-
-        let unlikes = diff(fromLikes, toLikes).removed;
-
-        unlikes.forEach(user =>
-            feeds.push({
-                type,
-                photo,
-                user,
-                period,
-                owner
-            })
-        );
-    });
+    let type;
 
     type = 'unfriend';
 
@@ -102,9 +82,61 @@ function createFeeds(owner, from, to) {
         })
     );
 
+    type = 'unlike_photo';
+
+    let photosFromMap = mapByPhoto(from.photosLikes);
+    let photosToMap = mapByPhoto(to.photosLikes);
+
+    let commonPhotos = diff(from.photos, to.photos).common;
+
+    commonPhotos.forEach(photo => {
+        let fromLikes = photosFromMap.get(photo) && photosFromMap.get(photo).likes || [];
+        let toLikes = photosToMap.get(photo) && photosToMap.get(photo).likes || [];
+
+        let unlikes = diff(fromLikes, toLikes).removed;
+
+        unlikes.forEach(user =>
+            feeds.push({
+                type,
+                photo,
+                user,
+                period,
+                owner
+            })
+        );
+    });
+
+    type = 'unlike_post';
+
+    let postsFromMap = mapByPost(from.postsLikes);
+    let postsToMap = mapByPost(to.postsLikes);
+
+    let commonPosts = diff(from.posts, to.posts).common;
+
+    commonPosts.forEach(post => {
+        let fromLikes = postsFromMap.get(post) && postsFromMap.get(post).likes || [];
+        let toLikes = postsToMap.get(post) && postsToMap.get(post).likes || [];
+
+        let unlikes = diff(fromLikes, toLikes).removed;
+
+        unlikes.forEach(user =>
+            feeds.push({
+                type,
+                post,
+                user,
+                period,
+                owner
+            })
+        );
+    });
+
     return feeds;
 
     function mapByPhoto(array) {
         return new Map(array.map(item => [item.photo, item]));
+    }
+
+    function mapByPost(array) {
+        return new Map(array.map(item => [item.post, item]));
     }
 }

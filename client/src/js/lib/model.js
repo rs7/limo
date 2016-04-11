@@ -70,8 +70,12 @@ export function getPhotosByList(photos) {
     }
 }
 
-export function getLikes(photo) {
-    return aggregate(vk.getLikes(photo), execute);
+export function getPhotoLikes(photo) {
+    return aggregate(vk.getPhotoLikes(photo), execute);
+}
+
+export function getPostLikes(post) {
+    return aggregate(vk.getPostLikes(post), execute);
 }
 
 let usersCache = new Map();
@@ -183,4 +187,50 @@ export function getSubscriptions() {
 
 export function getFollowers() {
     return aggregate(vk.getFollowers(), execute);
+}
+
+export function getPosts() {
+    return aggregate(vk.getPosts(), execute);
+}
+
+let postsCache = new Map();
+
+export function getPostsByList(posts) {
+    if (posts.isEmpty()) {
+        return Promise.resolve([]);
+    }
+
+    let newcomers = posts.filter(post => !postsCache.has(post));
+
+    return getPosts(newcomers).then(
+        newcomers => newcomers.forEach(post => postsCache.set(post.id, post))
+    ).then(
+        () => posts.map(post => postsCache.get(post))
+    );
+
+    function getPosts(posts) {
+        if (posts.isEmpty()) {
+            return Promise.resolve([]);
+        }
+
+        return execute(vk.getPostsByList(posts)).then(response => {
+            if (response.length == posts.length) {
+                return response;
+            }
+
+            //В запрашиваемом списке были удалённые посты, добавляем заглушку вместо них
+
+            let responseList = response.map(post => post.id);
+            let deleted = posts.filter(post => !responseList.includes(post));
+            Array.prototype.push.apply(response, deleted.map(post => deletedPost(post)));
+
+            return response;
+        });
+    }
+
+    function deletedPost(post) {
+        return {
+            id: post
+        };
+    }
 }

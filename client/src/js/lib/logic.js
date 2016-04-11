@@ -8,37 +8,54 @@ import * as model from './model';
 
 export function saveSnapshot() {
     return auto({
-        albums: () => model.getAlbums().then(response => response.items),
-
-        photos: ['albums', ({albums}) => async.map(
-            albums.filter(album => album.size > 0).map(album => album.id),
-            model.getPhotos
-        ).then(responses => Array.prototype.concat.apply([], responses.map(response => response.items)))],
-
-        photosList: ['photos', ({photos}) => photos.map(photo => photo.id)],
-
-        photosWithLikes: ['photos', ({photos}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
-
-        likes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getLikes)],
-
         friends: () => model.getFriends().then(response => response.items),
         subscriptions: () => model.getSubscriptions().then(response => response.items),
         followers: () => model.getFollowers().then(response => response.items),
 
-        snapshot: ['photosList', 'photosWithLikes', 'likes', 'friends', 'subscriptions', 'followers',
-            ({photosList, photosWithLikes, likes, friends, subscriptions, followers}) => ({
-                photos: photosList,
+        albums: () => model.getAlbums().then(response => response.items),
+        photos: ['albums', ({albums}) => async.map(
+            albums.filter(album => album.size > 0).map(album => album.id),
+            model.getPhotos
+        ).then(responses => Array.prototype.concat.apply([], responses.map(response => response.items)))],
+        photosList: ['photos', ({photos}) => photos.map(photo => photo.id)],
+        photosWithLikes: ['photos', ({photos}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
+        photosLikes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getPhotoLikes)],
+
+        posts: () => model.getPosts().then(response => response.items),
+        postsList: ['posts', ({posts}) => posts.map(post => post.id)],
+        postWithLikes: ['posts', ({posts}) => posts.filter(post => post.likes.count > 0).map(post => post.id)],
+        postsLikes: ['postWithLikes', ({postWithLikes}) => async.map(postWithLikes, model.getPostLikes)],
+
+        snapshot: [
+            'friends', 'subscriptions', 'followers',
+            'photosList', 'photosWithLikes', 'photosLikes',
+            'postsList', 'postWithLikes', 'postsLikes',
+            ({
+                friends, subscriptions, followers,
+                photosList, photosWithLikes, photosLikes,
+                postsList, postWithLikes, postsLikes
+            }) => ({
                 friends,
                 subscriptions,
                 followers,
-                likes: photosWithLikes.map((photo, index) => ({
+
+                photos: photosList,
+                photosLikes: photosWithLikes.map((photo, index) => ({
                     photo,
-                    likes: likes[index].items
+                    likes: photosLikes[index].items
+                })),
+
+                posts: postsList,
+                postsLikes: postWithLikes.map((post, index) => ({
+                    post,
+                    likes: postsLikes[index].items
                 }))
             })
         ],
 
         result: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
+    }, {
+        log: 1
     });
 }
 
@@ -80,10 +97,17 @@ function fillFeeds(feeds) {
             return model.getUsers(users).then(users => mapById(users));
         }],
 
-        result: ['feeds', 'photos', 'users', ({feeds, photos, users}) =>
+        posts: ['feeds', ({feeds}) => {
+            let posts = feeds.filter(feed => feed.post).map(like => like.post).filter(uniqueFilter);
+
+            return model.getPostsByList(posts).then(posts => mapById(posts));
+        }],
+
+        result: ['feeds', 'photos', 'users', 'posts', ({feeds, photos, users, posts}) =>
             processArray(feeds, {
                 user: user => users.get(user),
-                photo: photo => photos.get(photo)
+                photo: photo => photos.get(photo),
+                post: post => posts.get(post)
             })
         ]
     });

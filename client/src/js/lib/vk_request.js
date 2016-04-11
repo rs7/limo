@@ -34,10 +34,17 @@ export function getPhotosByList(photos) {
     });
 }
 
-export function getLikes(photo) {
+export function getPhotoLikes(photo) {
     return create(API.likes.getList, {
         type: 'photo',
         item_id: photo
+    });
+}
+
+export function getPostLikes(post) {
+    return create(API.likes.getList, {
+        type: 'post',
+        item_id: post
     });
 }
 
@@ -72,4 +79,13 @@ export function getSubscriptions() {
 
 export function getFollowers() {
     return create(API.users.getFollowers);
+}
+
+export function getPosts() {
+    return create(API.wall.get);
+}
+export function getPostsByList(posts) {
+    return create(API.wall.getById, {
+        posts: posts.map(post => `${user}_${post}`)
+    });
 }

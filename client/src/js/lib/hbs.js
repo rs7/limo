@@ -13,6 +13,8 @@ export function initHelpers() {
 
     Handlebars.registerHelper('photo_link', ({owner_id, id}) => `//vk.com/photo${owner_id}_${id}`);
 
+    Handlebars.registerHelper('post_link', ({owner_id, id}) => `//vk.com/wall${owner_id}_${id}`);
+
     Handlebars.registerHelper('user_name', ({first_name, last_name}) => `${first_name} ${last_name}`);
 
     Handlebars.registerHelper('user_name_case', (user, nameCase) =>
