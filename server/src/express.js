@@ -3,7 +3,6 @@
 let express = require('express');
 
 let bodyParser = require('body-parser');
-let morgan = require('morgan');
 
 const expressValidator = require('express-validator');
 import {validators} from './validation';
@@ -16,5 +15,3 @@ app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json());
 
 app.use(expressValidator({customValidators: validators}));
-
-app.use(morgan('dev'));
