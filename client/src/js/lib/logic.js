@@ -2,7 +2,7 @@
 
 import * as async from './async';
 
-import {uniqueFilter, processArray, parseObjectId} from './util';
+import {concat, processArray, parseObjectId, uniqueFilter} from './util';
 
 import * as model from './model';
 
@@ -16,40 +16,44 @@ export function saveSnapshot() {
         photos: ['albums', ({albums}) => async.map(
             albums.filter(album => album.size > 0).map(album => album.id),
             model.getPhotos
-        ).then(responses => Array.prototype.concat.apply([], responses.map(response => response.items)))],
+        ).then(responses => concat(responses.map(response => response.items)))],
         photosList: ['photos', ({photos}) => photos.map(photo => photo.id)],
         photosWithLikes: ['photos', ({photos}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
-        photosLikes: ['photosWithLikes', ({photosWithLikes}) => async.map(photosWithLikes, model.getPhotoLikes)],
+        photosLikes: ['photosWithLikes', ({photosWithLikes}) =>
+            async.map(photosWithLikes, model.getPhotoLikes).then(likes => photosWithLikes.map((photo, index) => ({
+                photo,
+                likes: likes[index].items
+            })))
+        ],
 
         posts: () => model.getPosts().then(response => response.items),
         postsList: ['posts', ({posts}) => posts.map(post => post.id)],
         postWithLikes: ['posts', ({posts}) => posts.filter(post => post.likes.count > 0).map(post => post.id)],
-        postsLikes: ['postWithLikes', ({postWithLikes}) => async.map(postWithLikes, model.getPostLikes)],
+        postsLikes: ['postWithLikes', ({postWithLikes}) =>
+            async.map(postWithLikes, model.getPostLikes).then(likes => postWithLikes.map((post, index) => ({
+                post,
+                likes: likes[index].items
+            })))
+        ],
 
         snapshot: [
             'friends', 'subscriptions', 'followers',
-            'photosList', 'photosWithLikes', 'photosLikes',
-            'postsList', 'postWithLikes', 'postsLikes',
+            'photosList', 'photosLikes',
+            'postsList', 'postsLikes',
             ({
                 friends, subscriptions, followers,
-                photosList, photosWithLikes, photosLikes,
-                postsList, postWithLikes, postsLikes
+                photosList, photosLikes,
+                postsList, postsLikes
             }) => ({
                 friends,
                 subscriptions,
                 followers,
 
                 photos: photosList,
-                photosLikes: photosWithLikes.map((photo, index) => ({
-                    photo,
-                    likes: photosLikes[index].items
-                })),
+                photosLikes,
 
                 posts: postsList,
-                postsLikes: postWithLikes.map((post, index) => ({
-                    post,
-                    likes: postsLikes[index].items
-                }))
+                postsLikes
             })
         ],
 

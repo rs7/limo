@@ -3,7 +3,7 @@
 export {printDate, printPeriod} from './printDate';
 export {fetch, responseCallback} from './net';
 export {Deferred} from './util/promise';
-export {uniqueFilter} from './util/array';
+export {concat, uniqueFilter} from './util/array';
 export {ObjectId} from './util/ObjectId';
 export {parseDate, parseObjectId} from './util/parse';
 export {processArray, processObject} from './util/process';

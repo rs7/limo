@@ -32,3 +32,7 @@ Array.prototype.clear = function () {
 export function uniqueFilter(value, index, self) {
     return self.indexOf(value) === index;
 }
+
+export function concat(values) {
+    return Array.prototype.concat.apply([], values);
+}
