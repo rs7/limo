@@ -24,7 +24,8 @@
   },
   "scripts": {
     "prebuild": "gulp clean",
-    "build": "gulp build"
+    "build": "gulp build",
+    "watch": "gulp watch"
   },
   "babel": {
     "presets": [
