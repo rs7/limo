@@ -68,12 +68,12 @@ var PATH = {
         dir: './src/hbs',
         source: './src/hbs/*.hbs',
         build: {
-            dir: './src/js',
+            dir: './src/js/templates',
             file: 'templates.js',
-            path: './src/js/templates.js'
+            path: './src/js/templates/templates.js'
         },
         watch: './src/hbs/*.hbs',
-        clean: './src/js/templates.js'
+        clean: './src/js/templates/templates.js'
     }
 };
 

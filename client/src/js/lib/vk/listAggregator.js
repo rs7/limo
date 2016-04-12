@@ -1,6 +1,6 @@
 'use strict';
 
-const async = require('async-q');
+import * as async from '../async';
 
 export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
     if (limit == 0) {

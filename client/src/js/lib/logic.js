@@ -1,13 +1,13 @@
 'use strict';
 
-const async = require('async-q');
+import * as async from './async';
 
-import {uniqueFilter, auto, processArray, parseObjectId} from './util';
+import {uniqueFilter, processArray, parseObjectId} from './util';
 
 import * as model from './model';
 
 export function saveSnapshot() {
-    return auto({
+    return async.auto({
         friends: () => model.getFriends().then(response => response.items),
         subscriptions: () => model.getSubscriptions().then(response => response.items),
         followers: () => model.getFollowers().then(response => response.items),
@@ -60,7 +60,7 @@ export function saveSnapshot() {
 }
 
 export function getFeeds({from}) {
-    return auto({
+    return async.auto({
         response: () => model.getFeeds({from}),
 
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
@@ -72,7 +72,7 @@ export function getFeeds({from}) {
 }
 
 export function getNewFeeds({to}) {
-    return auto({
+    return async.auto({
         response: () => model.getNewFeeds({to}),
 
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
@@ -82,7 +82,7 @@ export function getNewFeeds({to}) {
 }
 
 function fillFeeds(feeds) {
-    return auto({
+    return async.auto({
         feeds: () => feeds,
 
         photos: ['feeds', ({feeds}) => {

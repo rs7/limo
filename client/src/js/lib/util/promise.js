@@ -1,11 +1,5 @@
 'use strict';
 
-export function timeout(delay) {
-    return new Promise(resolve => setTimeout(resolve, delay));
-}
-
-export {Deferred} from './Deferred';
-
 Promise.prototype.finally = function (callback) {
     let p = this.constructor;
     return this.then(
@@ -15,3 +9,12 @@ Promise.prototype.finally = function (callback) {
         })
     );
 };
+
+export class Deferred {
+    constructor() {
+        this.promise = new Promise((resolve, reject) => {
+            this.resolve = resolve;
+            this.reject = reject;
+        });
+    }
+}

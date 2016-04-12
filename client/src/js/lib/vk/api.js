@@ -100,7 +100,6 @@ export let API = {
             }
         },
         getById: {
-
         }
     }
 

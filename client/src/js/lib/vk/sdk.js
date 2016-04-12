@@ -1,6 +1,6 @@
 'use strict';
 
-import {responseCallback} from './util';
+import {responseCallback} from './../util';
 
 export function frameHeight(height) {
     VK.callMethod('resizeWindow', null, height)

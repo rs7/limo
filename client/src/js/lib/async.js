@@ -11,3 +11,5 @@ export function auto(tasks, {returnTask = 'result', log} = {}) {
         async.auto(tasks).then(results => resolve(results[returnTask]), reject);
     });
 }
+
+export let map = async.map;

@@ -1,6 +1,6 @@
 'use strict';
 
-import {execute} from './../../vk_request';
+import {execute} from './../request';
 import {stripDefault} from './../options';
 
 export let limit = 25;

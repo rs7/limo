@@ -2,9 +2,11 @@
 
 import {user, apiResult} from './params';
 
-import {processArray, processObject, parseDate, parseObjectId, auto} from './util';
+import {processArray, processObject, parseDate, parseObjectId} from './util';
 
-import * as vk from './vk_request';
+import * as async from './async';
+
+import * as vk from './vk/request';
 import * as remote from './remote/request';
 
 import {execute} from './vk/execute/autoExecutor';
@@ -89,7 +91,7 @@ export function getUsers(users) {
 
     let newcomers = users.filter(user => !usersCache.has(user));
 
-    return auto({
+    return async.auto({
         users: () => getUsers(newcomers, ['photo_50', 'domain', 'sex'], 'nom'),
 
         usersDat: () => getUsers(newcomers, [], 'dat'),

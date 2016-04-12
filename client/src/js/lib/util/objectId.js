@@ -27,5 +27,3 @@ export class ObjectId {
         return this.value;
     }
 }
-
-
