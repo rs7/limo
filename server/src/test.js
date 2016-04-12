@@ -2,10 +2,12 @@
 
 const OWNER = [{
     id: 1052662,
-    photos: [404, 186063354, 265643362, 273263115, 280134965, 284160443, 298490651, 299328128, 300859215, 300908802, 304101403, 312964640, 315332500, 318194034, 296458165, 318700763, 320139016, 320139102, 323571338, 324186596, 323349119, 328161314, 313779488, 335355885, 336774329, 338104511, 290355736, 346605826, 349652797, 354872156, 375161548, 382069629, 393135726, 285076967, 344561132, 358693393]
+    photos: [404, 186063354, 265643362, 273263115, 280134965, 284160443, 298490651, 299328128, 300859215, 300908802, 304101403, 312964640, 315332500, 318194034, 296458165, 318700763, 320139016, 320139102, 323571338, 324186596, 323349119, 328161314, 313779488, 335355885, 336774329, 338104511, 290355736, 346605826, 349652797, 354872156, 375161548, 382069629, 393135726, 285076967, 344561132, 358693393],
+    post: 2238
 }, {
     id: 45147844,
-    photos: [404, 356693075]
+    photos: [404, 356693075],
+    post: 65
 }];
 
 let argv = require('optimist')
@@ -52,10 +54,21 @@ function getFeed() {
     };
 }
 
+function getPost() {
+    return Math.ceil(Math.random() * user.post);
+}
+
 function unlikePhotoFeed() {
     return Object.assign({
         type : 'unlike_photo',
         photo : getRandomArrayItem(user.photos)
+    }, getFeed());
+}
+
+function unlikePostFeed() {
+    return Object.assign({
+        type : 'unlike_post',
+        post : getPost()
     }, getFeed());
 }
 
@@ -71,7 +84,7 @@ function unfollowFeed() {
     }, getFeed());
 }
 
-const FEED = [unlikePhotoFeed, unfriendFeed, unfollowFeed];
+const FEED = [unfriendFeed, unfollowFeed, unlikePhotoFeed, unlikePostFeed];
 
 function createRandomFeed() {
     return getRandomArrayItem(FEED)();
