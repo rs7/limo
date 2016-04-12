@@ -55,18 +55,15 @@ export function saveSnapshot() {
 
         result: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     }, {
-        log: 1
+        log: 'snap'
     });
 }
 
 export function getFeeds({from}) {
     return async.auto({
         response: () => model.getFeeds({from}),
-
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
-
         next: ['response', ({response}) => response.next],
-
         result: ['feeds', 'next', ({feeds, next}) => ({feeds, next})]
     });
 }
@@ -74,9 +71,7 @@ export function getFeeds({from}) {
 export function getNewFeeds({to}) {
     return async.auto({
         response: () => model.getNewFeeds({to}),
-
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
-
         result: ['feeds', ({feeds}) => ({feeds})]
     });
 }
@@ -87,19 +82,16 @@ function fillFeeds(feeds) {
 
         photos: ['feeds', ({feeds}) => {
             let photos = feeds.filter(feed => feed.photo).map(like => like.photo).filter(uniqueFilter);
-
             return model.getPhotosByList(photos).then(photos => mapById(photos));
         }],
 
         users: ['feeds', ({feeds}) => {
             let users = feeds.filter(feed => feed.user).map(like => like.user).filter(uniqueFilter);
-
             return model.getUsers(users).then(users => mapById(users));
         }],
 
         posts: ['feeds', ({feeds}) => {
             let posts = feeds.filter(feed => feed.post).map(like => like.post).filter(uniqueFilter);
-
             return model.getPostsByList(posts).then(posts => mapById(posts));
         }],
 

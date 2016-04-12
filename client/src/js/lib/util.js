@@ -86,3 +86,17 @@ Object.defineProperty(Error.prototype, 'toJSON', {
         return alt;
     }
 });
+
+const log = console.log;
+const warn = console.warn;
+const error = console.error;
+
+function appendMarker(args) {
+    return ['☵'.repeat(1)].concat(args);
+}
+
+Object.assign(console, {
+    log: (...args) => log.apply(console, appendMarker(args)),
+    warn: (...args) => warn.apply(console, appendMarker(args)),
+    error: (...args) => error.apply(console, appendMarker(args))
+});
