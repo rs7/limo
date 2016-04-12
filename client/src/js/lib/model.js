@@ -232,7 +232,8 @@ export function getPostsByList(posts) {
 
     function deletedPost(post) {
         return {
-            id: post
+            id: post,
+            owner_id: user
         };
     }
 }
