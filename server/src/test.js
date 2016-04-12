@@ -65,13 +65,13 @@ function unfriendFeed() {
     }, getFeed());
 }
 
-function unfollowerFeed() {
+function unfollowFeed() {
     return Object.assign({
-        type : 'unfollower'
+        type : 'unfollow'
     }, getFeed());
 }
 
-const FEED = [unlikePhotoFeed, unfriendFeed, unfollowerFeed];
+const FEED = [unlikePhotoFeed, unfriendFeed, unfollowFeed];
 
 function createRandomFeed() {
     return getRandomArrayItem(FEED)();

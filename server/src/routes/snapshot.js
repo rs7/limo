@@ -69,11 +69,11 @@ function createFeeds(owner, from, to) {
         })
     );
 
-    type = 'unfollower';
+    type = 'unfollow';
 
-    let unfollowered = diff(from.followers, to.followers).removed.filter(user => to.friends.indexOf(user) == -1);
+    let unfollowed = diff(from.followers, to.followers).removed.filter(user => to.friends.indexOf(user) == -1);
 
-    unfollowered.forEach(user =>
+    unfollowed.forEach(user =>
         feeds.push({
             type,
             owner,

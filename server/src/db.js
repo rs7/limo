@@ -52,7 +52,7 @@ let snapshotSchema = mongoose.Schema({
 });
 
 let feedSchema = mongoose.Schema({
-    type: {type: String, required: true, enum: ['unfriend', 'unfollower', 'unlike_photo', 'unlike_post']},
+    type: {type: String, required: true, enum: ['unfriend', 'unfollow', 'unlike_photo', 'unlike_post']},
     owner: {type: Number, required: true},
     user: {type: Number, required: true},
     period: {

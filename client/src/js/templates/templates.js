@@ -18,7 +18,7 @@ module.exports["feed_new_posts"] = Handlebars.template({"compiler":[7,">= 4.0.0"
     + "\n";
 },"useData":true});
 
-module.exports["feed_unfollower"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
+module.exports["feed_unfollow"] = Handlebars.template({"compiler":[7,">= 4.0.0"],"main":function(container,depth0,helpers,partials,data) {
     var stack1, helper, alias1=depth0 != null ? depth0 : {}, alias2=helpers.helperMissing, alias3=container.escapeExpression;
 
   return "<div class=\"feed_row\" id=\"feed_row_"
