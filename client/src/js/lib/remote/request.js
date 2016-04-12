@@ -1,6 +1,6 @@
 'use strict';
 
-import {user} from '../params';
+import {user} from './../params';
 
 import {get, post} from './exec';
 

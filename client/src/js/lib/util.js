@@ -1,7 +1,7 @@
 'use strict';
 
 export {printDate, printPeriod} from './printDate';
-export {fetch, responseCallback} from './net';
+export {fetch, successCallback} from './net';
 export {Deferred} from './util/promise';
 export {concat, uniqueFilter} from './util/array';
 export {ObjectId} from './util/ObjectId';
@@ -33,6 +33,14 @@ export function isUndefined(value) {
 
 export function isScalar(value) {
     return /boolean|number|string/.test(typeof value);
+}
+
+export function isString(value) {
+    return typeof value === 'string' || value instanceof String;
+}
+
+export function isFunction(value) {
+    return typeof value === 'function';
 }
 
 export function numeralDeclension(value, forms012) {
@@ -85,18 +93,4 @@ Object.defineProperty(Error.prototype, 'toJSON', {
         Object.getOwnPropertyNames(this).forEach(storeKey, this);
         return alt;
     }
-});
-
-const log = console.log;
-const warn = console.warn;
-const error = console.error;
-
-function appendMarker(args) {
-    return ['☵'.repeat(1)].concat(args);
-}
-
-Object.assign(console, {
-    log: (...args) => log.apply(console, appendMarker(args)),
-    warn: (...args) => warn.apply(console, appendMarker(args)),
-    error: (...args) => error.apply(console, appendMarker(args))
 });

@@ -25,6 +25,7 @@ var TASK = {
     hbs: 'hbs',
     html: 'html',
     js: 'js',
+    con: 'con',
     watch: function (task) {
         return task + '-watch';
     },
@@ -63,6 +64,16 @@ var PATH = {
         },
         watch: './src/js/**/*.js',
         clean: './build/script.js'
+    },
+    con: {
+        source: './src/console/console.js',
+        build: {
+            dir: './build',
+            file: 'console.js',
+            path: './build/console.js'
+        },
+        watch: './src/console/**/*.js',
+        clean: './build/console.js'
     },
     hbs: {
         dir: './src/hbs',
@@ -120,6 +131,18 @@ gulp.task(TASK.js, [TASK.hbs], function () {
     ;
 });
 
+//con
+
+gulp.task(TASK.con, function () {
+    return browserify({entries: PATH.con.source, debug: true})
+        .transform(babelify, {presets: ['es2015'], sourceMaps: true})
+        .bundle()
+        .on('error', errorHandler)
+        .pipe(source(PATH.con.build.file))
+        .pipe(gulp.dest(PATH.con.build.dir))
+    ;
+});
+
 //html
 
 var HTML_TASK = {
@@ -127,7 +150,7 @@ var HTML_TASK = {
     inject: 'html-inject'
 };
 
-gulp.task(HTML_TASK.build, [TASK.css, TASK.js], function () {
+gulp.task(HTML_TASK.build, function () {
     return gulp
         .src(PATH.html.source)
         .pipe(rigger())
@@ -136,21 +159,21 @@ gulp.task(HTML_TASK.build, [TASK.css, TASK.js], function () {
     ;
 });
 
-gulp.task(HTML_TASK.inject, [HTML_TASK.build], function () {
+gulp.task(HTML_TASK.inject, [HTML_TASK.build, TASK.css, TASK.js, TASK.con], function () {
     return gulp
         .src(PATH.html.build.path)
         .pipe(inject(
-            gulp.src([PATH.js.build.path, PATH.css.build.path], {read: false}), {relative: true}
+            gulp.src([PATH.con.build.path, PATH.js.build.path, PATH.css.build.path], {read: false}), {relative: true}
         ))
         .pipe(gulp.dest(PATH.html.build.dir))
     ;
 });
 
-gulp.task(TASK.html, [HTML_TASK.inject]);
+gulp.task(TASK.html, [HTML_TASK.build, HTML_TASK.inject]);
 
 //system
 
-var ALL = [TASK.hbs, TASK.js, TASK.css, TASK.html];
+var ALL = [TASK.hbs, TASK.js, TASK.css, TASK.html, TASK.con];
 
 function watchTask(task) {
     return gulp.task(TASK.watch(task), function () {

@@ -1,6 +1,6 @@
 'use strict';
 
-import {User, Feed, objectId, renameId} from './db';
+import {User, Feed, Rec, objectId, renameId} from './db';
 
 const pageSize = 10;
 
@@ -68,4 +68,8 @@ export function getUser(user) {
             }
         });
     }
+}
+
+export function saveRec(rec) {
+    return Rec.collection.insert(rec);
 }

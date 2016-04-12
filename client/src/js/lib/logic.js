@@ -6,6 +6,10 @@ import {concat, processArray, parseObjectId, uniqueFilter} from './util';
 
 import * as model from './model';
 
+function recLogger(auto) {
+    return (task, result) => console.rec({auto, task, result});
+}
+
 export function saveSnapshot() {
     return async.auto({
         friends: () => model.getFriends().then(response => response.items),
@@ -59,7 +63,7 @@ export function saveSnapshot() {
 
         result: ['snapshot', ({snapshot}) => model.setSnapshot(snapshot)]
     }, {
-        log: 'snap'
+        log: recLogger('snapshot')
     });
 }
 
@@ -69,6 +73,8 @@ export function getFeeds({from}) {
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
         next: ['response', ({response}) => response.next],
         result: ['feeds', 'next', ({feeds, next}) => ({feeds, next})]
+    }, {
+        log: recLogger('getFeeds')
     });
 }
 
@@ -77,6 +83,8 @@ export function getNewFeeds({to}) {
         response: () => model.getNewFeeds({to}),
         feeds: ['response', ({response}) => fillFeeds(response.feeds)],
         result: ['feeds', ({feeds}) => ({feeds})]
+    }, {
+        log: recLogger('getNewFeeds')
     });
 }
 
@@ -106,6 +114,8 @@ function fillFeeds(feeds) {
                 post: post => posts.get(post)
             })
         ]
+    }, {
+        log: recLogger('fillFeeds')
     });
 }
 

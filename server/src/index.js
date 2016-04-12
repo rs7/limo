@@ -5,9 +5,13 @@ import {listen} from './server';
 import {authCheck, isString} from './util';
 import {app} from './express';
 
-import {feed, snapshot} from './routes/index';
+import {feed, snapshot, rec} from './routes/index';
 
 app.use(function (req, res, next) {
+    if (req.originalUrl === '/rec') {
+        return next();
+    }
+
     req.checkQuery('auth', 'Недопустимый ключ аутентификации').isAuthKey();
     req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
 
@@ -22,6 +26,10 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
+    if (req.originalUrl === '/rec') {
+        return next();
+    }
+
     let {user, auth} = req.query;
 
     if (authCheck(user, auth)) {
@@ -34,6 +42,7 @@ app.use(function (req, res, next) {
 
 app.use(feed);
 app.use(snapshot);
+app.use(rec);
 
 app.use(function (error, req, res, next) {
     /*if (error instanceof Error) {

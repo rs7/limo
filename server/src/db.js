@@ -76,3 +76,14 @@ let userSchema = mongoose.Schema({
 });
 
 export let User = mongoose.model('User', userSchema);
+
+let recSchema = mongoose.Schema({
+    user: {type: Number, required: true},
+    date: {type: Date, required: true},
+    rows: []
+}, {
+    strict: 'throw',
+    id: false
+});
+
+export let Rec = mongoose.model('Rec', recSchema);

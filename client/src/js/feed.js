@@ -19,14 +19,22 @@ export function setLastSeen(value) {
 
     prev = lastSeen || ObjectId.now();
     next = lastSeen || ObjectId.now();
+
+    console.rec({lastSeen, prev, next});
 }
 
 export function getLastSeen() {
-    return id(feeds.first());
+    let value = id(feeds.first());
+
+    console.rec({getLastSeen: value});
+
+    return value;
 }
 
 function setPrev(value) {
     prev = value;
+
+    console.rec({setPrev: value});
 }
 
 export function getPrev() {
@@ -35,6 +43,8 @@ export function getPrev() {
 
 export function setNext(value) {
     next = value;
+
+    console.rec({setNext: value});
 }
 
 export function getNext() {
@@ -52,10 +62,14 @@ function id(feed) {
 export function addPrev(feedsNew) {
     feedsPrev.pushAll(feedsNew);
     setPrev(id(feedsPrev.last()));
+
+    console.rec({addPrev: feedsNew});
 }
 
 export function addNext(feedsNew) {
     feedsNext.pushAll(feedsNew);
+
+    console.rec({addNext: feedsNew});
 }
 
 //----------------------------------------
@@ -64,6 +78,9 @@ export function flushPrev() {
     let result = feedsPrev.slice();
     feeds.unshiftAll(feedsPrev);
     feedsPrev.clear();
+
+    console.rec({flushPrev: result});
+
     return result;
 }
 
@@ -71,6 +88,9 @@ export function flushNext() {
     let result = feedsNext.slice();
     feeds.pushAll(feedsNext);
     feedsNext.clear();
+
+    console.rec({flushNext: result});
+
     return result;
 }
 

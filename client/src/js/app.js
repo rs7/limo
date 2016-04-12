@@ -11,6 +11,8 @@ import * as display from './display';
 $(window).load(init);
 
 function init() {
+    console.rec({load: 1});
+
     fd.setLastSeen(getLastSeen());
 
     display.feedNewUpdateHandler(updateNew);
@@ -21,6 +23,8 @@ function init() {
         showNextPage(),
         updateNew()
     ]).then(() => {
+        console.rec({empty: 1});
+
         display.feedEmptyVisible(fd.isEmpty());
     });
 }
@@ -28,14 +32,18 @@ function init() {
 //----------------------------------------
 
 function errorHandler(error) {
+    console.rec({error});
+    console.sendRec();
+
     display.showError(error);
     console.error(error);
-    throw error;
 }
 
 //----------------------------------------
 
 function updateNew() {
+    console.rec({updateNew: 1});
+
     display.feedNewUpdateVisible(false);
     display.feedNewProgressVisible(true);
 
@@ -59,6 +67,8 @@ function updateNew() {
 }
 
 function openNew() {
+    console.rec({openNew: 1});
+
     display.feedAddPrev(fd.flushPrev());
     display.feedUnread(fd.findLastRead());
     display.feedNewOpenCount(fd.countPrev());
@@ -70,6 +80,8 @@ function openNew() {
 //----------------------------------------
 
 function showNextPage() {
+    console.rec({showNextPage: 1});
+
     display.feedPageNextVisible(false);
     display.feedPageProgressVisible(true);
     return getFeeds({from: fd.getNext()}).finally(() => {

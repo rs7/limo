@@ -12,6 +12,6 @@ export let app = express();
 app.use(express.static('../client/build'));
 
 app.use(bodyParser.urlencoded({extended: false}));
-app.use(bodyParser.json());
+app.use(bodyParser.json({limit: '50mb'}));
 
 app.use(expressValidator({customValidators: validators}));

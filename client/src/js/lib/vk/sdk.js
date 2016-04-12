@@ -1,11 +1,21 @@
 'use strict';
 
-import {responseCallback} from './../util';
+import {successCallback} from './../util';
 
 export function frameHeight(height) {
     VK.callMethod('resizeWindow', null, height)
 }
 
+let id = 2000;
+
+function getId() {
+    return ++id;
+}
+
 export function callMethod(method, params) {
-    return new Promise((resolve, reject) => VK.api(method, params, responseCallback(resolve, reject)));
+    let id = getId();
+
+    console.rec({id, sdk: {method, params}});
+
+    return new Promise((resolve, reject) => VK.api(method, params, successCallback(id, resolve, reject)));
 }

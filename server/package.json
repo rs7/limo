@@ -21,6 +21,7 @@
   "scripts": {
     "build": "gulp build",
     "start": "nodemon ./build/index.js",
+    "watch": "gulp watch",
     "tdata": "node ./build/test.js"
   },
   "babel": {

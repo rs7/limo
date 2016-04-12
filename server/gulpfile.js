@@ -32,7 +32,11 @@ gulp.task('js', function () {
     ;
 });
 
-gulp.task('js-clean', function () {
+gulp.task('watch', function () {
+    return gulp.watch(PATH.js.source, ['js']);
+});
+
+gulp.task('clean', function () {
     return gulp.src(PATH.js.clean, {read: false}).pipe(clean());
 });
 

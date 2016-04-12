@@ -2,25 +2,47 @@
 
 const $ = require('jquery');
 
+let id = 1000;
+
+function getId() {
+    return ++id;
+}
+
 export function fetch(params) {
+    let id = getId();
+
+    console.rec({id, fetch: params});
+
     return new Promise((resolve, reject) =>
         $.ajax(params).then(
-            responseCallback(resolve, reject),
-            (jqXHR) => reject(jqXHRError(jqXHR))
+            successCallback(id, resolve, reject),
+            failCallback(id, reject)
         )
     );
 }
 
-function jqXHRError(jqXHR) {
-    return {
-        response: jqXHR.responseText,
-        status: jqXHR.status,
-        statusText: jqXHR.statusText
+function failCallback(id, reject) {
+    return jqXHR => {
+        let error = jqXHRError(jqXHR);
+
+        console.rec({id, fail: error});
+
+        reject(error);
     };
+
+    function jqXHRError(jqXHR) {
+        return {
+            response: jqXHR.responseText,
+            status: jqXHR.status,
+            statusText: jqXHR.statusText
+        };
+    }
 }
 
-export function responseCallback(resolve, reject) {
-    return function (result) {
+export function successCallback(id, resolve, reject) {
+    return result => {
+        console.rec({id, success: result});
+
         if (result.response != undefined) {
             resolve(result.response);
             return;
