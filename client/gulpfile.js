@@ -152,7 +152,7 @@ gulp.task(TASK.con, function () {
         .on('error', errorHandler)
         .pipe(source(PATH.con.build.file))
         .pipe(buffer())
-        .pipe(replace('{{git}}', git.short()))
+        .pipe(replace('{{git}}', git.long()))
         .pipe(gulp.dest(PATH.con.build.dir))
     ;
 });

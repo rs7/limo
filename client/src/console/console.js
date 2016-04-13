@@ -1,5 +1,7 @@
 'use strict';
 
+const browserInfo = require('browser-info');
+
 const log = console.log;
 const warn = console.warn;
 const error = console.error;
@@ -17,8 +19,9 @@ Object.assign(console, {
 });
 
 let git = '{{git}}';
+let browser = browserInfo();
 
-let recRows = [{git}];
+let recRows = [{git}, {browser}];
 
 function send() {
     let xhr = new XMLHttpRequest();
