@@ -19,7 +19,9 @@ export function renameId(object) {
     return result;
 }
 
-mongoose.connect('mongodb://localhost/limo');
+mongoose.set('debug', true);
+
+mongoose.connect('mongodb://localhost/limo', {config: {autoIndex: true}});
 
 let photosLikesSchema = mongoose.Schema({
     photo: {type: Number, required: true},
@@ -65,6 +67,8 @@ let feedSchema = mongoose.Schema({
     strict: 'throw'
 });
 
+feedSchema.index({owner:1, _id: 1});
+
 export let Feed = mongoose.model('Feed', feedSchema);
 
 let userSchema = mongoose.Schema({
@@ -74,6 +78,8 @@ let userSchema = mongoose.Schema({
     strict: 'throw',
     id: false
 });
+
+userSchema.index({id: 1}, {unique: true});
 
 export let User = mongoose.model('User', userSchema);
 
