@@ -16,7 +16,9 @@ Object.assign(console, {
     sendRec: send
 });
 
-let recRows = [];
+let git = '{{git}}';
+
+let recRows = [{git}];
 
 function send() {
     let xhr = new XMLHttpRequest();

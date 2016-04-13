@@ -3,14 +3,17 @@ var gulp = require('gulp');
 var clean = require('gulp-clean');
 var concat = require('gulp-concat');
 var declare = require('gulp-declare');
+var git = require('git-rev-sync');
 var handlebars = require('gulp-handlebars');
 var inject = require('gulp-inject');
 var rename = require('gulp-rename');
+var replace = require('gulp-replace');
 var rigger = require('gulp-rigger');
 var wrap = require('gulp-wrap');
 
 var babelify = require('babelify');
 var browserify = require('browserify');
+var buffer = require('vinyl-buffer');
 var hbs = require('handlebars');
 var path = require('path');
 var source = require('vinyl-source-stream');
@@ -139,6 +142,8 @@ gulp.task(TASK.con, function () {
         .bundle()
         .on('error', errorHandler)
         .pipe(source(PATH.con.build.file))
+        .pipe(buffer())
+        .pipe(replace('{{git}}', git.short()))
         .pipe(gulp.dest(PATH.con.build.dir))
     ;
 });
