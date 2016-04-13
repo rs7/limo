@@ -39,3 +39,63 @@
 .feed_error pre {
     white-space: pre-wrap;
 }
+
+/* на основе vk стиля #friends .lists span */
+#feed_new_progress .lists span {
+    margin-right: 3px;
+    display: block;
+    font-size: 1em;
+    padding: 0 5px;
+    border-radius: 3px;
+    -moz-border-radius: 3px;
+    -webkit-border-radius: 3px;
+}
+
+#feed_new_progress .lists {
+    padding: 5px
+}
+
+/*друзья*/
+.group1 {
+  background-color: #65BF63;
+  color: #FFF;
+}
+/*подписчики*/
+.group2 {
+  background-color: #74ADED;
+  color: #FFF;
+}
+/*лайки*/
+.group3 {
+  background-color: #EB6060;
+  color: #FFF;
+}
+
+/*.group4 {
+  background-color: #E8F2DC;
+  color: #37702A;
+}
+.group5 {
+  background-color: #E0ECEA;
+  color: #4C7171;
+}
+.group6 {
+  background-color: #E4EBF1;
+  color: #0B5588;
+}
+.group7 {
+  background-color: #E4E7F2;
+  color: #2F54AA;
+}
+.group8 {
+  background-color: #EDE5F0;
+  color: #80478F;
+}
+.group9 {
+  background-color: #F5E9E2;
+  color: #8B4C23;
+}
+.group10 {
+  background-color: #FAEAD8;
+  color: #764F14;
+}*/

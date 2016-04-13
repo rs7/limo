@@ -84,6 +84,12 @@ export function feedNewOpenVisible(value) {
     updateFrameSize();
 }
 
+export function feedNewProgressGroup(group, value) {
+    visible($(`#feed_new_progress .lists .group${group}`), value);
+
+    updateFrameSize();
+}
+
 export function feedNewProgressVisible(value) {
     visible($('#feed_new_progress'), value);
 

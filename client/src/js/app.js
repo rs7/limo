@@ -46,11 +46,17 @@ function updateNew() {
 
     display.feedNewUpdateVisible(false);
     display.feedNewProgressVisible(true);
+    display.feedNewProgressGroup(1, true);
+    display.feedNewProgressGroup(2, true);
+    display.feedNewProgressGroup(3, true);
 
     return saveSnapshot().then(() => {
         return getNewFeeds({to: fd.getPrev()});
     }).finally(() => {
         display.feedNewProgressVisible(false);
+        display.feedNewProgressGroup(1, false);
+        display.feedNewProgressGroup(2, false);
+        display.feedNewProgressGroup(3, false);
     }).then(({feeds}) => {
         fd.addPrev(feeds);
         display.feedNewOpenCount(fd.countPrev());
