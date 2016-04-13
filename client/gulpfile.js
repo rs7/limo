@@ -29,6 +29,7 @@ var TASK = {
     html: 'html',
     js: 'js',
     con: 'con',
+    img: 'img',
     watch: function (task) {
         return task + '-watch';
     },
@@ -88,6 +89,14 @@ var PATH = {
         },
         watch: './src/hbs/*.hbs',
         clean: './src/js/templates/templates.js'
+    },
+    img: {
+        source: './assets/*.png',
+        build: {
+            dir: './build/images'
+        },
+        watch: './assets/*.png',
+        clean: './build/images/*.png'
     }
 };
 
@@ -176,9 +185,18 @@ gulp.task(HTML_TASK.inject, [HTML_TASK.build, TASK.css, TASK.js, TASK.con], func
 
 gulp.task(TASK.html, [HTML_TASK.build, HTML_TASK.inject]);
 
+//img
+
+gulp.task(TASK.img, function () {
+    return gulp
+        .src(PATH.img.source)
+        .pipe(gulp.dest(PATH.img.build.dir))
+    ;
+});
+
 //system
 
-var ALL = [TASK.hbs, TASK.js, TASK.css, TASK.html, TASK.con];
+var ALL = [TASK.hbs, TASK.js, TASK.css, TASK.html, TASK.con, TASK.img];
 
 function watchTask(task) {
     return gulp.task(TASK.watch(task), function () {
