@@ -1,6 +1,6 @@
 'use strict';
 
-import {language, isSecure} from '../params';
+import {language, isSecure} from './../params';
 
 export function populate(params, options = {}) {
     let result = Object.assign({}, params);

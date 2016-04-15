@@ -1,10 +1,12 @@
 'use strict';
 
-import * as async from './async';
+import * as async from './util/async';
 
-import {concat, processArray, parseObjectId, uniqueFilter} from './util';
+import {concat, uniqueFilter} from './util/array';
+import {processArray} from './util/process';
+import {parseObjectId} from './util/parse';
 
-import * as model from './model';
+import * as model from './model/model';
 
 function recLogger(auto) {
     return (task, result) => console.rec({auto, task, result});

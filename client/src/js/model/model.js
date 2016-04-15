@@ -1,17 +1,18 @@
 'use strict';
 
-import {user, apiResult} from './params';
+import {user, apiResult} from './../params';
 
-import {processArray, processObject, parseDate, parseObjectId} from './util';
+import {parseDate, parseObjectId} from './../util/parse';
+import {processArray, processObject} from './../util/process';
 
-import * as async from './async';
+import * as async from './../util/async';
 
-import * as vk from './vk/request';
-import * as remote from './remote/request';
+import * as vk from './../vk/request';
+import * as remote from './../back/request';
 
-import {execute} from './vk/execute/autoExecutor';
+import {execute} from './../vk/execute/autoExecutor';
 
-import {aggregate} from './vk/listAggregator';
+import {aggregate} from './../vk/listAggregator';
 
 export function getAlbums() {
     return execute(vk.getAlbums());

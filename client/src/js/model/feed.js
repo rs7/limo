@@ -1,6 +1,7 @@
 'use strict';
 
-import {ObjectId, isBetween} from './lib/util';
+import {isBetween} from './../util/util';
+import {ObjectId} from './../util/objectId';
 
 let feeds = [];
 

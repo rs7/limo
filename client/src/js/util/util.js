@@ -1,24 +1,5 @@
 'use strict';
 
-export {printDate, printPeriod} from './printDate';
-export {fetch, successCallback} from './net';
-export {Deferred} from './util/promise';
-export {concat, uniqueFilter} from './util/array';
-export {ObjectId} from './util/ObjectId';
-export {parseDate, parseObjectId} from './util/parse';
-export {processArray, processObject} from './util/process';
-export {currentTime, currentTimestamp, timestamp} from './util/datetime';
-
-export function getUrlVars() {
-    var vars = {};
-    window.location.href.replace(/[?&]+([^=&]+)=([^&]*)/gi,
-        function (m, key, value) {
-            vars[key] = value;
-        }
-    );
-    return vars;
-}
-
 export function stringSize(string) {
     return encodeURI(string).split(/%..|./).length - 1;
 }
@@ -94,3 +75,19 @@ Object.defineProperty(Error.prototype, 'toJSON', {
         return alt;
     }
 });
+
+export function kvArrayToObject(kvArray) {
+    return kvArray.reduce(
+        (result, kvPair) => Object.assign(result, kvToObject(kvPair))
+    );
+
+    function kvToObject(kvPair) {
+        return {
+            [kvPair[0]]: kvPair[1]
+        };
+    }
+}
+
+export function objectToKVArray(object) {
+    return Object.keys(object).map(key => [key, object[key]]);
+}

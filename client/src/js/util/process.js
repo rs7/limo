@@ -1,6 +1,6 @@
 'use strict';
 
-import {isUndefined, isScalar} from './../util';
+import {isUndefined, isScalar} from './util';
 
 export function processArray(array, transform) {
     return array.map(item => processObject(item, transform));

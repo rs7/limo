@@ -1,8 +1,8 @@
 'use strict';
 
-import {getUrlVars} from './util';
+import {getParamsFromURI} from './util/net';
 
-const runParams = getUrlVars();
+const runParams = getParamsFromURI(window.location.href);
 
 console.rec({runParams});
 

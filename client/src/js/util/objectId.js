@@ -1,6 +1,6 @@
 'use strict';
 
-import {currentTimestamp} from './../util';
+import {currentTimestamp} from './../util/datetime';
 
 export class ObjectId {
     static compare(a, b) {

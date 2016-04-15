@@ -1,6 +1,6 @@
 'use strict';
 
-import * as async from '../async';
+import * as async from './../util/async';
 
 export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
     if (limit == 0) {

@@ -5,7 +5,7 @@ import * as grouping from './group';
 
 //----------------------------------------
 
-import {Deferred} from './../../util';
+import {Deferred} from './../../util/promise';
 
 export function execute({method, params, options}) {
     let deferred = new Deferred();

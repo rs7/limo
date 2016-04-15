@@ -1,10 +1,9 @@
 'use strict';
 
-const $ = require('jquery');
+import {user, authKey} from './../params';
 
-import {user, authKey} from '../params';
-
-import {fetch} from '../util';
+import {fetch} from './../net';
+import {jsonResultHandler, xhrErrorHandler, createURIQuery} from './../util/net';
 
 const CONST_SERVER_PARAMS = {
     auth: authKey,
@@ -17,18 +16,17 @@ export function get(endpoint, params) {
     return fetch({
         url: endpoint,
         data: query
-    });
+    }).then(jsonResultHandler).catch(xhrErrorHandler);
 }
 
 export function post(endpoint, params, data) {
     let url = endpoint;
 
     let query = Object.assign({}, params, CONST_SERVER_PARAMS);
+    let queryURI = createURIQuery(query);
 
-    let queryStr = $.param(query);
-
-    if (queryStr) {
-        url += `?${queryStr}`;
+    if (queryURI) {
+        url += `?${queryURI}`;
     }
 
     return fetch({
@@ -37,5 +35,5 @@ export function post(endpoint, params, data) {
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json'
-    });
+    }).then(jsonResultHandler).catch(xhrErrorHandler);
 }

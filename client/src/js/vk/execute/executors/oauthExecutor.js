@@ -2,7 +2,7 @@
 
 import {accessToken} from './../../../params';
 
-import {fetch} from './../../../util';
+import {fetch} from './../../../net';
 
 import {stripDefault} from '././../../options';
 

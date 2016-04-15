@@ -2,10 +2,10 @@
 
 const $ = require('jquery');
 
-const templates = require('./templates/templates');
+const templates = require('./../templates/templates');
 
-import {initHelpers} from './templates/helpers';
-import {frameHeight} from './lib/vk/sdk';
+import {initHelpers} from './../templates/helpers';
+import {frameHeight} from './../vk/sdk';
 
 $(document).ready(initHelpers);
 

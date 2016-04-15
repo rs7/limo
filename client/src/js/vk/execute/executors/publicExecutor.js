@@ -2,7 +2,7 @@
 
 import {protocol} from './../../../params';
 
-import {fetch} from './../../../util';
+import {fetch} from './../../../net';
 
 export function execute({method, params}) {
     return fetch({

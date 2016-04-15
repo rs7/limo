@@ -1,5 +1,6 @@
 'use strict';
 
+//todo: заменить на promise.catch().then(finally)
 Promise.prototype.finally = function (callback) {
     let p = this.constructor;
     return this.then(

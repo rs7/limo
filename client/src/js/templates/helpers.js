@@ -1,6 +1,8 @@
 const Handlebars = require('handlebars');
 
-import {printDate, printPeriod, timestamp, numeralDeclension, escapeSecret} from './../lib/util';
+import {numeralDeclension, escapeSecret} from './../util/util';
+import {printDate, printPeriod} from './../display/printDate';
+import {timestamp} from './../util/datetime';
 
 export function initHelpers() {
     Handlebars.registerHelper('timestamp', date => timestamp(date));

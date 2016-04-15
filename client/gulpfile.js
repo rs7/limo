@@ -199,7 +199,7 @@ gulp.task(TASK.img, function () {
 var ALL = [TASK.hbs, TASK.js, TASK.css, TASK.html, TASK.con, TASK.img];
 
 function watchTask(task) {
-    return gulp.task(TASK.watch(task), function () {
+    return gulp.task(TASK.watch(task), [task], function () {
         gulp.watch(PATH[task].watch, [task]);
     });
 }

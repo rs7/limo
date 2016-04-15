@@ -2,7 +2,7 @@
 
 import {user} from './../params';
 
-import {get, post} from './exec';
+import {get, post} from './executor';
 
 export function setSnapshot(snapshot) {
     return post('/snapshot', {user}, snapshot);

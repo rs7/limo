@@ -2,11 +2,11 @@
 
 const $ = require('jquery');
 
-import {saveSnapshot, getFeeds, getNewFeeds} from './lib/logic';
-import {getLastSeen, setLastSeen} from './lib/model';
+import {saveSnapshot, getFeeds, getNewFeeds} from './logic';
+import {getLastSeen, setLastSeen} from './model/model';
 
-import * as fd from './feed';
-import * as display from './display';
+import * as fd from './model/feed';
+import * as display from './display/display';
 
 $(window).load(init);
 
