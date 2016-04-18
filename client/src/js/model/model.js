@@ -32,7 +32,12 @@ export function getPhotosByList(photos) {
 
             throw error;
         }
-    );
+    ).then(photos => photos.map(processPhoto));
+}
+
+function processPhoto(photo) {
+    let {id, owner_id, photo_130} = photo;
+    return {id, owner_id, photo_130};
 }
 
 export function getPhotoLikes(photo) {
@@ -47,14 +52,14 @@ export function setSnapshot(snapshot) {
     return remote.setSnapshot(snapshot);
 }
 
-export function getFeeds({from}) {
+export function getFeeds(from) {
     return remote
         .getFeeds(from && from.value)
         .then(processFeedsResponse)
     ;
 }
 
-export function getNewFeeds({to}) {
+export function getNewFeeds(to) {
     return remote
         .getNewFeeds(to && to.value)
         .then(processFeedsResponse)
@@ -103,5 +108,10 @@ export function getPosts() {
 }
 
 export function getPostsByList(posts) {
-    return execute(vk.getPostsByList(posts));
+    return execute(vk.getPostsByList(posts)).then(posts => posts.map(processPost));
+}
+
+function processPost(post) {
+    let {id, owner_id} = post;
+    return {id, owner_id};
 }

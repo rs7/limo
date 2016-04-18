@@ -7,7 +7,16 @@ export function createURIQuery(params) {
 }
 
 export function parseURIQuery(query) {
-    return kvArrayToObject(query.split('&').map(decodeURIComponent).map(pair => pair.split('=')));
+    return kvArrayToObject(query.split('&').map(kvSplit));
+
+    //Делать .split('=') нельзя из-за бага: vk.com/bugs?act=show&id=1052662_22
+    function kvSplit(pair) {
+        let index = pair.indexOf('=');
+        return [
+            pair.slice(0, index),
+            pair.slice(index + 1)
+        ].map(decodeURIComponent);
+    }
 }
 
 export function getParamsFromURI(uri) {

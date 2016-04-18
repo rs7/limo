@@ -3,8 +3,6 @@
 import {concat} from './../util/array';
 import {ProgressStepper} from './../util/promise';
 
-import * as async from './../util/async';
-
 export function aggregate(request, executor, from = 0, to = -1, limit = 0, progress = Function()) {
     if (limit == 0) {
         limit = request.method.list.limit;

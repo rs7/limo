@@ -1,6 +1,5 @@
 'use strict';
 
-//todo: заменить на promise.catch().then(finally)
 Promise.prototype.finally = function (callback) {
     let p = this.constructor;
     return this.then(
@@ -8,6 +7,22 @@ Promise.prototype.finally = function (callback) {
         reason => p.resolve(callback()).then(() => {
             throw reason
         })
+    );
+};
+
+Promise.prototype.log = function (label) {
+    return this.then(
+        value => this.constructor.resolve(log(label, value)).then(() => value)
+    );
+
+    function log(label, value) {
+        console.log(label, value);
+    }
+};
+
+Promise.prototype.transparent = function (callback) {
+    return this.then(
+        value => this.constructor.resolve(callback(value)).then(() => value)
     );
 };
 

@@ -78,7 +78,7 @@ Object.defineProperty(Error.prototype, 'toJSON', {
 
 export function kvArrayToObject(kvArray) {
     return kvArray.reduce(
-        (result, kvPair) => Object.assign(result, kvToObject(kvPair))
+        (result, kvPair) => Object.assign(result, kvToObject(kvPair)), {}
     );
 
     function kvToObject(kvPair) {
@@ -94,4 +94,14 @@ export function objectToKVArray(object) {
 
 export function mapById(array) {
     return new Map(array.map(item => [item.id, item]));
+}
+
+export class Counter {
+    constructor(startValue = 0) {
+        this.id = startValue;
+    }
+
+    getNext() {
+        return this.id++;
+    }
 }

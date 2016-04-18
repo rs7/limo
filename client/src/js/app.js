@@ -2,7 +2,9 @@
 
 const $ = require('jquery');
 
-import {saveSnapshot, getFeeds, getNewFeeds} from './logic';
+import {saveSnapshot} from './controller/snapshot';
+import {getFeedsTo, getFeedsFrom} from './controller/feeds';
+
 import {getLastSeen, setLastSeen} from './model/model';
 
 import * as fd from './model/feed';
@@ -50,7 +52,7 @@ function updateNew() {
     display.feedNewProgressVisible(true);
 
     return saveSnapshot().then(() => {
-        return getNewFeeds({to: fd.getPrev()});
+        return getFeedsTo(fd.getPrev());
     }).finally(() => {
         display.feedNewProgressVisible(false);
     }).then(({feeds}) => {
@@ -86,7 +88,7 @@ function showNextPage() {
 
     display.feedPageNextVisible(false);
     display.feedPageProgressVisible(true);
-    return getFeeds({from: fd.getNext()}).finally(() => {
+    return getFeedsFrom(fd.getNext()).finally(() => {
         display.feedPageProgressVisible(false);
     }).then(({feeds, next}) => {
         fd.setNext(next);
