@@ -37,6 +37,8 @@ function errorHandler(error) {
 
     display.showError(error);
     console.error(error);
+
+    throw error;
 }
 
 //----------------------------------------

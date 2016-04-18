@@ -26,5 +26,3 @@ export function auto(tasks, {returnTask = 'result', log} = {}) {
         console.log(`αὐτο_${log} {${task}} => `, result);
     }
 }
-
-export let map = async.map;

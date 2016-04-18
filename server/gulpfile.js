@@ -32,7 +32,7 @@ gulp.task('js', function () {
     ;
 });
 
-gulp.task('watch', function () {
+gulp.task('watch', ['js'], function () {
     return gulp.watch(PATH.js.source, ['js']);
 });
 

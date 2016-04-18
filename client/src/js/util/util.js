@@ -91,3 +91,7 @@ export function kvArrayToObject(kvArray) {
 export function objectToKVArray(object) {
     return Object.keys(object).map(key => [key, object[key]]);
 }
+
+export function mapById(array) {
+    return new Map(array.map(item => [item.id, item]));
+}

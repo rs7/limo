@@ -1,13 +1,18 @@
 'use strict';
 
+import {concat} from './../util/array';
+import {ProgressStepper} from './../util/promise';
+
 import * as async from './../util/async';
 
-export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
+export function aggregate(request, executor, from = 0, to = -1, limit = 0, progress = Function()) {
     if (limit == 0) {
         limit = request.method.list.limit;
     }
 
     if (to === -1) {
+        progress(-1);
+
         return getList(request, executor, from, limit, limit).then(({count, items}) => {
             to = count;
 
@@ -27,17 +32,19 @@ export function aggregate(request, executor, from = 0, to = -1, limit = 0) {
         });
     }
 
+    progress(0);
+
     return getList(request, executor, from, to, limit);
 }
 
-function getList(request, exec, from, to, limit) {
+function getList(request, exec, from, to, limit, progress = Function()) {
     let requests = getListParams(from, to, limit).map(params => populateRequest(request, params));
 
-    return async.map(requests, exec).then(results => {
+    return Promise.all(
+        requests.map(exec)
+    ).then(results => {
         let count = results.first().count;
-        let items = Array.prototype.concat.apply([],
-            results.map(result => result.items)
-        );
+        let items = concat(results.map(result => result.items));
         return {from, to, count, items};
     });
 }

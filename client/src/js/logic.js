@@ -4,9 +4,12 @@ import * as async from './util/async';
 
 import {concat, uniqueFilter} from './util/array';
 import {processArray} from './util/process';
-import {parseObjectId} from './util/parse';
+import {mapById} from './util/util';
 
 import * as model from './model/model';
+import * as usersCache from './model/users';
+import * as photosCache from './model/photos';
+import * as postsCache from './model/posts';
 
 function recLogger(auto) {
     return (task, result) => console.rec({auto, task, result});
@@ -19,14 +22,13 @@ export function saveSnapshot() {
         followers: () => model.getFollowers().then(response => response.items),
 
         albums: () => model.getAlbums().then(response => response.items),
-        photos: ['albums', ({albums}) => async.map(
-            albums.filter(album => album.size > 0).map(album => album.id),
-            model.getPhotos
+        photos: ['albums', ({albums}) => Promise.all(
+            albums.filter(album => album.size > 0).map(album => album.id).map(model.getPhotos)
         ).then(responses => concat(responses.map(response => response.items)))],
         photosList: ['photos', ({photos}) => photos.map(photo => photo.id)],
         photosWithLikes: ['photos', ({photos}) => photos.filter(photo => photo.likes.count > 0).map(photo => photo.id)],
         photosLikes: ['photosWithLikes', ({photosWithLikes}) =>
-            async.map(photosWithLikes, model.getPhotoLikes).then(likes => photosWithLikes.map((photo, index) => ({
+            Promise.all(photosWithLikes.map(model.getPhotoLikes)).then(likes => photosWithLikes.map((photo, index) => ({
                 photo,
                 likes: likes[index].items
             })))
@@ -36,7 +38,7 @@ export function saveSnapshot() {
         postsList: ['posts', ({posts}) => posts.map(post => post.id)],
         postWithLikes: ['posts', ({posts}) => posts.filter(post => post.likes.count > 0).map(post => post.id)],
         postsLikes: ['postWithLikes', ({postWithLikes}) =>
-            async.map(postWithLikes, model.getPostLikes).then(likes => postWithLikes.map((post, index) => ({
+            Promise.all(postWithLikes.map(model.getPostLikes)).then(likes => postWithLikes.map((post, index) => ({
                 post,
                 likes: likes[index].items
             })))
@@ -96,17 +98,17 @@ function fillFeeds(feeds) {
 
         photos: ['feeds', ({feeds}) => {
             let photos = feeds.filter(feed => feed.photo).map(like => like.photo).filter(uniqueFilter);
-            return model.getPhotosByList(photos).then(photos => mapById(photos));
+            return photosCache.getPhotos(photos).then(photos => mapById(photos));
         }],
 
         users: ['feeds', ({feeds}) => {
             let users = feeds.filter(feed => feed.user).map(like => like.user).filter(uniqueFilter);
-            return model.getUsers(users).then(users => mapById(users));
+            return usersCache.getUsers(users).then(users => mapById(users));
         }],
 
         posts: ['feeds', ({feeds}) => {
             let posts = feeds.filter(feed => feed.post).map(like => like.post).filter(uniqueFilter);
-            return model.getPostsByList(posts).then(posts => mapById(posts));
+            return postsCache.getPosts(posts).then(posts => mapById(posts));
         }],
 
         result: ['feeds', 'photos', 'users', 'posts', ({feeds, photos, users, posts}) =>
@@ -119,8 +121,4 @@ function fillFeeds(feeds) {
     }, {
         log: recLogger('fillFeeds')
     });
-}
-
-function mapById(array) {
-    return new Map(array.map(item => [item.id, item]));
 }

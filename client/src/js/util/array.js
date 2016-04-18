@@ -36,3 +36,20 @@ export function uniqueFilter(value, index, self) {
 export function concat(values) {
     return Array.prototype.concat.apply([], values);
 }
+
+export function syncArrays(arrays) {
+    let length = Math.max.apply(null, arrays.map(array => array.length));
+
+    let result = new Array(length);
+
+    let i = length;
+    while(i--) {
+        result[i] = arrays.map(array => array[i]);
+    }
+
+    return result;
+}
+
+export function mergeArrayOfObjects(array) {
+    return Object.assign.apply(null, [{}].concat(array));
+}
