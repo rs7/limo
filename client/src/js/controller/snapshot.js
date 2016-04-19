@@ -4,7 +4,7 @@ import {concat} from './../util/array';
 
 import * as model from './../model/model';
 
-export function saveSnapshot() {
+export function getSnapshot() {
     return Promise.all([
         getFriendsLists().transparent(friendsLists => console.rec({friendsLists})),
         getPhotosObject().transparent(photosObject => console.rec({photosObject})),
@@ -21,9 +21,11 @@ export function saveSnapshot() {
         })
     ).transparent(
         snapshot => console.rec({snapshot})
-    ).then(
-        snapshot => model.setSnapshot(snapshot)
     );
+}
+
+export function saveSnapshot(snapshot) {
+    return model.setSnapshot(snapshot);
 }
 
 function getFriendsLists() {
@@ -73,9 +75,7 @@ function getPhotosList(photos) {
 function getPhotosLikes(photos) {
     let photosWithLikes = photos.filter(photo => photo.likes.count > 0).map(photo => photo.id);
 
-    return Promise.all(
-        photosWithLikes.map(getPhotoLikes)
-    );
+    return Promise.all(photosWithLikes.map(getPhotoLikes));
 }
 
 function getPhotoLikes(photo) {

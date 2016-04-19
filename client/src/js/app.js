@@ -2,7 +2,7 @@
 
 const $ = require('jquery');
 
-import {saveSnapshot} from './controller/snapshot';
+import {getSnapshot, saveSnapshot} from './controller/snapshot';
 import {getFeedsTo, getFeedsFrom} from './controller/feeds';
 
 import {getLastSeen, setLastSeen} from './model/model';
@@ -51,11 +51,11 @@ function updateNew() {
     display.feedNewUpdateVisible(false);
     display.feedNewProgressVisible(true);
 
-    return saveSnapshot().then(() => {
-        return getFeedsTo(fd.getPrev());
-    }).finally(() => {
-        display.feedNewProgressVisible(false);
-    }).then(({feeds}) => {
+    return getSnapshot().then(saveSnapshot).then(
+        () => getFeedsTo(fd.getPrev())
+    ).finally(
+        () => display.feedNewProgressVisible(false)
+    ).then(({feeds}) => {
         fd.addPrev(feeds);
         display.feedNewOpenCount(fd.countPrev());
         display.feedNewOpenVisible(fd.countPrev());

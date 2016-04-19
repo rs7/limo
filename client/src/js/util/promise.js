@@ -34,16 +34,3 @@ export class Deferred {
         });
     }
 }
-
-export class ProgressStepper {
-    constructor(progress, count) {
-        this.progress = progress;
-        this.total = count;
-        this.completed = 0;
-    }
-
-    complete(count = 1) {
-        this.completed += count;
-        this.progress(this.completed / this.total);
-    }
-}
