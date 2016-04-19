@@ -84,7 +84,7 @@ function processFeedsResponse(response) {
 }
 
 export function getLastSeen() {
-    return parseObjectId(apiResult);
+    return parseObjectId(apiResult.lastSeen);
 }
 
 export function setLastSeen(id) {

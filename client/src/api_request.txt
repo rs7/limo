@@ -1,1 +1,1 @@
-method=storage.get&key=lastSeen&format=json&v=5.50
+v=5.50&format=json&method=execute&code=return {lastSeen: API.storage.get({key:"lastSeen"})};
