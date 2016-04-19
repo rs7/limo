@@ -90,6 +90,16 @@ export function feedNewProgressVisible(value) {
     updateFrameSize();
 }
 
+export function feedNewSnapshotProgressTime(time) {
+    $('#feed_new_snapshot_progress_timer').html(templates.time(time));
+}
+
+export function feedNewSnapshotProgressVisible(value) {
+    visible($('#feed_new_snapshot_progress'), value);
+
+    updateFrameSize();
+}
+
 export function feedNewUpdateHandler(handler) {
     $('#feed_new_update').click(handler);
 }

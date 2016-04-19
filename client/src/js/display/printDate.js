@@ -1,5 +1,7 @@
 'use strict';
 
+import {leadZero} from './../util/util';
+
 export function printDate(date) {
     if (date >= fiveMinuteAgo()) {
         return 'только что';
@@ -76,4 +78,12 @@ function printFullDate(date, forceYear = false) {
     function fullDate() {
         return `${date.getDate()} ${monthName(date.getMonth())} ${date.getFullYear()}`;
     }
+}
+
+export function printTime(time) {
+    let milliseconds = time % 1000;
+    let seconds = Math.floor(time / 1000) % 60;
+    let minutes = Math.floor(time / 1000 / 60);
+
+    return `${minutes}:${leadZero(seconds, 2)}.${leadZero(milliseconds, 3)}`;
 }

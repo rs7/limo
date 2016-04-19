@@ -91,6 +91,14 @@ export function setLastSeen(id) {
     return execute(vk.storageSet('lastSeen', id.value));
 }
 
+export function getLastTime() {
+    return +apiResult.lastTime;
+}
+
+export function setLastTime(time) {
+    return execute(vk.storageSet('lastTime', time));
+}
+
 export function getFriends() {
     return execute(vk.getFriends());
 }

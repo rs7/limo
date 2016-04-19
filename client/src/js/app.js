@@ -5,7 +5,9 @@ const $ = require('jquery');
 import {getSnapshot, saveSnapshot} from './controller/snapshot';
 import {getFeedsTo, getFeedsFrom} from './controller/feeds';
 
-import {getLastSeen, setLastSeen} from './model/model';
+import {getLastSeen, setLastSeen, getLastTime, setLastTime} from './model/model';
+
+import {currentTime} from './util/datetime';
 
 import * as fd from './model/feed';
 import * as display from './display/display';
@@ -49,25 +51,47 @@ function updateNew() {
     console.rec({updateNew: 1});
 
     display.feedNewUpdateVisible(false);
-    display.feedNewProgressVisible(true);
 
-    return getSnapshot().then(saveSnapshot).then(
-        () => getFeedsTo(fd.getPrev())
-    ).finally(
-        () => display.feedNewProgressVisible(false)
-    ).then(({feeds}) => {
-        fd.addPrev(feeds);
-        display.feedNewOpenCount(fd.countPrev());
-        display.feedNewOpenVisible(fd.countPrev());
-        display.feedNewEmptyVisible(!fd.countPrev());
-
-        if (fd.isOnlyPrev()) {
-            return openNew();
-        }
+    return snapshot().then(time => {
+        return Promise.all([
+            setLastTime(time),
+            checkNew()
+        ]);
     }).catch(error => {
         display.feedNewUpdateVisible(true);
         throw error;
     }).catch(errorHandler);
+
+    function checkNew() {
+        display.feedNewProgressVisible(true);
+
+        return getFeedsTo(fd.getPrev()).finally(
+            () => display.feedNewProgressVisible(false)
+        ).then(({feeds}) => {
+            fd.addPrev(feeds);
+            display.feedNewOpenCount(fd.countPrev());
+            display.feedNewOpenVisible(fd.countPrev());
+            display.feedNewEmptyVisible(!fd.countPrev());
+
+            if (fd.isOnlyPrev()) {
+                return openNew();
+            }
+        });
+    }
+
+    function snapshot() {
+        let startTime = currentTime();
+
+        display.feedNewSnapshotProgressVisible(true);
+        display.feedNewSnapshotProgressTime(getLastTime());
+
+        return getSnapshot().then(saveSnapshot).then(() => {
+            let finishTime = currentTime();
+            return finishTime - startTime;
+        }).finally(
+            () => display.feedNewSnapshotProgressVisible(false)
+        );
+    }
 }
 
 function openNew() {

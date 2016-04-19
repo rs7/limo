@@ -1,7 +1,6 @@
 'use strict';
 
 import {concat} from './../util/array';
-import {ProgressStepper} from './../util/promise';
 
 export function aggregate(request, executor, from = 0, to = -1, limit = 0, progress = Function()) {
     if (limit == 0) {
