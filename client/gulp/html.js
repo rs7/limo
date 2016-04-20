@@ -4,10 +4,14 @@ const gulp = require('gulp');
 
 const batch = require('gulp-batch');
 const del = require('del');
+const gulpif = require('gulp-if');
+const htmlmin = require('gulp-htmlmin');
 const inject = require('gulp-inject');
 const rename = require('gulp-rename');
 const rigger = require('gulp-rigger');
 const watch = require('gulp-watch');
+
+const isProduction = process.env.NODE_ENV == 'production';
 
 let sourcePath = './src/html/index.html';
 let watchPath = './src/html/*.html';
@@ -25,6 +29,7 @@ function build() {
     return gulp
         .src(sourcePath)
         .pipe(rigger())
+        .pipe(gulpif(isProduction, htmlmin({collapseWhitespace: true})))
         .pipe(rename(outputFile))
         .pipe(gulp.dest(outputDir))
         .pipe(inject(
@@ -43,5 +48,6 @@ function clean() {
 }
 
 gulp.task('build-html', build);
+gulp.task('build:html:prod', build);
 gulp.task('watch-html', watching);
 gulp.task('clean-html', clean);

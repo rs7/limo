@@ -6,9 +6,14 @@ const babelify = require('babelify');
 const batch = require('gulp-batch');
 const browserify = require('browserify');
 const del = require('del');
+const gulpif = require('gulp-if');
 const plumber = require('gulp-plumber');
 const source = require('vinyl-source-stream');
+const streamify = require('gulp-streamify');
+const uglify = require('gulp-uglify');
 const watch = require('gulp-watch');
+
+const isProduction = process.env.NODE_ENV == 'production';
 
 let sourceDir = './src/js';
 let sourcePath = `${sourceDir}/app.js`;
@@ -22,6 +27,7 @@ function build() {
         .transform(babelify, {presets: ['es2015'], sourceMaps: true})
         .bundle()
         .pipe(source(outputFile))
+        .pipe(gulpif(isProduction, streamify(uglify())))
         .pipe(gulp.dest(outputDir))
     ;
 }

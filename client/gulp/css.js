@@ -2,8 +2,12 @@
 
 const gulp = require('gulp');
 
+const cssnano = require('gulp-cssnano');
 const del = require('del');
+const gulpif = require('gulp-if');
 const rename = require('gulp-rename');
+
+const isProduction = process.env.NODE_ENV == 'production';
 
 let source = './src/css/vk_override.css';
 let outputDir = './build';
@@ -13,6 +17,7 @@ export let outputPath = `${outputDir}/${outputFile}`;
 function build() {
     return gulp
         .src(source)
+        .pipe(gulpif(isProduction, cssnano()))
         .pipe(rename(outputFile))
         .pipe(gulp.dest(outputDir))
     ;

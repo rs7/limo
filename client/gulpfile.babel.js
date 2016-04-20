@@ -1,8 +1,12 @@
+'use strict';
+
 const gulp = require('gulp');
 
 const del = require('del');
 const runSequence = require('run-sequence');
 const requireDir = require('require-dir');
+
+//const isProduction = process.env.NODE_ENV == 'production';
 
 requireDir('./gulp');
 
@@ -46,9 +50,18 @@ function dev(callback) {
     );
 }
 
+function prod(callback) {
+    runSequence(
+        'cleanAll',
+        'build',
+        callback
+    );
+}
+
 gulp.task('cleanAll', cleanAll);
 
 gulp.task('build', build);
 gulp.task('watch', watch);
 gulp.task('clean', clean);
 gulp.task('dev', dev);
+gulp.task('prod', prod);
