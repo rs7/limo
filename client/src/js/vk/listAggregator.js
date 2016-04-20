@@ -2,48 +2,58 @@
 
 import {concat} from './../util/array';
 
-export function aggregate(request, executor, from = 0, to = -1, limit = 0, progress = Function()) {
-    if (limit == 0) {
+export function aggregate(request, executor, from, to, limit) {
+    if (!from) {
+        from = 0;
+    }
+
+    if (!limit) {
         limit = request.method.list.limit;
     }
 
-    if (to === -1) {
-        progress(-1);
-
-        return getList(request, executor, from, limit, limit).then(({count, items}) => {
-            to = count;
-
-            if (limit >= to) {
-                return {from, to, count, items};
-            }
-
-            from = limit;
-
-            let firstItems = items;
-
-            return getList(request, executor, from, to, limit).then(({items: otherItems}) => {
-                let items = [].concat(firstItems, otherItems);
-
-                return {from, to, count, items};
-            });
-        });
+    if (to) {
+        return getList(request, executor, from, to, limit);
     }
 
-    progress(0);
-
-    return getList(request, executor, from, to, limit);
+    return getListToEnd(request, executor, from, limit);
 }
 
-function getList(request, exec, from, to, limit, progress = Function()) {
+function getListToEnd(request, executor, from, limit) {
+    return getList(request, executor, from, limit, limit).then(
+        ({count, items}) => {
+            let to = count;
+
+            if (limit >= count) {
+                return result(items, count, from, to);
+            }
+
+            let items0 = items;
+
+            return getList(request, executor, limit, count, limit).then(
+                ({items: items1}) => {
+                    let items = concat(items0, items1);
+
+                    return result(items, count, from, to);
+                }
+            );
+        }
+    );
+}
+
+function getList(request, executor, from, to, limit) {
     let requests = getListParams(from, to, limit).map(params => populateRequest(request, params));
 
     return Promise.all(
-        requests.map(exec)
+        requests.map(executor)
     ).then(results => {
         let count = results.first().count;
         let items = concat(results.map(result => result.items));
-        return {from, to, count, items};
+        return result(items, count, from, to);
     });
+}
+
+function result(items, count, from, to) {
+    return {items, count, from, to};
 }
 
 function getListParams(from, to, limit) {
@@ -72,5 +82,5 @@ function populateRequest({method, params, options}, {count, offset}) {
         method,
         params: Object.assign({}, params, {count, offset}),
         options
-    }
+    };
 }
