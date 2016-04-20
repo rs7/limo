@@ -6,6 +6,7 @@ const templates = require('./../templates/templates');
 
 import {initHelpers} from './../templates/helpers';
 import {frameHeight} from './../vk/sdk';
+import {parseTimer} from './../util/datetime';
 
 $(document).ready(initHelpers);
 
@@ -90,8 +91,12 @@ export function feedNewProgressVisible(value) {
     updateFrameSize();
 }
 
-export function feedNewSnapshotProgressTime(time) {
-    $('#feed_new_snapshot_progress_timer').html(templates.time(time));
+export function feedNewSnapshotProgressTimerUpdate(time) {
+    let {sign, minutes, seconds} = parseTimer(time);
+    let timer = $('#feed_new_snapshot_progress').find('.timer');
+    timer.find('.sign').text(sign);
+    timer.find('.minutes').text(minutes);
+    timer.find('.seconds').text(seconds);
 }
 
 export function feedNewSnapshotProgressVisible(value) {

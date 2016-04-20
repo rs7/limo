@@ -44,9 +44,6 @@
     background: url(/images/feedback_color.png?1) no-repeat;
 }
 
-.duration {
-  display: inline-block;
-  color: #627a94;
-  font-size: 0.9em;
-  max-width: 40px;
+#feed_new_snapshot_progress .timer {
+
 }

@@ -79,11 +79,3 @@ function printFullDate(date, forceYear = false) {
         return `${date.getDate()} ${monthName(date.getMonth())} ${date.getFullYear()}`;
     }
 }
-
-export function printTime(time) {
-    let milliseconds = time % 1000;
-    let seconds = Math.floor(time / 1000) % 60;
-    let minutes = Math.floor(time / 1000 / 60);
-
-    return `${minutes}:${leadZero(seconds, 2)}.${leadZero(milliseconds, 3)}`;
-}

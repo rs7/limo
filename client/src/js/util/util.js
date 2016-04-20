@@ -106,8 +106,6 @@ export class Counter {
     }
 }
 
-export function leadZero(value, length) {
-    let number = String(value);
-    let lacked = Math.max(length - number.length, 0);
-    return `${'0'.repeat(lacked)}${number}`;
-}
+String.prototype.pad = function (value) {
+   return String(value + this).slice(-value.length);
+};

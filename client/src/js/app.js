@@ -7,7 +7,7 @@ import {getFeedsTo, getFeedsFrom} from './controller/feeds';
 
 import {getLastSeen, setLastSeen, getLastTime, setLastTime} from './model/model';
 
-import {currentTime} from './util/datetime';
+import {Timer, Duration} from './util/datetime';
 
 import * as fd from './model/feed';
 import * as display from './display/display';
@@ -80,16 +80,24 @@ function updateNew() {
     }
 
     function snapshot() {
-        let startTime = currentTime();
+        let timer = new Timer(-getLastTime(), Infinity, 1000);
+        timer.start(time => display.feedNewSnapshotProgressTimerUpdate(time));
 
         display.feedNewSnapshotProgressVisible(true);
-        display.feedNewSnapshotProgressTime(getLastTime());
 
-        return getSnapshot().then(saveSnapshot).then(() => {
-            let finishTime = currentTime();
-            return finishTime - startTime;
-        }).finally(
-            () => display.feedNewSnapshotProgressVisible(false)
+        let duration = new Duration();
+        duration.start();
+
+        return getSnapshot().then(saveSnapshot).then(
+            () => {
+                duration.stop();
+                return duration.get();
+            }
+        ).finally(
+            () => {
+                timer.stop();
+                display.feedNewSnapshotProgressVisible(false);
+            }
         );
     }
 }
