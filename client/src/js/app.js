@@ -53,6 +53,8 @@ function updateNew() {
     display.feedNewUpdateVisible(false);
 
     return snapshot().then(time => {
+        console.rec({time});
+
         return Promise.all([
             setLastTime(time),
             checkNew()
