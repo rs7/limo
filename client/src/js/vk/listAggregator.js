@@ -31,7 +31,7 @@ function getListToEnd(request, executor, from, limit) {
 
             return getList(request, executor, limit, count, limit).then(
                 ({items: items1}) => {
-                    let items = concat(items0, items1);
+                    let items = concat([items0, items1]);
 
                     return result(items, count, from, to);
                 }
