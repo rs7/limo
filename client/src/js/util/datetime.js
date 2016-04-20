@@ -13,7 +13,7 @@ export function currentTimestamp() {
 }
 
 export function parseTimer(time) {
-    let sign = time < 0 ? '-' : '';
+    let sign = time <= -1000 ? '-' : '';
     let seconds = String(Math.floor(Math.abs(time / 1000) % 60)).pad('00');
     let minutes = String(Math.floor(Math.abs(time / 1000 / 60)));
 
