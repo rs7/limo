@@ -1,5 +1,7 @@
 'use strict';
 
+const isProduction = process.env.NODE_ENV == 'production';
+
 export let mongoose = require('mongoose');
 
 export let ObjectId = mongoose.Types.ObjectId;
@@ -19,7 +21,7 @@ export function renameId(object) {
     return result;
 }
 
-mongoose.set('debug', true);
+mongoose.set('debug', !isProduction);
 
 mongoose.connect('mongodb://localhost/limo', {config: {autoIndex: true}});
 
