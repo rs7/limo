@@ -6,6 +6,8 @@ const requireDir = require('require-dir');
 
 requireDir('./gulp');
 
+require('events').EventEmitter.defaultMaxListeners = 0;
+
 let cleanDir = './build';
 
 function cleanAll() {
