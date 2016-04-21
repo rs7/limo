@@ -95,3 +95,15 @@ let recSchema = mongoose.Schema({
 });
 
 export let Rec = mongoose.model('Rec', recSchema);
+
+let subscriptionSchema = mongoose.Schema({
+    user: {type: Number, required: true},
+    activation: {type: Date, required: true},
+    expires: {type: Date, required: true},
+    basis: {}
+}, {
+    strict: 'throw',
+    id: false
+});
+
+export let Subscription = mongoose.model('Rec', recSchema);
