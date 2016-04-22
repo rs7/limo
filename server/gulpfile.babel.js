@@ -1,58 +1,54 @@
 'use strict';
 
-var gulp = require('gulp');
+const gulp = require('gulp');
 
-var babel = require('gulp-babel');
-var clean = require('gulp-clean');
-var eol = require('gulp-eol');
-var merge = require('gulp-merge-json');
+const babel = require('gulp-babel');
+const batch = require('gulp-batch');
+const del = require('del');
+const eol = require('gulp-eol');
+const merge = require('gulp-merge-json');
+const watch = require('gulp-watch');
 
-var PATH = {
-    js: {
-        source: './src/**/*.js',
-        build: {
-            dir: './build'
-        },
-        clean: './build/**/*.js'
-    },
-    config: {
-        source: './src/config.sample.json',
-        build: {
-            dir: './build',
-            file: 'config.json',
-            path: './build/config.json'
-        }
-    }
-};
+let source = './src/**/*.js';
+let outputDir = './build';
 
-gulp.task('js', function () {
-    return gulp.src(PATH.js.source)
+let configSource = './src/config.sample.json';
+let configOutputDir = './build';
+let configOutputFile = 'config.json';
+let configOutputPath = `${configOutputDir}/${configOutputFile}`;
+
+let cleanPath = [`${outputDir}/**`, `!${outputDir}`, `!${configOutputPath}`];
+
+function build() {
+    return gulp
+        .src(source)
         .pipe(babel({
             presets: ['es2015']
         }))
-        .pipe(gulp.dest(PATH.js.build.dir))
+        .pipe(gulp.dest(outputDir))
     ;
-});
+}
 
-gulp.task('watch', ['js'], function () {
-    return gulp.watch(PATH.js.source, ['js']);
-});
+function watching() {
+    watch(source, batch((events, done) => gulp.start('js', done)));
+}
 
-gulp.task('clean', function () {
-    return gulp.src(PATH.js.clean, {read: false}).pipe(clean());
-});
+function clean() {
+    return del(cleanPath);
+}
 
-gulp.task('config', function () {
-    return gulp.src([PATH.config.source, PATH.config.build.path])
+function config() {
+    return gulp.src([configSource, configOutputPath])
         .pipe(merge({
-            fileName: PATH.config.build.file,
-            jsonSpace: '  '
+            fileName: configOutputFile,
+            jsonSpace: ' '.repeat(2)
         }))
         .pipe(eol())
-        .pipe(gulp.dest(PATH.config.build.dir))
+        .pipe(gulp.dest(configOutputDir))
     ;
-});
+}
 
-gulp.task('build', ['js']);
-
-gulp.task('default', ['build']);
+gulp.task('build', build);
+gulp.task('watch', watching);
+gulp.task('clean', clean);
+gulp.task('config', config);
