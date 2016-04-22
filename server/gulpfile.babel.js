@@ -13,7 +13,7 @@ let source = './src/**/*.js';
 let outputDir = './build';
 
 let configSource = './src/config.sample.json';
-let configOutputDir = './build';
+let configOutputDir = './..';
 let configOutputFile = 'config.json';
 let configOutputPath = `${configOutputDir}/${configOutputFile}`;
 

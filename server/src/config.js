@@ -1,8 +1,13 @@
 'use strict';
 
 let nconf = require('nconf');
+let path = require('path');
 
-nconf.file({file: './build/config.json'});
+let configPath = path.join(__dirname, './../../config.json');
+
+console.log('Файл конфигурации:', configPath);
+
+nconf.file({file: configPath});
 
 export let appId = nconf.get('app:id');
 

@@ -1,15 +1,21 @@
 'use strict';
 
-let express = require('express');
+const express = require('express');
 
-let bodyParser = require('body-parser');
+const bodyParser = require('body-parser');
+const path = require('path');
 
 const expressValidator = require('express-validator');
+
 import {validators} from './validation';
 
 export let app = express();
 
-app.use(express.static('../client/build'));
+let staticPath = path.join(__dirname, './../../client/build');
+
+console.log('Клиентское приложение:', staticPath);
+
+app.use(express.static(staticPath));
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json({limit: '50mb'}));

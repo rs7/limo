@@ -1,6 +1,10 @@
-# IntelliJ
+# IntelliJ IDEA
 .idea
 *.iml
+
 # npm
 node_modules
 npm-debug.log
+
+# Файл конфигурации
+/config.json

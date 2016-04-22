@@ -1,12 +1,13 @@
 'use strict';
 
-let fs = require('fs');
+const fs = require('fs');
+const http = require('http');
+const https = require('https');
 
 import {pfx, listen as bind} from './config';
 import {app} from './express';
 
-let http = require('http');
-let https = require('https');
+console.log('Сертификат:', pfx.path);
 
 let httpsOptions = {
     pfx: fs.readFileSync(pfx.path),
