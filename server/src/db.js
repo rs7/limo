@@ -2,6 +2,8 @@
 
 const isProduction = process.env.NODE_ENV == 'production';
 
+import {db} from './config';
+
 export let mongoose = require('mongoose');
 
 export let ObjectId = mongoose.Types.ObjectId;
@@ -23,7 +25,11 @@ export function renameId(object) {
 
 mongoose.set('debug', !isProduction);
 
-mongoose.connect('mongodb://localhost/limo', {config: {autoIndex: true}});
+mongoose.connect(db.uri, {
+    user: db.user,
+    pass: db.pass,
+    config: {autoIndex: true}
+});
 
 let photosLikesSchema = mongoose.Schema({
     photo: {type: Number, required: true},

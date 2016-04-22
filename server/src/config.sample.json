@@ -10,5 +10,10 @@
   "listen": {
     "http": 80,
     "https": 443
+  },
+  "db": {
+    "uri": "mongodb://localhost/limo",
+    "user": "limo",
+    "pass": "password"
   }
 }

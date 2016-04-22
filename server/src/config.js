@@ -17,3 +17,9 @@ export let listen = {
     http: nconf.get('listen:http'),
     https: nconf.get('listen:https')
 };
+
+export let db = {
+    uri: nconf.get('db:uri'),
+    user: nconf.get('db:user'),
+    pass: nconf.get('db:pass')
+};
