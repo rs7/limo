@@ -3,6 +3,8 @@ const Handlebars = require('handlebars');
 import {numeralDeclension, escapeSecret} from './../util/util';
 import {printDate, printPeriod} from './../display/printDate';
 import {timestamp} from './../util/datetime';
+import {getText} from './../display/text';
+import {protocol} from './../params';
 
 export function initHelpers() {
     Handlebars.registerHelper('timestamp', date => timestamp(date));
@@ -30,4 +32,8 @@ export function initHelpers() {
     Handlebars.registerHelper('json', value => JSON.stringify(value, null, 2));
 
     Handlebars.registerHelper('escape', value => escapeSecret(value));
+
+    Handlebars.registerHelper('text', (key, data) => Handlebars.compile(getText(key))(data));
+
+    Handlebars.registerHelper('link', value => `${protocol}:${value}`);
 }

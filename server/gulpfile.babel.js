@@ -4,20 +4,19 @@ const gulp = require('gulp');
 
 const babel = require('gulp-babel');
 const batch = require('gulp-batch');
+const debug = require('gulp-debug');
 const del = require('del');
 const eol = require('gulp-eol');
 const merge = require('gulp-merge-json');
+const notify = require("gulp-notify");
+const plumber = require('gulp-plumber');
+const runSequence = require('run-sequence');
 const watch = require('gulp-watch');
 
 let source = './src/**/*.js';
 let outputDir = './build';
 
-let configSource = './src/config.sample.json';
-let configOutputDir = './..';
-let configOutputFile = 'config.json';
-let configOutputPath = `${configOutputDir}/${configOutputFile}`;
-
-let cleanPath = [`${outputDir}/**`, `!${outputDir}`, `!${configOutputPath}`];
+let cleanPath = [`${outputDir}/**`, `!${outputDir}`];
 
 function build() {
     return gulp
@@ -25,17 +24,38 @@ function build() {
         .pipe(babel({
             presets: ['es2015']
         }))
+        .pipe(plumber({errorHandler: notify.onError("Сервер: ошибка\n<%= error.message %>")}))
         .pipe(gulp.dest(outputDir))
+        .pipe(notify({message: "Сервер: собран", "onLast": true}))
     ;
 }
 
 function watching() {
-    watch(source, batch((events, done) => gulp.start('js', done)));
+    watch(source, batch((events, done) => gulp.start('build', done)));
 }
 
 function clean() {
     return del(cleanPath);
 }
+
+function dev(callback) {
+    runSequence(
+        'clean',
+        'build',
+        'watch',
+        callback
+    );
+}
+
+gulp.task('build', build);
+gulp.task('watch', watching);
+gulp.task('clean', clean);
+gulp.task('dev', dev);
+
+let configSource = './src/config.sample.json';
+let configOutputDir = './..';
+let configOutputFile = 'config.json';
+let configOutputPath = `${configOutputDir}/${configOutputFile}`;
 
 function config() {
     return gulp.src([configSource, configOutputPath])
@@ -48,7 +68,4 @@ function config() {
     ;
 }
 
-gulp.task('build', build);
-gulp.task('watch', watching);
-gulp.task('clean', clean);
 gulp.task('config', config);

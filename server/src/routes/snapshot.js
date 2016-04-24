@@ -6,6 +6,8 @@ export let router = express.Router();
 
 import {getUser, addFeeds} from './../model';
 
+import {UnfriendFeed, UnfollowFeed, UnlikePhotoFeed, UnlikePostFeed, InfoFeed} from './../db/models';
+
 router.post('/snapshot', function (req, res, next) {
     req.checkQuery('user', 'Недопустимый идентификатор пользователя').isUser();
 
@@ -34,7 +36,22 @@ router.post('/snapshot', function (req, res, next) {
     });
 
     getUser(user).then(user => {
-        let feeds = createFeeds(user.id, user.snapshot, snapshot);
+        let feeds = [];
+
+        /*if (user.isNew) {
+            feeds.push(new InfoFeed({
+                owner: user.id,
+                date: new Date(),
+                message: {
+                    key: 'test',
+                    data: {
+                        id: user.id
+                    }
+                }
+            }));
+        }*/
+
+        Array.prototype.push.apply(feeds, createFeeds(user.id, user.snapshot, snapshot));
 
         user.snapshot = snapshot;
 
@@ -61,12 +78,12 @@ function createFeeds(owner, from, to) {
     let unfriended = diff(from.friends, to.friends).removed.filter(user => to.followers.indexOf(user) == -1);
 
     unfriended.forEach(user =>
-        feeds.push({
+        feeds.push(new UnfriendFeed({
             type,
             owner,
             user,
             period
-        })
+        }))
     );
 
     type = 'unfollow';
@@ -74,12 +91,12 @@ function createFeeds(owner, from, to) {
     let unfollowed = diff(from.followers, to.followers).removed.filter(user => to.friends.indexOf(user) == -1);
 
     unfollowed.forEach(user =>
-        feeds.push({
+        feeds.push(new UnfollowFeed({
             type,
             owner,
             user,
             period
-        })
+        }))
     );
 
     type = 'unlike_photo';
@@ -96,13 +113,13 @@ function createFeeds(owner, from, to) {
         let unlikes = diff(fromLikes, toLikes).removed;
 
         unlikes.forEach(user =>
-            feeds.push({
+            feeds.push(new UnlikePhotoFeed({
                 type,
                 photo,
                 user,
                 period,
                 owner
-            })
+            }))
         );
     });
 
@@ -120,13 +137,13 @@ function createFeeds(owner, from, to) {
         let unlikes = diff(fromLikes, toLikes).removed;
 
         unlikes.forEach(user =>
-            feeds.push({
+            feeds.push(new UnlikePostFeed({
                 type,
                 post,
                 user,
                 period,
                 owner
-            })
+            }))
         );
     });
 

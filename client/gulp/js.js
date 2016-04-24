@@ -7,6 +7,7 @@ const batch = require('gulp-batch');
 const browserify = require('browserify');
 const del = require('del');
 const gulpif = require('gulp-if');
+const notify = require("gulp-notify");
 const plumber = require('gulp-plumber');
 const source = require('vinyl-source-stream');
 const streamify = require('gulp-streamify');
@@ -26,9 +27,11 @@ function build() {
     return browserify({entries: sourcePath, debug: true})
         .transform(babelify, {presets: ['es2015'], sourceMaps: true})
         .bundle()
+        .pipe(plumber({errorHandler: notify.onError("Клиент: ошибка\n<%= error.message %>")}))
         .pipe(source(outputFile))
         .pipe(gulpif(isProduction, streamify(uglify())))
         .pipe(gulp.dest(outputDir))
+        .pipe(notify({message: "Клиент: собран"}))
     ;
 }
 

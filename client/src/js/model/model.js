@@ -78,7 +78,8 @@ function processFeedsResponse(response) {
             period: {
                 from: parseDate,
                 to: parseDate
-            }
+            },
+            date: parseDate
         });
     }
 }

@@ -1,6 +1,7 @@
 'use strict';
 
-import {User, Feed, Rec, objectId, renameId} from './db';
+import {objectId, renameId} from './db';
+import {Feed, User, Rec} from './db/models';
 
 const pageSize = 10;
 
@@ -43,11 +44,9 @@ export function checkNewFeeds({user, to}) {
 }
 
 export function addFeeds(feeds) {
-    if (feeds.length == 0) {
-        return Promise.resolve();
-    }
-
-    return Feed.insertMany(feeds);
+    return Promise.all([
+        feeds.map(feed => feed.save())
+    ]);
 }
 
 export function getUser(user) {

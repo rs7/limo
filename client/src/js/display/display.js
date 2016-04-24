@@ -2,13 +2,20 @@
 
 const $ = require('jquery');
 
-const templates = require('./../templates/templates');
+import * as templates from './../templates/templates';
 
 import {initHelpers} from './../templates/helpers';
 import {frameHeight} from './../vk/sdk';
 import {parseTimer} from './../util/datetime';
+import {initText} from './text';
+import {user} from './../params';
 
-$(document).ready(initHelpers);
+$(document).ready(() => {
+    initHelpers();
+    initText();
+
+    $('#feed_empty').html(templates.feedEmpty({user}));
+});
 
 $(window).load(updateFrameSize);
 
@@ -23,7 +30,7 @@ function updateFrameSize() {
 //----------------------------------------
 
 export function showError(error) {
-    $('#feed_errors').append(templates['error'](error));
+    $('#feed_errors').append(templates.error(error));
 
     updateFrameSize();
 }
@@ -72,7 +79,7 @@ export function feedNewEmptyVisible(value) {
 }
 
 export function feedNewOpenCount(count) {
-    $('#feed_new_posts').html(templates['feed_new_posts']({count}));
+    $('#feed_new_posts').html(templates.feedNewPosts({count}));
 }
 
 export function feedNewOpenHandler(handler) {

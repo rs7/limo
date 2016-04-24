@@ -30,6 +30,7 @@ function init() {
         console.rec({empty: 1});
 
         display.feedEmptyVisible(fd.isEmpty());
+        display.feedNewEmptyVisible(!fd.isEmpty());
     });
 }
 

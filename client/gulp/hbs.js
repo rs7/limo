@@ -39,11 +39,21 @@ function build() {
         .src(source)
         .pipe(plumber())
         .pipe(gulpif(isProduction, htmlmin({collapseWhitespace: true})))
+        .pipe(through2.obj(
+            function (file, enc, cb) {
+                let match = /\{\{!(\w+)}}/.exec(String(file.contents));
+                if (match) {
+                    file.name = match[1];
+                }
+                this.push(file);
+                cb();
+            }
+        ))
         .pipe(handlebars({handlebars: HBS}))
         .pipe(through2.obj(
             function (file, enc, cb) {
                 templates.push({
-                    name: path.basename(file.path, '.js'),
+                    name: file.name || path.basename(file.path, '.js'),
                     code: String(file.contents)
                 });
                 cb();

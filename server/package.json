@@ -5,6 +5,7 @@
     "express-validator": "^2.20.2",
     "md5": "^2.0.0",
     "mongoose": "^4.4.3",
+    "mongoose-schema-extend": "^0.2.2",
     "nconf": "^0.8.4",
     "simple-array-diff": "^1.1.0"
   },
@@ -15,16 +16,20 @@
     "gulp": "^3.9.1",
     "gulp-babel": "^6.1.2",
     "gulp-batch": "^1.0.5",
+    "gulp-debug": "^2.1.2",
     "gulp-eol": "^0.1.1",
     "gulp-merge-json": "^0.4.0",
+    "gulp-notify": "^2.2.0",
+    "gulp-plumber": "^1.1.0",
     "gulp-watch": "^4.3.5",
     "nodemon": "^1.9.1",
-    "optimist": "^0.6.1"
+    "optimist": "^0.6.1",
+    "run-sequence": "^1.1.5"
   },
   "scripts": {
     "build": "gulp build",
-    "start": "nodemon ./build/index.js",
-    "watch": "gulp watch",
+    "dev": "gulp dev",
+    "start": "nodemon --harmony_proxies ./build/index.js",
     "tdata": "node ./build/test.js"
   },
   "babel": {
