@@ -82,7 +82,9 @@ export function getFollowers() {
 }
 
 export function getPosts() {
-    return create(API.wall.get);
+    return create(API.wall.get, {
+        filter: 'owner'
+    });
 }
 export function getPostsByList(posts) {
     return create(API.wall.getById, {
