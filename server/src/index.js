@@ -5,7 +5,7 @@ import {listen} from './server';
 import {authCheck, isString} from './util';
 import {app} from './express';
 
-import {feed, snapshot, rec} from './routes/index';
+import {routes} from './routes/index';
 
 app.use(function (req, res, next) {
     if (req.originalUrl === '/rec') {
@@ -40,17 +40,9 @@ app.use(function (req, res, next) {
     next({message: 'Не пройдена аутентификации'});
 });
 
-app.use(feed);
-app.use(snapshot);
-app.use(rec);
+routes(app);
 
 app.use(function (error, req, res, next) {
-    /*if (error instanceof Error) {
-        error = {
-            message: error.message
-        };
-    }*/
-
     if (isString(error)) {
         error = {
             message: error

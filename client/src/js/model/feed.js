@@ -16,10 +16,7 @@ let next;
 //----------------------------------------
 
 export function setLastSeen(value) {
-    lastSeen = value;
-
-    prev = lastSeen || ObjectId.now();
-    next = lastSeen || ObjectId.now();
+    prev = next = lastSeen = value;
 
     console.rec({lastSeen, prev, next});
 }

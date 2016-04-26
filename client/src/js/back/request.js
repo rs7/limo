@@ -15,3 +15,7 @@ export function getFeeds(from) {
 export function getNewFeeds(to) {
     return get('/feed/new', {user, to});
 }
+
+export function getTime() {
+    return get('/time');
+}

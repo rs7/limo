@@ -5,32 +5,37 @@ const $ = require('jquery');
 import {getSnapshot, saveSnapshot} from './controller/snapshot';
 import {getFeedsTo, getFeedsFrom} from './controller/feeds';
 
-import {getLastSeen, setLastSeen, getLastTime, setLastTime} from './model/model';
-
 import {Timer, Duration} from './util/datetime';
 
-import * as fd from './model/feed';
 import * as display from './display/display';
+import * as fd from './model/feed';
+import * as model from './model/model';
 
 $(window).load(init);
 
 function init() {
     console.rec({load: 1});
 
-    fd.setLastSeen(getLastSeen());
+    getLastSeen().then(lastSeen => {
+        fd.setLastSeen(lastSeen);
 
-    display.feedNewUpdateHandler(updateNew);
-    display.feedNewOpenHandler(openNew);
-    display.feedPageNextHandler(showNextPage);
+        display.feedNewUpdateHandler(updateNew);
+        display.feedNewOpenHandler(openNew);
+        display.feedPageNextHandler(showNextPage);
 
-    Promise.all([
-        showNextPage(),
-        updateNew()
-    ]).then(() => {
-        console.rec({empty: 1});
+        Promise.all([
+            showNextPage(),
+            updateNew()
+        ]).then(() => {
+            console.rec({empty: 1});
 
-        display.feedEmptyVisible(fd.isEmpty());
+            display.feedEmptyVisible(fd.isEmpty());
+        });
     });
+}
+
+function getLastSeen() {
+    return Promise.resolve(model.getLastSeen() || model.getNewLastSeen());
 }
 
 //----------------------------------------
@@ -52,11 +57,11 @@ function updateNew() {
 
     display.feedNewUpdateVisible(false);
 
-    return snapshot().then(time => {
-        console.rec({time});
+    return snapshot().then(duration => {
+        console.rec({duration});
 
         return Promise.all([
-            setLastTime(time),
+            model.setLastTime(duration),
             checkNew()
         ]);
     }).catch(error => {
@@ -82,7 +87,7 @@ function updateNew() {
     }
 
     function snapshot() {
-        let timer = new Timer(-getLastTime(), Infinity, 1000);
+        let timer = new Timer(-model.getLastTime(), Infinity, 1000);
         timer.start(time => display.feedNewSnapshotProgressTimerUpdate(time));
 
         display.feedNewSnapshotProgressVisible(true);
@@ -112,7 +117,7 @@ function openNew() {
     display.feedNewOpenCount(fd.countPrev());
     display.feedNewOpenVisible(fd.countPrev());
     display.feedAllShownVisible(!fd.getNext() && !fd.isEmpty());
-    return setLastSeen(fd.getLastSeen()).catch(errorHandler);
+    return setLastSeen().catch(errorHandler);
 }
 
 //----------------------------------------
@@ -135,4 +140,10 @@ function showNextPage() {
         display.feedPageNextVisible(true);
         throw error;
     }).catch(errorHandler);
+}
+
+//----------------------------------------
+
+function setLastSeen() {
+    return model.setLastSeen(fd.getLastSeen());
 }

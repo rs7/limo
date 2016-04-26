@@ -1,14 +1,14 @@
 'use strict';
 
-import {currentTimestamp} from './../util/datetime';
+import {timestamp} from './../util/datetime';
 
 export class ObjectId {
     static compare(a, b) {
         return a.date - b.date || a.machine - b.machine || a.process - b.process || a.counter - b.counter;
     }
 
-    static now() {
-        return new ObjectId(`${currentTimestamp().toString(16)}${'0'.repeat(16)}`);
+    static fromDate(date) {
+        return new ObjectId(`${timestamp(date).toString(16)}${'0'.repeat(16)}`);
     }
 
     static validate(value) {

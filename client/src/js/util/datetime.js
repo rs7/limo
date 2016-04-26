@@ -12,6 +12,10 @@ export function currentTimestamp() {
     return timestamp(new Date());
 }
 
+export function timestampToDate(timestamp) {
+    return new Date(timestamp * 1000);
+}
+
 export function parseTimer(time) {
     let sign = time <= -1000 ? '-' : '';
     let seconds = String(Math.floor(Math.abs(time / 1000) % 60)).pad('00');

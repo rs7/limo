@@ -4,6 +4,8 @@ import {user, apiResult} from './../params';
 
 import {parseDate, parseObjectId} from './../util/parse';
 import {processArray, processObject} from './../util/process';
+import {ObjectId} from './../util/objectId';
+import {timestampToDate} from './../util/datetime';
 import {execute} from './../vk/execute/autoExecutor';
 import {aggregate} from './../vk/listAggregator';
 
@@ -123,4 +125,8 @@ export function getPostsByList(posts) {
 function processPost(post) {
     let {id, owner_id} = post;
     return {id, owner_id};
+}
+
+export function getNewLastSeen() {
+    return remote.getTime().then(timestampToDate).then(date => ObjectId.fromDate(date));
 }

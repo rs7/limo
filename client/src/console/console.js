@@ -20,8 +20,9 @@ Object.assign(console, {
 
 let git = '{{git}}';
 let browser = browserInfo();
+let timestamp = Date.now() / 1000 ^ 0;
 
-let recRows = [{git}, {browser}];
+let recRows = [{git, browser, timestamp}];
 
 function send() {
     let xhr = new XMLHttpRequest();
