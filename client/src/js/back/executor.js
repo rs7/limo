@@ -16,7 +16,7 @@ export function get(endpoint, params) {
     return fetch({
         url: endpoint,
         data: query
-    }).then(jsonResultHandler).catch(xhrErrorHandler);
+    }).catch(xhrErrorHandler).then(jsonResultHandler);
 }
 
 export function post(endpoint, params, data) {
@@ -35,5 +35,5 @@ export function post(endpoint, params, data) {
         data: JSON.stringify(data),
         contentType: 'application/json; charset=utf-8',
         dataType: 'json'
-    }).then(jsonResultHandler).catch(xhrErrorHandler);
+    }).catch(xhrErrorHandler).then(jsonResultHandler);
 }
