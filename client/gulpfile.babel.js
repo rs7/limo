@@ -14,18 +14,18 @@ require('events').EventEmitter.defaultMaxListeners = 0;
 
 let cleanDir = './build';
 
-function cleanAll() {
+function cleanForce() {
     return del([`${cleanDir}/**`, `!${cleanDir}`]);
 }
 
-function clean() {
+function cleanAll() {
     runSequence(
         ['clean-css', 'clean-png', 'clean-console', 'clean-hbs', 'clean-js', 'clean-html'],
         callback
     );
 }
 
-function build(callback) {
+function buildAll(callback) {
     runSequence(
         ['build-css', 'build-png', 'build-console', 'build-hbs'],
         'build-js',
@@ -34,7 +34,7 @@ function build(callback) {
     );
 }
 
-function watch(callback) {
+function watchAll(callback) {
     runSequence(
         ['watch-css', 'watch-png', 'watch-console', 'watch-hbs', 'watch-js', 'watch-html'],
         callback
@@ -43,25 +43,24 @@ function watch(callback) {
 
 function dev(callback) {
     runSequence(
-        'cleanAll',
-        'build',
-        'watch',
+        'clean:all',
+        'build:all',
+        'watch:all',
         callback
     );
 }
 
-function prod(callback) {
+function buildClean(callback) {
     runSequence(
-        'cleanAll',
-        'build',
+        'clean:force',
+        'build:all',
         callback
     );
 }
 
-gulp.task('cleanAll', cleanAll);
-
-gulp.task('build', build);
-gulp.task('watch', watch);
-gulp.task('clean', clean);
+gulp.task('clean:force', cleanForce);
+gulp.task('build:all', buildAll);
+gulp.task('watch:all', watchAll);
+gulp.task('clean:all', cleanAll);
 gulp.task('dev', dev);
-gulp.task('prod', prod);
+gulp.task('build:clean', buildClean);

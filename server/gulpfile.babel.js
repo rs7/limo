@@ -47,7 +47,16 @@ function dev(callback) {
     );
 }
 
+function buildClean(callback) {
+    runSequence(
+        'clean',
+        'build',
+        callback
+    );
+}
+
 gulp.task('build', build);
+gulp.task('build:clean', buildClean);
 gulp.task('watch', watching);
 gulp.task('clean', clean);
 gulp.task('dev', dev);
