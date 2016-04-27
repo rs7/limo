@@ -18,7 +18,7 @@ function cleanForce() {
     return del([`${cleanDir}/**`, `!${cleanDir}`]);
 }
 
-function cleanAll() {
+function cleanAll(callback) {
     runSequence(
         ['clean-css', 'clean-png', 'clean-console', 'clean-hbs', 'clean-js', 'clean-html'],
         callback
