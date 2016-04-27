@@ -47,3 +47,7 @@
 #feed_new_snapshot_progress .timer {
 
 }
+
+#feed_empty {
+  padding: 30px 30px 0;
+}
