@@ -1,5 +1,7 @@
 'use strict';
 
+require('babel-polyfill');
+
 const browserInfo = require('browser-info');
 
 const log = console.log;

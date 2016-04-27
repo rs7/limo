@@ -24,8 +24,8 @@ let outputFile = 'script.js';
 export let outputPath = `${outputDir}/${outputFile}`;
 
 function build() {
-    return browserify({entries: sourcePath, debug: true})
-        .transform(babelify, {presets: ['es2015'], sourceMaps: true})
+    return browserify(sourcePath, {debug: !isProduction})
+        .transform(babelify, {presets: ['es2015'], sourceMaps: !isProduction})
         .bundle()
         .pipe(plumber({errorHandler: notify.onError("Клиент: ошибка\n<%= error.message %>")}))
         .pipe(source(outputFile))
