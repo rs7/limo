@@ -2,9 +2,7 @@
   "apps": [
     {
       "name": "limo",
-      "script": "./build/index.js",
-      "cwd": "./build",
-      "watch": false,
+      "script": "./server/build/index.js",
       "env": {
         "NODE_ENV": "development"
       },
@@ -13,7 +11,8 @@
       },
       "node_args": "--harmony_proxies",
       "max_restarts": 10,
-      "restart_delay": 3000
+      "min_uptime": 3000,
+      "restart_delay": 10000
     }
   ]
 }
