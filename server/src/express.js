@@ -15,11 +15,7 @@ let staticPath = path.join(__dirname, './../../client/build');
 
 console.log('Клиентское приложение:', staticPath);
 
-app.use(express.static(staticPath, {
-    setHeaders: res => {
-        res.setHeader('X-XSS-Protection', '0');
-    }
-}));
+app.use(express.static(staticPath));
 
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(bodyParser.json({limit: '50mb'}));

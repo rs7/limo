@@ -54,6 +54,7 @@ export function getUsers(users, fields, nameCase) {
         fields: fields.join(),
         name_case: nameCase
     }, {
+        https: 1,
         lang: 1
     });
 }
