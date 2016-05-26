@@ -8,7 +8,7 @@ import {app} from './express';
 import {routes} from './routes/index';
 
 app.use(function (req, res, next) {
-    if (req.originalUrl === '/rec') {
+    if (['/rec', '/rtrg.jpg'].indexOf(req.originalUrl) != -1) {
         return next();
     }
 
@@ -26,7 +26,7 @@ app.use(function (req, res, next) {
 });
 
 app.use(function (req, res, next) {
-    if (req.originalUrl === '/rec') {
+    if (['/rec', '/rtrg.jpg'].indexOf(req.originalUrl) != -1) {
         return next();
     }
 
